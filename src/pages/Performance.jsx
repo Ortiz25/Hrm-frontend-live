@@ -14,7 +14,13 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../components/ui/tabs.jsx";
-import { LayoutDashboard, TrendingUp, Search, Menu } from "lucide-react";
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Search,
+  Menu,
+  RefreshCcw,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -239,6 +245,12 @@ const Perfomance = () => {
                   <TabsTrigger value="evaluations">Evaluations</TabsTrigger>
                   <TabsTrigger value="results">Results</TabsTrigger>
                 </TabsList>
+                <RefreshCcw
+                  className="inline-block mr-4 mt-2 float-right hover:cursor-pointer"
+                  onClick={() => {
+                    setSelectedEmployee(null);
+                  }}
+                />
                 <TabsContent value="overview">
                   <div className="grid grid-cols-2 gap-4 ">
                     <div className="col-span-2">

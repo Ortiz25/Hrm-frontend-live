@@ -187,29 +187,29 @@ const EmployeeDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-100 rounded-lg">
+                  <div className="text-center p-4 bg-blue-100 hover:bg-blue-200 rounded-lg">
                     <h4 className="font-semibold">Annual Leave</h4>
                     <p className="text-2xl font-bold">
                       {employeeData.leaveBalance.annual} days
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-green-100 rounded-lg">
+                  <div className="text-center p-4 bg-green-100 hover:bg-green-200 rounded-lg">
                     <h4 className="font-semibold">Sick Leave</h4>
                     <p className="text-2xl font-bold">
                       {employeeData.leaveBalance.sick} days
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-yellow-100 rounded-lg">
+                  <div className="text-center p-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg">
                     <h4 className="font-semibold">Personal Leave</h4>
                     <p className="text-2xl font-bold">10 days</p>
                   </div>
-                  <div className="text-center p-4 bg-teal-100 rounded-lg">
+                  <div className="text-center p-4 bg-teal-100 hover:bg-teal-200 rounded-lg">
                     <h4 className="font-semibold">Paternity Leave</h4>
                     <p className="text-2xl font-bold">
                       {employeeData.leaveBalance.personal} days
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-lime-100 rounded-lg">
+                  <div className="text-center p-4 bg-lime-100 hover:bg-lime-200 rounded-lg">
                     <h4 className="font-semibold">Maternity Leave</h4>
                     <p className="text-2xl font-bold">
                       {employeeData.leaveBalance.personal} days
