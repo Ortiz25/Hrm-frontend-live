@@ -38,7 +38,7 @@ const HolidayCalendar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    changeModule("Dashboard");
+    changeModule("Holidays Calender");
   }, []);
 
   // Fetch holidays from API and combine with Kenya holidays
@@ -101,7 +101,7 @@ const HolidayCalendar = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {months.map((month) => (
           <div key={month} className="border p-4 rounded shadow">
-            <h3 className="text-lg font-bold mb-2">{month}</h3>
+            <h3 className="text-2xl font-bold mb-2">{month}</h3>
             {events
               .filter(
                 (event) =>
@@ -163,7 +163,9 @@ const HolidayCalendar = () => {
 
           {isHRM && (
             <div className="mt-6 p-4 border rounded shadow-lg w-2/4">
-              <h2 className="text-xl font-semibold mb-4">Add Holiday</h2>
+              <h2 className="text-2xl font-bold mb-4 text-center">
+                Add Holiday
+              </h2>
               <div className="flex flex-col space-y-4">
                 <div>
                   <label className="block mb-2 font-medium">Holiday Name</label>

@@ -206,7 +206,10 @@ const LeaveManagementModule = () => {
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu />
           </Button>
-          <NavLink to="/calender" className="w-48 ">
+          <NavLink
+            to="/calender"
+            className=" border p-2  rounded shadow-lg hover:bg-slate-200"
+          >
             <span className="font-semibold text-lg mr-2">Holidays</span>
             <Calendar className="inline" />
           </NavLink>
@@ -279,7 +282,7 @@ const LeaveManagementModule = () => {
                     <Input
                       type="text"
                       name="employeeId"
-                      value={newLeave.employeeName}
+                      value={newLeave.employeeId}
                       onChange={handleInputChange}
                       placeholder="Enter employee No/ID"
                       required
@@ -301,7 +304,7 @@ const LeaveManagementModule = () => {
                     <Input
                       type="text"
                       name="employeeDepartment"
-                      value={newLeave.employeeName}
+                      value={newLeave.employeeDepartment}
                       onChange={handleInputChange}
                       placeholder="Enter employee Department"
                       required
@@ -349,7 +352,7 @@ const LeaveManagementModule = () => {
                     <Input
                       type="number"
                       name="days"
-                      value={newLeave.endDate}
+                      value={newLeave.days}
                       onChange={handleInputChange}
                       placeholder="Enter Number of Days Taken"
                       required
