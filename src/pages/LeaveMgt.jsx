@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu, Calendar } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,6 +12,33 @@ import { Label } from "../components/ui/label.jsx";
 import { useStore } from "../store/store.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { Dialog } from "@headlessui/react";
+import { NavLink } from "react-router-dom";
+
+// Sample data for leave balances per employee
+const initialEmployeeLeaveData = [
+  {
+    employeeName: "John Doe",
+    employeeId: "NR/055",
+    leaveBalances: {
+      Annual: 10,
+      Sick: 5,
+      Paternal: 2,
+      Maternal: 0,
+      Personal: 3,
+    },
+  },
+  {
+    employeeName: "Jane Smith",
+    employeeId: "NR/012",
+    leaveBalances: {
+      Annual: 8,
+      Sick: 7,
+      Paternal: 0,
+      Maternal: 2,
+      Personal: 5,
+    },
+  },
+];
 
 // Sample data for leave entries
 const initialLeaveData = [
@@ -55,12 +82,21 @@ const LeaveManagementModule = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [leaveData, setLeaveData] = useState(initialLeaveData);
+  const [employeeLeaveData, setEmployeeLeaveData] = useState(
+    initialEmployeeLeaveData
+  );
   const [newLeave, setNewLeave] = useState({
     employeeName: "",
     leaveType: "",
     startDate: "",
     endDate: "",
     status: "Pending",
+  });
+  const [leaveAdjustment, setLeaveAdjustment] = useState({
+    employeeName: "",
+    employeeId: "",
+    leaveType: "",
+    days: 0,
   });
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,6 +110,11 @@ const LeaveManagementModule = () => {
     setNewLeave((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAdjustmentChange = (e) => {
+    const { name, value } = e.target;
+    setLeaveAdjustment((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const id = leaveData.length + 1;
@@ -85,9 +126,11 @@ const LeaveManagementModule = () => {
     setNewLeave({
       employeeName: "",
       employeeId: "",
+      employeeDepartment: "",
       leaveType: "",
       startDate: "",
       endDate: "",
+      days: 0,
       status: "Pending",
     });
   };
@@ -120,6 +163,29 @@ const LeaveManagementModule = () => {
     setSelectedLeave(null);
   };
 
+  const handleLeaveAdjustment = () => {
+    const { employeeName, leaveType, days } = leaveAdjustment;
+    setEmployeeLeaveData((prevData) =>
+      prevData.map((employee) =>
+        employee.employeeName === employeeName
+          ? {
+              ...employee,
+              leaveBalances: {
+                ...employee.leaveBalances,
+                [leaveType]:
+                  (employee.leaveBalances[leaveType] || 0) + Number(days),
+              },
+            }
+          : employee
+      )
+    );
+    setLeaveAdjustment({
+      employeeName: "",
+      leaveType: "",
+      days: 0,
+    });
+  };
+
   const filteredLeaveData = leaveData.filter(
     (entry) =>
       entry.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -140,12 +206,17 @@ const LeaveManagementModule = () => {
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu />
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <NavLink to="/calender" className="w-48 ">
+            <span className="font-semibold text-lg mr-2">Holidays</span>
+            <Calendar className="inline" />
+          </NavLink>
+
+          <h1 className="text-2xl font-bold">{activeModule}</h1>
         </div>
         <div className="p-4 space-y-6">
           <Card className="shadow-2xl">
             <CardHeader>
-              <CardTitle className="text-2xl">Leave Management</CardTitle>
+              <CardTitle className="text-xl">Manage Requests</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="mb-4">
@@ -198,127 +269,263 @@ const LeaveManagementModule = () => {
 
           <Card className="shadow-2xl">
             <CardHeader>
-              <CardTitle className="text-2xl">Request Leave</CardTitle>
+              <CardTitle className="text-xl">Request Leave</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="employeeName">Employee Name</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Employee No/ID</Label>
                     <Input
-                      id="employeeName"
+                      type="text"
+                      name="employeeId"
+                      value={newLeave.employeeName}
+                      onChange={handleInputChange}
+                      placeholder="Enter employee No/ID"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Employee Name</Label>
+                    <Input
+                      type="text"
                       name="employeeName"
                       value={newLeave.employeeName}
                       onChange={handleInputChange}
+                      placeholder="Enter employee name"
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="employeeId">Employee ID</Label>
+                  <div>
+                    <Label>Employee Department</Label>
                     <Input
-                      id="employeeId"
-                      name="employeeId"
-                      value={newLeave.employeeId}
+                      type="text"
+                      name="employeeDepartment"
+                      value={newLeave.employeeName}
                       onChange={handleInputChange}
+                      placeholder="Enter employee Department"
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="leaveType">Leave Type</Label>
+                  <div>
+                    <Label>Leave Type</Label>
                     <select
-                      id="leaveType"
                       name="leaveType"
-                      className="border-4 rounded-md p-2 w-full"
                       value={newLeave.leaveType}
                       onChange={handleInputChange}
+                      className="border p-2 w-full"
                       required
                     >
-                      <option value="">Select Leave Type</option>
+                      <option value="">Select leave type</option>
                       <option value="Annual">Annual</option>
                       <option value="Sick">Sick</option>
+                      <option value="Paternal">Paternal</option>
+                      <option value="Maternal">Maternal</option>
                       <option value="Personal">Personal</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="startDate">Start Date</Label>
+                  <div>
+                    <Label>Start Date</Label>
                     <Input
-                      id="startDate"
-                      name="startDate"
                       type="date"
+                      name="startDate"
                       value={newLeave.startDate}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="endDate">End Date</Label>
+                  <div>
+                    <Label>End Date</Label>
                     <Input
-                      id="endDate"
-                      name="endDate"
                       type="date"
+                      name="endDate"
                       value={newLeave.endDate}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
+                  <div>
+                    <Label>No. of Days</Label>
+                    <Input
+                      type="number"
+                      name="days"
+                      value={newLeave.endDate}
+                      onChange={handleInputChange}
+                      placeholder="Enter Number of Days Taken"
+                      required
+                    />
+                  </div>
                 </div>
-                <Button type="submit">Submit Leave Request</Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  Request Leave
+                </Button>
               </form>
             </CardContent>
           </Card>
-        </div>
-      </div>
 
-      {/* Modal for leave action */}
-      <Dialog open={isModalOpen} onClose={handleCloseModal}>
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="max-w-sm bg-white p-6 rounded">
-            <Dialog.Title className="text-xl border-b-2 border-slate-600 font-bold mb-4">
-              Leave Details
-            </Dialog.Title>
-            {selectedLeave && (
-              <div>
-                <p>
-                  <strong>Employee Name:</strong> {selectedLeave.employeeName}
-                </p>
-                <p>
-                  <strong>Leave Type:</strong> {selectedLeave.leaveType}
-                </p>
-                <p>
-                  <strong>Start Date:</strong> {selectedLeave.startDate}
-                </p>
-                <p>
-                  <strong>End Date:</strong> {selectedLeave.endDate}
-                </p>
-                <p>
-                  <strong>Status:</strong> {selectedLeave.status}
-                </p>
-                <div className="mt-4 flex justify-end space-x-2">
+          <Card className="shadow-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl">Adjust Leave Balance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>Employee Name</Label>
+                    <Input
+                      type="text"
+                      name="employeeName"
+                      value={leaveAdjustment.employeeName}
+                      onChange={handleAdjustmentChange}
+                      placeholder="Enter employee name"
+                    />
+                  </div>
+                  <div>
+                    <Label>Employee ID</Label>
+                    <Input
+                      type="text"
+                      name="employeeName"
+                      value={leaveAdjustment.employeeId}
+                      onChange={handleAdjustmentChange}
+                      placeholder="Enter employee name"
+                    />
+                  </div>
+                  <div>
+                    <Label>Leave Type</Label>
+                    <select
+                      name="leaveType"
+                      value={leaveAdjustment.leaveType}
+                      onChange={handleAdjustmentChange}
+                      className="border p-2 w-full"
+                    >
+                      <option value="">Select leave type</option>
+                      <option value="Annual">Annual</option>
+                      <option value="Sick">Sick</option>
+                      <option value="Paternal">Paternal</option>
+                      <option value="Maternal">Maternal</option>
+                      <option value="Personal">Personal</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label>Days</Label>
+                    <Input
+                      type="number"
+                      name="days"
+                      value={leaveAdjustment.days}
+                      onChange={handleAdjustmentChange}
+                      placeholder="Enter days"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={handleLeaveAdjustment}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+                >
+                  Adjust Leave
+                </Button>
+              </div>
+              <div className="mt-4">
+                <h3 className="font-bold mb-2">Employee Leave Balances</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border p-2 text-left">Employee Name</th>
+                        <th className="border p-2 text-left">Employee Id</th>
+                        <th className="border p-2 text-left">Annual</th>
+                        <th className="border p-2 text-left">Sick</th>
+                        <th className="border p-2 text-left">Paternal</th>
+                        <th className="border p-2 text-left">Maternal</th>
+                        <th className="border p-2 text-left">Personal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {employeeLeaveData.map((employee) => (
+                        <tr
+                          key={employee.employeeName}
+                          className="hover:bg-gray-50"
+                        >
+                          <td className="border p-2">
+                            {employee.employeeName}
+                          </td>
+                          <td className="border p-2">{employee.employeeId}</td>
+                          <td className="border p-2">
+                            {employee.leaveBalances.Annual}
+                          </td>
+                          <td className="border p-2">
+                            {employee.leaveBalances.Sick}
+                          </td>
+                          <td className="border p-2">
+                            {employee.leaveBalances.Paternal}
+                          </td>
+                          <td className="border p-2">
+                            {employee.leaveBalances.Maternal}
+                          </td>
+                          <td className="border p-2">
+                            {employee.leaveBalances.Personal}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {isModalOpen && selectedLeave && (
+          <Dialog open={isModalOpen} onClose={handleCloseModal}>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <Dialog.Title className="text-lg font-bold">
+                  Leave Details
+                </Dialog.Title>
+                <div className="mt-4">
+                  <p>
+                    <strong>Employee Name:</strong> {selectedLeave.employeeName}
+                  </p>
+                  <p>
+                    <strong>Leave Type:</strong> {selectedLeave.leaveType}
+                  </p>
+                  <p>
+                    <strong>Start Date:</strong> {selectedLeave.startDate}
+                  </p>
+                  <p>
+                    <strong>End Date:</strong> {selectedLeave.endDate}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {selectedLeave.status}
+                  </p>
+                </div>
+                <div className="mt-6 flex space-x-2">
                   <Button
-                    className="bg-green-500 hover:bg-green-600 text-white"
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
                     onClick={() => handleApprove(selectedLeave.id)}
                   >
                     Approve
                   </Button>
                   <Button
-                    className="bg-red-500 hover:bg-red-600 text-white"
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
                     onClick={() => handleReject(selectedLeave.id)}
                   >
                     Reject
                   </Button>
-                  <button
-                    className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+                  <Button
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
                     onClick={handleCloseModal}
                   >
                     Close
-                  </button>
+                  </Button>
                 </div>
               </div>
-            )}
-          </Dialog.Panel>
-        </div>
-      </Dialog>
+            </div>
+          </Dialog>
+        )}
+      </div>
     </div>
   );
 };

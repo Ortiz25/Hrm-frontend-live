@@ -13,6 +13,7 @@ import HRDocumentModule from "./pages/Hrdocuments.jsx";
 import ProfilePage from "./pages/profilePage.jsx";
 import EmployeeDashboard from "./pages/EmployeeDash.jsx";
 import Perfomance from "./pages/Performance.jsx";
+import HolidayCalendar from "./pages/HolidayCalender.jsx";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
   {
     path: "/onboarding",
     element: <Onboarding />,
+  },
+  {
+    path: "/calender",
+    element: <HolidayCalendar />,
   },
   {
     path: "/perfomance",
