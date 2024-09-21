@@ -183,7 +183,7 @@ const EmployeeDashboard = () => {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Leave Balance</CardTitle>
+                <CardTitle>Leave Balances</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
@@ -201,6 +201,16 @@ const EmployeeDashboard = () => {
                   </div>
                   <div className="text-center p-4 bg-yellow-100 rounded-lg">
                     <h4 className="font-semibold">Personal Leave</h4>
+                    <p className="text-2xl font-bold">10 days</p>
+                  </div>
+                  <div className="text-center p-4 bg-teal-100 rounded-lg">
+                    <h4 className="font-semibold">Paternity Leave</h4>
+                    <p className="text-2xl font-bold">
+                      {employeeData.leaveBalance.personal} days
+                    </p>
+                  </div>
+                  <div className="text-center p-4 bg-lime-100 rounded-lg">
+                    <h4 className="font-semibold">Maternity Leave</h4>
                     <p className="text-2xl font-bold">
                       {employeeData.leaveBalance.personal} days
                     </p>

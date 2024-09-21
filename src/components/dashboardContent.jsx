@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card.jsx";
+import PerformanceOverview from "./ui/perOverview.jsx";
 
 const mockData = [
   {
@@ -152,6 +153,7 @@ const DashboardContent = () => (
           </ResponsiveContainer>
         </CardContent>
       </Card>
+      <PerformanceOverview />
     </div>
   </div>
 );

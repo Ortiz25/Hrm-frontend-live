@@ -12,6 +12,7 @@ import Onboarding from "./pages/Onboarding.jsx";
 import HRDocumentModule from "./pages/Hrdocuments.jsx";
 import ProfilePage from "./pages/profilePage.jsx";
 import EmployeeDashboard from "./pages/EmployeeDash.jsx";
+import Perfomance from "./pages/Performance.jsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
   {
     path: "/onboarding",
     element: <Onboarding />,
+  },
+  {
+    path: "/perfomance",
+    element: <Perfomance />,
   },
   {
     path: "/hrdocs",
