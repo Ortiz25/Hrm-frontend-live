@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "../components/ui/card.jsx";
 import { Button } from "../components/ui/button.jsx";
+import { Input } from "../components/ui/input.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { useStore } from "../store/store";
 
@@ -74,7 +75,7 @@ const ProfilePage = () => {
 
         <Card className="w-full max-w-full md:max-w-6xl mx-auto m-6 shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl md:text-4xl font-bold mb-4">
+            <CardTitle className="text-xl md:text-3xl font-bold mb-4 text-center">
               User Profile
             </CardTitle>
           </CardHeader>
@@ -82,17 +83,19 @@ const ProfilePage = () => {
             <div className="space-y-4 m-4">
               {/* Name Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <User className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">Name:</span>
+                <User className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl text-gray-500 ">
+                  Name:
+                </span>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="text"
                     value={user.name}
                     onChange={(e) => setUser({ ...user, name: e.target.value })}
                     className="ml-0 sm:ml-4 p-1 pl-6 border rounded"
                   />
                 ) : (
-                  <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                  <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                     {user.name}
                   </span>
                 )}
@@ -100,23 +103,23 @@ const ProfilePage = () => {
 
               {/* Email Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <Mail className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">
+                <Mail className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl  text-gray-500">
                   Email:
                 </span>
-                <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                   {user.email}
                 </span>
               </div>
 
               {/* Phone Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <Phone className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">
+                <Phone className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl  text-gray-500">
                   Phone:
                 </span>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="tel"
                     value={user.phone}
                     onChange={(e) =>
@@ -125,7 +128,7 @@ const ProfilePage = () => {
                     className="ml-0 sm:ml-4 p-1 pl-6 border rounded"
                   />
                 ) : (
-                  <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                  <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                     {user.phone}
                   </span>
                 )}
@@ -133,45 +136,45 @@ const ProfilePage = () => {
 
               {/* Position Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <Network className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">
+                <Network className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl  text-gray-500">
                   Position:
                 </span>
-                <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                   {user.position}
                 </span>
               </div>
 
               {/* Department Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <Briefcase className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">
+                <Briefcase className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl  text-gray-500 ">
                   Department:
                 </span>
-                <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                   {user.department}
                 </span>
               </div>
 
               {/* Join Date Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <Calendar className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">
+                <Calendar className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl  text-gray-500">
                   Join Date:
                 </span>
-                <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                   {user.joinDate}
                 </span>
               </div>
 
               {/* Location Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <MapPin className="mr-4 md:mr-6 size-14" />
-                <span className="font-semibold text-xl md:text-2xl">
+                <MapPin className="mr-4 md:mr-6 size-8" />
+                <span className="font-semibold text-xl md:text-2xl  text-gray-500">
                   Location:
                 </span>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="text"
                     value={user.location}
                     onChange={(e) =>
@@ -180,7 +183,7 @@ const ProfilePage = () => {
                     className="ml-0 sm:ml-4 p-1 pl-6 border rounded"
                   />
                 ) : (
-                  <span className="ml-0 sm:ml-4 text-xl md:text-2xl">
+                  <span className="ml-0 sm:ml-4 text-xl md:text-2xl font-semibold ">
                     {user.location}
                   </span>
                 )}

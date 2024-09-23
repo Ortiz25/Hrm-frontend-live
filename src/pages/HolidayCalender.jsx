@@ -145,7 +145,7 @@ const HolidayCalendar = () => {
         </div>
 
         <div className="flex flex-col items-center p-4 shadow-lg">
-          <h1 className="text-2xl font-bold mb-4">Holiday Calendar</h1>
+          <h1 className="text-3xl font-bold mb-4">Holiday Calendar</h1>
           <Calendar
             localizer={localizer}
             events={holidays}
@@ -159,10 +159,11 @@ const HolidayCalendar = () => {
               agenda: true,
             }}
             defaultView={Views.MONTH}
+            className="border shadow-2xl rounded"
           />
 
           {isHRM && (
-            <div className="mt-6 p-4 border rounded shadow-lg w-2/4">
+            <div className="mt-10 mb-5 p-4 border rounded shadow-lg w-2/4">
               <h2 className="text-2xl font-bold mb-4 text-center">
                 Add Holiday
               </h2>

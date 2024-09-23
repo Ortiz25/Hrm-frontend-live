@@ -11,6 +11,7 @@ import {
   CalendarDays,
   FileText,
   User,
+  Calendar,
   Clock,
   Target,
   Award,
@@ -302,6 +303,11 @@ const EmployeeDashboard = () => {
                 <User className="mr-2 h-4 w-4" />
 
                 <Link to="/profile">Update Profile</Link>
+              </Button>
+              <Button>
+                <Calendar className="mr-2 h-4 w-4" />
+
+                <Link to="/calender">Holidays Calendar</Link>
               </Button>
             </div>
           </div>
