@@ -13,6 +13,7 @@ import {
   UserCircle,
   Logs,
   TrendingUp,
+  UserCheck,
 } from "lucide-react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import "./tooltip.css";
@@ -29,6 +30,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
       route: "employeedashboard",
     },
     { name: "Payroll", icon: DollarSign, route: "payroll" },
+    { name: "Attendance", icon: UserCheck, route: "attendance" },
     { name: "Leave Management", icon: Calendar, route: "leave" },
     { name: "Disciplinary Management", icon: Scale, route: "disciplinary" },
     { name: "Staff Requisition", icon: UserPlus, route: "staff" },

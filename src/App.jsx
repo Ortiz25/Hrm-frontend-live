@@ -14,6 +14,7 @@ import ProfilePage from "./pages/profilePage.jsx";
 import EmployeeDashboard from "./pages/EmployeeDash.jsx";
 import Perfomance from "./pages/Performance.jsx";
 import HolidayCalendar from "./pages/HolidayCalender.jsx";
+import HRMSAttendanceModule from "./pages/Attendance.jsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: "/disciplinary",
     element: <DisciplinaryModule />,
+  },
+  {
+    path: "/attendance",
+    element: <HRMSAttendanceModule />,
   },
   {
     path: "/admin",
