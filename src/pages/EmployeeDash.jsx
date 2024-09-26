@@ -33,6 +33,7 @@ import { useStore } from "../store/store.jsx";
 import { Link } from "react-router-dom";
 import { generatePayslipPDF } from "../util/generatePdf.jsx";
 import LeaveStatusCard from "../components/leaveStatus.jsx";
+import DisciplinarySummaryCard from "../components/displinarySum.jsx";
 
 const employeeData = {
   name: "Alice Smith",
@@ -222,6 +223,7 @@ const EmployeeDashboard = () => {
             </Card>
 
             <LeaveStatusCard />
+            <DisciplinarySummaryCard />
 
             <Card>
               <CardHeader>
