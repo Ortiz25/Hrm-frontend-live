@@ -11,7 +11,7 @@ const WarningPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    changeModule("Dashboard");
+    changeModule("Warnings");
   }, []);
 
   return (

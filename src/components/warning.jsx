@@ -115,7 +115,7 @@ const WarningModule = () => {
               <option value="">Select Warning Type</option>
               {warningTypes.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.name}
+                  {type.name} expires in {type.expiryDays} Days
                 </option>
               ))}
             </select>
