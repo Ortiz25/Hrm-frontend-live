@@ -42,7 +42,7 @@ const WarningModule = () => {
         return expiryDate > currentDate;
       })
     );
-  }, [warnings, warningTypes]);
+  }, [warningTypes]);
 
   const handleNewWarning = () => {
     if (
@@ -59,6 +59,7 @@ const WarningModule = () => {
         date: "",
         attachments: [],
       });
+      console.log(warnings);
     } else {
       alert("Please fill in all fields");
     }

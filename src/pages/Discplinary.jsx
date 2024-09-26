@@ -130,7 +130,7 @@ const DisciplinaryModule = () => {
             to="/warnings"
             className=" border p-2  rounded shadow-lg hover:bg-slate-200"
           >
-            <TriangleAlert className="inline mr-2" />
+            <TriangleAlert className="inline mr-2 text-red-500" />
             <span className="font-semibold text-lg ">Warnings</span>
           </NavLink>
 
