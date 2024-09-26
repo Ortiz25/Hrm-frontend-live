@@ -129,9 +129,7 @@ const HRMSAttendanceModule = () => {
           <h1 className="text-xl font-bold">{activeModule}</h1>
         </div>
         <div className="p-4">
-          <h1 className="text-2xl font-bold mb-4 text-center">
-            HRMS Attendance Module
-          </h1>
+          <h1 className="text-2xl font-bold mb-4 text-center">Attendance</h1>
 
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-2">
@@ -189,12 +187,24 @@ const HRMSAttendanceModule = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Check In</TableHead>
-                    <TableHead>Check Out</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead className="font-semibold text-lg">
+                      Name
+                    </TableHead>
+                    <TableHead className="font-semibold text-lg">
+                      Department
+                    </TableHead>
+                    <TableHead className="font-semibold text-lg">
+                      Date
+                    </TableHead>
+                    <TableHead className="font-semibold text-lg">
+                      Check In
+                    </TableHead>
+                    <TableHead className="font-semibold text-lg">
+                      Check Out
+                    </TableHead>
+                    <TableHead className="font-semibold text-lg">
+                      Status
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

@@ -22,23 +22,75 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
   const navigate = useNavigate();
   const [hoveredModule, setHoveredModule] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Define the modules with access rules
   const modules = [
-    { name: "Dashboard", icon: LayoutDashboard, route: "dashboard" },
+    {
+      name: "Dashboard",
+      icon: LayoutDashboard,
+      route: "dashboard",
+      roles: ["admin"],
+    },
     {
       name: "Employee Dashboard",
       icon: Logs,
       route: "employeedashboard",
+      roles: ["employee"],
     },
-    { name: "Payroll", icon: DollarSign, route: "payroll" },
-    { name: "Attendance", icon: UserCheck, route: "attendance" },
-    { name: "Leave Management", icon: Calendar, route: "leave" },
-    { name: "Disciplinary Management", icon: Scale, route: "disciplinary" },
-    { name: "Staff Requisition", icon: UserPlus, route: "staff" },
-    { name: "ON/OFF Boarding", icon: ArrowRightLeft, route: "onboarding" },
-    { name: "Perfomance", icon: TrendingUp, route: "perfomance" },
-    { name: "HR Documents", icon: FileText, route: "hrdocs" },
-    { name: "Admin Settings", icon: Settings, route: "admin" },
+    { name: "Payroll", icon: DollarSign, route: "payroll", roles: ["admin"] },
+    {
+      name: "Attendance",
+      icon: UserCheck,
+      route: "attendance",
+      roles: ["admin", "employee"],
+    },
+    {
+      name: "Leave Management",
+      icon: Calendar,
+      route: "leave",
+      roles: ["admin", "employee"],
+    },
+    {
+      name: "Disciplinary Management",
+      icon: Scale,
+      route: "disciplinary",
+      roles: ["admin"],
+    },
+    {
+      name: "Staff Requisition",
+      icon: UserPlus,
+      route: "staff",
+      roles: ["admin"],
+    },
+    {
+      name: "ON/OFF Boarding",
+      icon: ArrowRightLeft,
+      route: "onboarding",
+      roles: ["admin"],
+    },
+    {
+      name: "Performance",
+      icon: TrendingUp,
+      route: "performance",
+      roles: ["admin", "employee"],
+    },
+    { name: "HR Documents", icon: FileText, route: "hrdocs", roles: ["admin"] },
+    {
+      name: "Admin Settings",
+      icon: Settings,
+      route: "admin",
+      roles: ["admin"],
+    },
   ];
+
+  // Function to get accessible modules based on user role
+  const getAccessibleModules = (role) => {
+    return modules.filter((module) => module.roles.includes(role));
+  };
+
+  // Example usage
+  const userRole = "admin"; // You can get this from your authentication context or state
+  const accessibleModules = getAccessibleModules(userRole);
 
   const toggleUserMenu = () => {
     setShowUserMenu(!showUserMenu);

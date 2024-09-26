@@ -354,10 +354,10 @@ const PayrollModule = () => {
   };
 
   const handlePrintPayslip = (employee) => {
-    const payslip = generatePayslip(employee);
+    //const payslip = generatePayslip(employee);
     // In a real application, you'd send this to a printer or generate a PDF
-    console.log(payslip);
-    alert("Payslip printed! Check the console for details.");
+
+    alert("Salary payments initiated for one employees!");
   };
 
   const handleMakePayments = () => {
@@ -473,7 +473,7 @@ const PayrollModule = () => {
               <CardContent>
                 <div className="space-y-4">
                   <Button onClick={handleMakePayments}>
-                    Make Salary Payments
+                    Make All Salary Payments
                   </Button>
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
@@ -492,7 +492,7 @@ const PayrollModule = () => {
                           <th className="border p-2 text-left">
                             Net Salary (kes)
                           </th>
-                          {/* <th className="border p-2 text-left">Actions</th> */}
+                          <th className="border p-2 text-left">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -517,14 +517,14 @@ const PayrollModule = () => {
                             <td className="border p-2">
                               {calculateNetSalary(employee).toLocaleString()}
                             </td>
-                            {/* <td className="border p-2">
+                            <td className="border p-2">
                               <Button
                                 onClick={() => handlePrintPayslip(employee)}
                                 size="sm"
                               >
-                                Print Payslip
+                                Make Payment
                               </Button>
-                            </td> */}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

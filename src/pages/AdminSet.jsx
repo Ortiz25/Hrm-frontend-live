@@ -303,7 +303,7 @@ const AdminSettingsModule = () => {
                     <h3 className="text-lg font-semibold mb-2 border-t pt-4">
                       Add New Admin/User:
                     </h3>
-                    <div className="space-y-2 space-x-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <input
                         type="text"
                         name="name"
@@ -313,7 +313,7 @@ const AdminSettingsModule = () => {
                           setNewUser({ ...newUser, name: e.target.value })
                         }
                         placeholder="Name"
-                        className="border border-gray-300 p-2 rounded-md flex-1"
+                        className="border border-gray-300 p-2 rounded-md"
                       />
                       <input
                         type="email"
@@ -324,29 +324,29 @@ const AdminSettingsModule = () => {
                           setNewUser({ ...newUser, email: e.target.value })
                         }
                         placeholder="Email"
-                        className="border border-gray-300 p-2 rounded-md flex-1"
+                        className="border border-gray-300 p-2 rounded-md"
                       />
                       <input
                         type="password"
                         name="password"
                         required
-                        value={newUser.email}
+                        value={newUser.password}
                         onChange={(e) =>
-                          setNewUser({ ...newUser, email: e.target.value })
+                          setNewUser({ ...newUser, password: e.target.value })
                         }
                         placeholder="New password"
-                        className="border border-gray-300 p-2 rounded-md flex-1"
+                        className="border border-gray-300 p-2 rounded-md"
                       />
                       <input
                         type="password"
                         name="cpassword"
-                        value={newUser.email}
+                        value={newUser.cpassword}
                         required
                         onChange={(e) =>
-                          setNewUser({ ...newUser, email: e.target.value })
+                          setNewUser({ ...newUser, cpassword: e.target.value })
                         }
                         placeholder="Confirm password"
-                        className="border focus:border-blue-300 border-gray-300 p-2 rounded-md flex-1"
+                        className="border border-gray-300 p-2 rounded-md"
                       />
                       <select
                         value={newUser.role}
@@ -354,14 +354,15 @@ const AdminSettingsModule = () => {
                         onChange={(e) =>
                           setNewUser({ ...newUser, role: e.target.value })
                         }
-                        className="border border-gray-300 p-2 rounded-md flex-1"
+                        className="border border-gray-300 p-2 rounded-md"
                       >
                         <option value="User">User</option>
-                        <option value="Admin">Admin</option>
-                        <option value="SuperAdmin">Super Admin</option>
+                        <option value="employee">Employee</option>
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
                       </select>
                       <button
-                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors col-span-1 sm:col-span-2"
                         onClick={handleAddUser}
                       >
                         Add User

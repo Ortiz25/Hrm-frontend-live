@@ -12,6 +12,7 @@ import { Label } from "../components/ui/label.jsx";
 import { useStore } from "../store/store.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { Dialog } from "@headlessui/react";
+import WarningModule from "../components/warning.jsx";
 
 // Sample data for disciplinary actions
 const initialDisciplinaryData = [
@@ -175,6 +176,9 @@ const DisciplinaryModule = () => {
                 </table>
               </div>
             </CardContent>
+          </Card>
+          <Card className="shadow-2xl m-2">
+            <WarningModule />
           </Card>
 
           <Card className="shadow-2xl">

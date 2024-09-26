@@ -32,6 +32,7 @@ import { useState, useEffect } from "react";
 import { useStore } from "../store/store.jsx";
 import { Link } from "react-router-dom";
 import { generatePayslipPDF } from "../util/generatePdf.jsx";
+import LeaveStatusCard from "../components/leaveStatus.jsx";
 
 const employeeData = {
   name: "Alice Smith",
@@ -219,6 +220,8 @@ const EmployeeDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <LeaveStatusCard />
 
             <Card>
               <CardHeader>

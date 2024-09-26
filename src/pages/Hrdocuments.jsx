@@ -53,7 +53,7 @@ const HRDocumentModule = () => {
   );
 
   useEffect(() => {
-    changeModule("HR Document Management");
+    changeModule("HR Documents");
   }, []);
 
   // Handle file upload

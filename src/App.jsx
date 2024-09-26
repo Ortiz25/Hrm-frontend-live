@@ -66,7 +66,7 @@ const router = createBrowserRouter([
     element: <HolidayCalendar />,
   },
   {
-    path: "/perfomance",
+    path: "/performance",
     element: <Perfomance />,
   },
   {
