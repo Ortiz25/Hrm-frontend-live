@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Calendar, TriangleAlert } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import { Label } from "../components/ui/label.jsx";
 import { useStore } from "../store/store.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { Dialog } from "@headlessui/react";
-import WarningModule from "../components/warning.jsx";
+import { NavLink } from "react-router-dom";
 
 // Sample data for disciplinary actions
 const initialDisciplinaryData = [
@@ -126,12 +126,20 @@ const DisciplinaryModule = () => {
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu />
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <NavLink
+            to="/warnings"
+            className=" border p-2  rounded shadow-lg hover:bg-slate-200"
+          >
+            <TriangleAlert className="inline mr-2" />
+            <span className="font-semibold text-lg ">Warnings</span>
+          </NavLink>
+
+          <h1 className="text-2xl font-bold">{activeModule}</h1>
         </div>
         <div className="p-4 space-y-6">
           <Card className="shadow-2xl">
             <CardHeader>
-              <CardTitle>Disciplinary Actions</CardTitle>
+              <CardTitle>Disciplinary Cases</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="mb-4">
@@ -177,13 +185,10 @@ const DisciplinaryModule = () => {
               </div>
             </CardContent>
           </Card>
-          <Card className="shadow-2xl m-2">
-            <WarningModule />
-          </Card>
 
           <Card className="shadow-2xl">
             <CardHeader>
-              <CardTitle>Record Disciplinary Action</CardTitle>
+              <CardTitle>Record Disciplinary Case</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleNewActionSubmit} className="space-y-4">

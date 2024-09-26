@@ -210,8 +210,8 @@ const LeaveManagementModule = () => {
             to="/calender"
             className=" border p-2  rounded shadow-lg hover:bg-slate-200"
           >
-            <span className="font-semibold text-lg mr-2">Holidays</span>
-            <Calendar className="inline" />
+            <Calendar className="inline mr-2" />
+            <span className="font-semibold text-lg ">Holidays</span>
           </NavLink>
 
           <h1 className="text-2xl font-bold">{activeModule}</h1>
