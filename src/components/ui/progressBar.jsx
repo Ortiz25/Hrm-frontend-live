@@ -69,7 +69,33 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">Bank Account:</Label>
+        <Label htmlFor="dob">Date Of Birth:</Label>
+        <Input
+          type="date"
+          name="dob"
+          className="mt-1 block w-full p-2 border rounded"
+          value={formData.dob}
+          onChange={(e) =>
+            setFormData({ ...formData, phoneNumber: e.target.value })
+          }
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="idNumber">ID Number:</Label>
+        <Input
+          type="text"
+          name="idNumber"
+          className="mt-1 block w-full p-2 border rounded"
+          value={formData.idNumber}
+          onChange={(e) =>
+            setFormData({ ...formData, phoneNumber: e.target.value })
+          }
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="bankAccount">Bank Account:</Label>
         <Input
           type="text"
           name="bankAccount"
@@ -131,6 +157,19 @@ export const Step2 = ({ nextStep, prevStep, formData, setFormData }) => (
   <div>
     <h3 className="text-xl font-bold mb-4">Step 2: Position Information: </h3>
     <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="employeeNumber">Employee NO/ID:</Label>
+        <Input
+          type="text"
+          name="employeeNumber"
+          className="mt-1 block w-full p-2 border rounded"
+          value={formData.employeeNumber}
+          onChange={(e) =>
+            setFormData({ ...formData, position: e.target.value })
+          }
+          required
+        />
+      </div>
       <div className="space-y-2">
         <Label htmlFor="firstName">Position:</Label>
         <Input

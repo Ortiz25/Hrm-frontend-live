@@ -121,6 +121,9 @@ const Onboarding = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    idNumber: "",
+    dob: "",
+    employeeNumber: "",
     department: "",
     position: "",
     hire_date: "",

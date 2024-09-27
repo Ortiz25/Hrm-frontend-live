@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import {
-  Calendar,
+  Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Download,
   Upload,
   Menu,
 } from "lucide-react";
+
+import Calendar from "../components/ui/calender";
 import {
   Card,
   CardContent,
@@ -29,11 +32,16 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
-import { useEffect } from "react";
 import SidebarLayout from "../components/layout/sidebarLayout";
-import { useStore } from "../store/store.jsx";
+import { useStore } from "../store/store";
 
-// Dummy data
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../components/ui/popover";
+
+// Extended dummy data
 const dummyAttendanceData = [
   {
     id: 1,
@@ -80,10 +88,67 @@ const dummyAttendanceData = [
     checkOut: "17:10",
     status: "Present",
   },
+  // Additional data for different dates
+  {
+    id: 6,
+    name: "John Doe",
+    department: "IT",
+    date: "2024-09-24",
+    checkIn: "08:50",
+    checkOut: "17:15",
+    status: "Present",
+  },
+  {
+    id: 7,
+    name: "Jane Smith",
+    department: "HR",
+    date: "2024-09-24",
+    checkIn: "09:05",
+    checkOut: "16:55",
+    status: "Present",
+  },
+  {
+    id: 8,
+    name: "Mike Johnson",
+    department: "Finance",
+    date: "2024-09-24",
+    checkIn: "",
+    checkOut: "",
+    status: "Absent",
+  },
+  {
+    id: 9,
+    name: "Emily Brown",
+    department: "Marketing",
+    date: "2024-09-24",
+    checkIn: "09:00",
+    checkOut: "17:00",
+    status: "Present",
+  },
+  {
+    id: 10,
+    name: "David Lee",
+    department: "Sales",
+    date: "2024-09-24",
+    checkIn: "08:45",
+    checkOut: "17:30",
+    status: "Present",
+  },
 ];
 
+const formatDate = (date, format = "long") => {
+  if (format === "long") {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } else if (format === "yyyy-MM-dd") {
+    return date.toISOString().split("T")[0];
+  }
+};
+
 const HRMSAttendanceModule = () => {
-  const [viewMode, setViewMode] = useState("daily");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [currentDate, setCurrentDate] = useState(new Date(2024, 8, 23)); // September 23, 2024
   const { activeModule, changeModule } = useStore();
@@ -93,18 +158,14 @@ const HRMSAttendanceModule = () => {
     changeModule("Attendance");
   }, []);
 
-  const filteredData =
-    selectedDepartment === "all"
-      ? dummyAttendanceData
-      : dummyAttendanceData.filter(
-          (item) => item.department.toLowerCase() === selectedDepartment
-        );
-  const formatDate = (date) => {
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const filteredData = dummyAttendanceData.filter(
+    (item) =>
+      (selectedDepartment === "all" ||
+        item.department.toLowerCase() === selectedDepartment) &&
+      item.date === formatDate(currentDate, "yyyy-MM-dd")
+  );
+  const handleDateChange = (event) => {
+    setCurrentDate(new Date(event.target.value));
   };
 
   const changeDate = (days) => {
@@ -132,47 +193,48 @@ const HRMSAttendanceModule = () => {
           <h1 className="text-2xl font-bold mb-4 text-center">Attendance</h1>
 
           <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-2">
-              <Select value={viewMode} onValueChange={setViewMode}>
-                <SelectTrigger className="w-[180px] bg-white border-2 border-gray-300 shadow-sm">
-                  <SelectValue placeholder="Select view" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-200">
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={selectedDepartment}
-                onValueChange={setSelectedDepartment}
-              >
-                <SelectTrigger className="w-[180px] bg-white border-2 border-gray-300 shadow-sm">
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-200">
-                  <SelectItem value="all">All Departments</SelectItem>
-                  <SelectItem value="it">IT</SelectItem>
-                  <SelectItem value="hr">HR</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="marketing">Marketing</SelectItem>
-                  <SelectItem value="sales">Sales</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={selectedDepartment}
+              onValueChange={setSelectedDepartment}
+            >
+              <SelectTrigger className="w-[180px] bg-white border-2 border-gray-300 shadow-sm">
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-200">
+                <SelectItem value="all">All Departments</SelectItem>
+                <SelectItem value="it">IT</SelectItem>
+                <SelectItem value="hr">HR</SelectItem>
+                <SelectItem value="finance">Finance</SelectItem>
+                <SelectItem value="marketing">Marketing</SelectItem>
+                <SelectItem value="sales">Sales</SelectItem>
+              </SelectContent>
+            </Select>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => changeDate(-1)}
+                className="mt-7 border hover:bg-gray-200"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="font-semibold">{formatDate(currentDate)}</span>
+              <div className="flex flex-col items-center space-y-2">
+                <label htmlFor="date-picker" className="text-sm font-medium">
+                  Choose a Date:
+                </label>
+                <input
+                  id="date-picker"
+                  type="date"
+                  value={format(currentDate, "yyyy-MM-dd")}
+                  onChange={handleDateChange}
+                  className="p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => changeDate(1)}
+                className="mt-7 border hover:bg-gray-200"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -181,7 +243,12 @@ const HRMSAttendanceModule = () => {
 
           <Card className="mb-4 shadow-lg">
             <CardHeader>
-              <CardTitle>Attendance Overview</CardTitle>
+              <CardTitle>
+                Attendance Overview for{" "}
+                <span className="text-rose-700">
+                  {format(currentDate, "MMMM d, yyyy")}
+                </span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -225,8 +292,8 @@ const HRMSAttendanceModule = () => {
 
           <div className="flex justify-between">
             <Button variant="outline" className="shadow-lg bg-gray-100">
-              <Calendar className="mr-2 h-4 w-4" />
-              Generate Monthly Report
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              Generate Current Report
             </Button>
             <div className="space-x-2">
               <Button variant="outline" className="shadow-lg bg-gray-100">

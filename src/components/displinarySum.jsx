@@ -16,8 +16,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
   });
 
   useEffect(() => {
-    // In a real application, you would fetch this data from your backend
-    // This is just mock data for demonstration
+    // Mock data for demonstration
     setDisciplinaryRecord({
       warnings: [
         {
@@ -44,6 +43,14 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
       clearSlate: false,
     });
   }, [employeeId]);
+
+  // Toggle the clearSlate state
+  const handleToggle = (e) => {
+    setDisciplinaryRecord((prevRecord) => ({
+      ...prevRecord,
+      clearSlate: e.target.checked,
+    }));
+  };
 
   const WarningItem = ({ warning }) => (
     <div className="flex items-center justify-between p-2 border-b last:border-b-0">
@@ -82,9 +89,18 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
   );
 
   return (
-    <Card className="w-full ">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Disciplinary Summary</CardTitle>
+        <div className="flex items-center mt-4">
+          <label className="mr-2 text-sm font-medium">Clear Slate</label>
+          <input
+            type="checkbox"
+            checked={disciplinaryRecord.clearSlate}
+            onChange={handleToggle}
+            className="toggle-checkbox h-4 w-4"
+          />
+        </div>
       </CardHeader>
       <CardContent>
         {disciplinaryRecord.clearSlate ? (
