@@ -17,43 +17,52 @@ import { Calendar } from "lucide-react";
 const LeaveStatusCard = ({ employeeId }) => {
   const [currentLeaves, setCurrentLeaves] = useState([]);
   const [pastLeaves, setPastLeaves] = useState([]);
+  const today = new Date();
 
   useEffect(() => {
-    // In a real application, you would fetch this data from your backend
-    // This is just mock data for demonstration
-    setCurrentLeaves([
-      {
-        id: 1,
-        type: "Annual",
-        startDate: "2024-10-01",
-        endDate: "2024-10-05",
-        status: "Pending",
-      },
-      {
-        id: 2,
-        type: "Sick",
-        startDate: "2024-10-15",
-        endDate: "2024-10-16",
-        status: "Approved",
-      },
-    ]);
+    async function fetchData() {
+      try {
+        const url = "http://localhost:5174/api/leaverequests";
+        const data = { employeeId: employeeId };
 
-    setPastLeaves([
-      {
-        id: 3,
-        type: "Annual",
-        startDate: "2024-09-01",
-        endDate: "2024-09-05",
-        status: "Approved",
-      },
-      {
-        id: 4,
-        type: "Sick",
-        startDate: "2024-08-15",
-        endDate: "2024-08-16",
-        status: "Rejected",
-      },
-    ]);
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const result = await response.json();
+
+        const leaveRequests = result.requests;
+        const pastApprovedLeaves = leaveRequests.filter((request) => {
+          return (
+            request.status === "approved" && new Date(request.end_date) < today
+          );
+        });
+
+        const currentOrUpcomingLeaves = leaveRequests.filter((request) => {
+          const startDate = new Date(request.start_date);
+          const endDate = new Date(request.end_date);
+
+          return (
+            (request.status === "approved" || request.status === "pending") &&
+            (startDate >= today || (startDate <= today && endDate >= today))
+          );
+        });
+        setCurrentLeaves(currentOrUpcomingLeaves);
+        setPastLeaves(pastApprovedLeaves);
+      } catch (error) {
+        console.log("Error", error);
+      }
+    }
+
+    fetchData();
   }, [employeeId]);
 
   const LeaveItem = ({ leave }) => (
@@ -61,18 +70,18 @@ const LeaveStatusCard = ({ employeeId }) => {
       <div className="flex items-center">
         <Calendar className="w-4 h-4 mr-2" />
         <div>
-          <p className="font-semibold">{leave.type} Leave</p>
+          <p className="font-semibold">{leave.leave_type} Leave</p>
           <p className="text-sm text-gray-500">
-            {new Date(leave.startDate).toLocaleDateString()} -{" "}
-            {new Date(leave.endDate).toLocaleDateString()}
+            {new Date(leave.start_date).toLocaleDateString()} -{" "}
+            {new Date(leave.end_date).toLocaleDateString()}
           </p>
         </div>
       </div>
       <Badge
         variant={
-          leave.status === "Approved"
+          leave.status === "approved"
             ? "success"
-            : leave.status === "Rejected"
+            : leave.status === "rejected"
             ? "destructive"
             : "default"
         }
@@ -90,7 +99,7 @@ const LeaveStatusCard = ({ employeeId }) => {
       <CardContent>
         <Tabs defaultValue="current">
           <TabsList className="grid w-full grid-cols-2 bg-gray-200">
-            <TabsTrigger value="current">Current & Upcoming</TabsTrigger>
+            <TabsTrigger value="current">Current & Pending</TabsTrigger>
             <TabsTrigger value="past">Past Leaves</TabsTrigger>
           </TabsList>
           <TabsContent value="current">

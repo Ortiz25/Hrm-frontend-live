@@ -16,41 +16,41 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
   });
 
   useEffect(() => {
-    // Mock data for demonstration
-    setDisciplinaryRecord({
-      warnings: [
-        {
-          id: 1,
-          type: "1st Warning",
-          date: "2024-08-15",
-          description: "Late arrival",
-        },
-        {
-          id: 2,
-          type: "2nd Warning",
-          date: "2024-09-20",
-          description: "Missed deadline",
-        },
-      ],
-      cases: [
-        {
-          id: 1,
-          status: "Ongoing",
-          date: "2024-10-01",
-          description: "Inappropriate conduct",
-        },
-      ],
-      clearSlate: false,
-    });
-  }, [employeeId]);
+    async function fetchData() {
+      try {
+        const url = "http://localhost:5174/api/discplinary";
 
-  // Toggle the clearSlate state
-  const handleToggle = (e) => {
-    setDisciplinaryRecord((prevRecord) => ({
-      ...prevRecord,
-      clearSlate: e.target.checked,
-    }));
-  };
+        const data = { employeeId: employeeId };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const result = await response.json();
+
+        const cases = result.cases;
+        const warnings = result.warnings;
+        setDisciplinaryRecord((prevState) => ({
+          warnings: [...warnings],
+          cases: [...cases],
+          clearSlate: warnings || cases ? false : true,
+        }));
+
+        // console.log(disciplinaryRecord);
+      } catch (error) {
+        console.log("Error", error);
+      }
+    }
+    fetchData();
+  }, []);
 
   const WarningItem = ({ warning }) => (
     <div className="flex items-center justify-between p-2 border-b last:border-b-0">
@@ -74,7 +74,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
         <div>
           <p className="font-semibold">Disciplinary Case</p>
           <p className="text-sm text-gray-500">
-            {new Date(disciplinaryCase.date).toLocaleDateString()}
+            {new Date(disciplinaryCase.action_date).toLocaleDateString()}
           </p>
         </div>
       </div>
@@ -92,15 +92,6 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Disciplinary Summary</CardTitle>
-        <div className="flex items-center mt-4">
-          <label className="mr-2 text-sm font-medium">Clear Slate</label>
-          <input
-            type="checkbox"
-            checked={disciplinaryRecord.clearSlate}
-            onChange={handleToggle}
-            className="toggle-checkbox h-4 w-4"
-          />
-        </div>
       </CardHeader>
       <CardContent>
         {disciplinaryRecord.clearSlate ? (

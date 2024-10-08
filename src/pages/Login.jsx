@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { Shield, Eye, EyeOff } from "lucide-react";
-import { Form, Link } from "react-router-dom";
+import { Shield, Eye, EyeOff, Loader } from "lucide-react";
+import {
+  Form,
+  Link,
+  redirect,
+  useActionData,
+  useNavigation,
+} from "react-router-dom";
 
 const LoginPage = () => {
   const [showPassword, updateShowPassword] = useState(false);
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const isLoading = navigation.state === "loading";
+
+  const errors = useActionData();
 
   function handleClick() {
-    if (showPassword) {
-      updateShowPassword(!showPassword);
-    } else {
-      updateShowPassword(!showPassword);
-    }
+    updateShowPassword(!showPassword);
   }
 
   return (
@@ -22,19 +29,22 @@ const LoginPage = () => {
         </div>
 
         <div className="w-full max-w-sm md:max-w-lg ">
-          <Form className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 shadow-2xl ">
+          <Form
+            method="post"
+            className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 shadow-2xl "
+          >
             <h1 className="text-center p-4 text-4xl font-semibold">Login</h1>
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-lg font-bold mb-2"
-                for="username"
+                htmlFor="username"
               >
                 Username:
               </label>
               <input
                 className="shadow appearance-none border-2 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:border-blue-400 focus:outline-none focus:shadow-outline"
-                id="username"
-                name="username"
+                id="email"
+                name="email"
                 type="email"
                 placeholder="Enter your email"
                 required
@@ -43,7 +53,7 @@ const LoginPage = () => {
             <div className="relative mb-6 ">
               <label
                 className="block text-gray-700 text-lg font-bold mb-2"
-                for="password"
+                htmlFor="password"
               >
                 Password:
               </label>
@@ -56,17 +66,23 @@ const LoginPage = () => {
                 required
                 minLength="8"
               />
-              <p className="text-red-500 text-sm italic">
-                Click sign-in to Demo the APP.
-              </p>
+              {errors && (
+                <p className="text-red-500 text-md text-bold italic">
+                  {errors.email}
+                </p>
+              )}
               {showPassword ? (
                 <EyeOff
-                  className="absolute right-5 bottom-10"
+                  className={`absolute right-5 ${
+                    errors?.email ? "bottom-10" : "bottom-5"
+                  }`}
                   onClick={handleClick}
                 />
               ) : (
                 <Eye
-                  className="absolute right-5 bottom-10"
+                  className={`absolute right-5 ${
+                    errors?.email ? "bottom-10" : "bottom-5"
+                  }`}
                   onClick={handleClick}
                 />
               )}
@@ -74,9 +90,14 @@ const LoginPage = () => {
             <div className="flex items-center justify-between">
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="button"
+                type="submit"
               >
-                <Link to="/dashboard"> Sign In</Link>
+                {isSubmitting || isLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
+                )}
+                {isSubmitting ? "Signing In..." : "Sign In"}
               </button>
               <Link
                 className="inline-block align-baseline font-bold text-md text-blue-500 hover:text-blue-800"
@@ -96,3 +117,61 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+export async function action({ request, params }) {
+  const data = await request.formData();
+  const errors = {};
+  const loginData = {
+    email: data.get("email"),
+    password: data.get("password").trim(),
+  };
+
+  let url = "http://localhost:5174/api/login";
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(loginData),
+  });
+  const resData = await response.json();
+  // console.log(resData);
+  if (resData.status === 404) {
+    errors.email = resData.message;
+    return errors;
+  }
+  if (resData.status === 401) {
+    errors.email = resData.message;
+    return errors;
+  }
+
+  localStorage.setItem("token", resData.token);
+
+  return redirect("/dashboard");
+}
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return null;
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const userData = await response.json();
+  // console.log(userData);
+  if (userData.message === "token expired") {
+    return null;
+  }
+  return redirect("/dashboard");
+}

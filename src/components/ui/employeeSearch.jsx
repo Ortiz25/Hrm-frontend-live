@@ -16,7 +16,7 @@ const EmployeeSearch = ({ employees, onSelectEmployee, onDataSend }) => {
     setSearchResults(results);
     onDataSend(results);
 
-    console.log("Result", results);
+    //console.log("Result", results);
   };
 
   // Perform search

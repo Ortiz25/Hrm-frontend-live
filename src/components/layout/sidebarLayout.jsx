@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Scale,
   DollarSign,
@@ -15,13 +15,43 @@ import {
   TrendingUp,
   UserCheck,
 } from "lucide-react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, redirect } from "react-router-dom";
 import "./tooltip.css";
+import { useStore } from "../../store/store";
 
 const SidebarLayout = ({ activeModule, setActiveModule }) => {
+  const { role, changeRole, user, changeUser } = useStore();
+
   const navigate = useNavigate();
   const [hoveredModule, setHoveredModule] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const url = "http://localhost:5174/api/profile";
+        const token = localStorage.getItem("token");
+        const data = { token: token };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const result = await response.json();
+        changeUser(result.result[0]);
+      } catch (error) {
+        console.log("Error", error);
+      }
+    }
+    fetchData();
+  }, []);
 
   // Define the modules with access rules
   const modules = [
@@ -29,72 +59,85 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
       name: "Dashboard",
       icon: LayoutDashboard,
       route: "dashboard",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
     },
     {
       name: "Employee Dashboard",
       icon: Logs,
       route: "employeedashboard",
-      roles: ["employee"],
+      roles: ["employee", "admin", "super_admin"],
     },
-    { name: "Payroll", icon: DollarSign, route: "payroll", roles: ["admin"] },
+    {
+      name: "Payroll",
+      icon: DollarSign,
+      route: "payroll",
+      roles: ["admin", "super_admin"],
+    },
     {
       name: "Attendance",
       icon: UserCheck,
       route: "attendance",
-      roles: ["admin", "employee"],
+      roles: ["admin", "employee", "super_admin"],
     },
     {
       name: "Leave Management",
       icon: Calendar,
       route: "leave",
-      roles: ["admin", "employee"],
+      roles: ["admin", "employee", "super_admin"],
     },
     {
       name: "Disciplinary Management",
       icon: Scale,
       route: "disciplinary",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
     },
     {
       name: "Staff Requisition",
       icon: UserPlus,
       route: "staff",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
     },
     {
       name: "ON/OFF Boarding",
       icon: ArrowRightLeft,
       route: "onboarding",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
     },
     {
       name: "Performance",
       icon: TrendingUp,
       route: "performance",
-      roles: ["admin", "employee"],
+      roles: ["admin", "super_admin"],
     },
-    { name: "HR Documents", icon: FileText, route: "hrdocs", roles: ["admin"] },
+    {
+      name: "HR Documents",
+      icon: FileText,
+      route: "hrdocs",
+      roles: ["admin", "super_admin"],
+    },
     {
       name: "Admin Settings",
       icon: Settings,
       route: "admin",
-      roles: ["admin"],
+      roles: ["super_admin"],
     },
   ];
 
-  // Function to get accessible modules based on user role
   const getAccessibleModules = (role) => {
     return modules.filter((module) => module.roles.includes(role));
   };
 
-  // Example usage
-  const userRole = "admin"; // You can get this from your authentication context or state
+  const userRole = role;
   const accessibleModules = getAccessibleModules(userRole);
 
   const toggleUserMenu = () => {
     setShowUserMenu(!showUserMenu);
   };
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    redirect("/");
+  }
 
   return (
     <div className="flex">
@@ -105,7 +148,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
         </div>
 
         <nav className="relative">
-          {modules.map((module) => (
+          {accessibleModules.map((module) => (
             <div
               key={module.name}
               className="relative flex flex-col items-center md:flex-row"
@@ -145,8 +188,10 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
               className="flex items-center hover:text-blue-500 justify-center md:justify-start text-gray-400 hover:text-white"
               onClick={toggleUserMenu}
             >
-              <UserCircle className="mr-0 md:mr-2 " size={24} />
-              <span className="hidden md:block  ">User</span>
+              <UserCircle className="mr-0 md:mr-2 text-white " size={24} />
+              <span className="hidden md:block text-white ">
+                {user ? user.first_name + " " + user.last_name : "User"}
+              </span>
             </button>
             {showUserMenu && (
               <div className="absolute bottom-full left-0 mb-2 bg-gray-700 rounded-md shadow-lg p-4">
@@ -166,7 +211,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
                   }}
                 >
                   <LogOut className="inline-block mr-2" size={16} />
-                  <NavLink to="/">Logout</NavLink>
+                  <NavLink onClick={handleLogout}>Logout</NavLink>
                 </button>
               </div>
             )}

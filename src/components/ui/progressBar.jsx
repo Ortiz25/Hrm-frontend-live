@@ -45,6 +45,27 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
         />
       </div>
       <div className="space-y-2">
+        <Label>Gender:</Label>
+        <select
+          name="leaveType"
+          value={formData.gender}
+          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+          className="border-4 p-2 w-full"
+          required
+        >
+          <option value="" className="font-semibold">
+            Select Gender
+          </option>
+          <option value="Annual" className="font-semibold">
+            Male
+          </option>
+          <option value="Sick" className="font-semibold">
+            Female
+          </option>
+        </select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="startDate">Email:</Label>
         <Input
           type="email"
@@ -75,9 +96,7 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
           name="dob"
           className="mt-1 block w-full p-2 border rounded"
           value={formData.dob}
-          onChange={(e) =>
-            setFormData({ ...formData, phoneNumber: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
           required
         />
       </div>
@@ -89,65 +108,74 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
           className="mt-1 block w-full p-2 border rounded"
           value={formData.idNumber}
           onChange={(e) =>
-            setFormData({ ...formData, phoneNumber: e.target.value })
+            setFormData({ ...formData, idNumber: e.target.value })
           }
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="bankAccount">Bank Account:</Label>
+        <Label htmlFor="bankName">Bank Name:</Label>
+        <Input
+          type="text"
+          name="bankName"
+          className="mt-1 block w-full p-2 border rounded"
+          value={formData.bankName}
+          onChange={(e) =>
+            setFormData({ ...formData, bankName: e.target.value })
+          }
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="bankAccount">Bank Account No:</Label>
         <Input
           type="text"
           name="bankAccount"
           className="mt-1 block w-full p-2 border rounded"
-          value={formData.phoneNumber}
+          value={formData.bankAccount}
           onChange={(e) =>
-            setFormData({ ...formData, phoneNumber: e.target.value })
+            setFormData({ ...formData, bankAccount: e.target.value })
           }
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">KRA Pin:</Label>
+        <Label htmlFor="kraPin">KRA Pin:</Label>
         <Input
           type="text"
           name="kraPin"
           className="mt-1 block w-full p-2 border rounded"
-          value={formData.phoneNumber}
-          onChange={(e) =>
-            setFormData({ ...formData, phoneNumber: e.target.value })
-          }
+          value={formData.kraPin}
+          onChange={(e) => setFormData({ ...formData, kraPin: e.target.value })}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">NHIF Membership No:</Label>
+        <Label htmlFor="nhifNo" be>
+          NHIF Membership No:
+        </Label>
         <Input
           type="text"
           name="nhifNo"
           className="mt-1 block w-full p-2 border rounded"
-          value={formData.phoneNumber}
-          onChange={(e) =>
-            setFormData({ ...formData, phoneNumber: e.target.value })
-          }
+          value={formData.nhifNo}
+          onChange={(e) => setFormData({ ...formData, nhifNo: e.target.value })}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">NSSF Membership No:</Label>
+        <Label htmlFor="nssfNo">NSSF Membership No:</Label>
         <Input
           type="text"
-          name="nssf"
+          name="nssfNo"
           className="mt-1 block w-full p-2 border rounded"
-          value={formData.phoneNumber}
-          onChange={(e) =>
-            setFormData({ ...formData, phoneNumber: e.target.value })
-          }
+          value={formData.nssfNo}
+          onChange={(e) => setFormData({ ...formData, nssfNo: e.target.value })}
           required
         />
       </div>
     </div>
-    <Button onClick={nextStep} className="mt-5">
+    <Button onClick={nextStep} className="mt-10">
       Next
     </Button>
   </div>

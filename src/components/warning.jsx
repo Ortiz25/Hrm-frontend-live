@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { AlertCircle, FileText, Clock, Paperclip } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  AlertCircle,
+  FileText,
+  Clock,
+  Paperclip,
+  Loader,
+  TriangleAlert,
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import {
   Card,
@@ -10,138 +17,129 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textArea";
+import {
+  Form,
+  redirect,
+  useNavigate,
+  useNavigation,
+  useSubmit,
+} from "react-router-dom";
 
-const WarningModule = () => {
-  const [warningTypes, setWarningTypes] = useState([
-    { id: 1, name: "1st Warning", expiryDays: 30 },
-    { id: 2, name: "2nd Warning", expiryDays: 60 },
-    { id: 3, name: "3rd Warning", expiryDays: 90 },
-    { id: 4, name: "Final Warning", expiryDays: 180 },
-    { id: 5, name: "Verbal Warning", expiryDays: 14 },
-  ]);
+const WarningModule = ({ warningsData, actionData }) => {
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const isLoading = navigation.state === "loading";
+  const [refresh, updateRefresh] = useState(false);
+  const [warnings, setWarnings] = useState(warningsData);
 
-  const [warnings, setWarnings] = useState([]);
-  const [appeals, setAppeals] = useState([]);
-  const [newWarning, setNewWarning] = useState({
-    employeeId: "",
-    typeId: "",
-    description: "",
-    date: "",
-    attachments: [],
-  });
+  const formRef = useRef();
+
+  if (actionData) {
+    formRef.current.reset();
+  }
+
+  async function handleDownload(id, attachments) {
+    try {
+      // Extract the file name from the attachment
+      const fileName = attachments[0].split("/").pop();
+
+      // Construct the download URL
+      const url = `http://localhost:5174/api/download/${fileName}`;
+
+      // Fetch the file
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Failed to download file");
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+
+      // Create a temporary link element to trigger the download
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName; // Set the downloaded file name
+      document.body.appendChild(link);
+      link.click();
+
+      // Remove the temporary link element
+      document.body.removeChild(link);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const slicedData = warnings.slice(0, 3);
 
   useEffect(() => {
-    const currentDate = new Date();
-    setWarnings((prevWarnings) =>
-      prevWarnings.filter((warning) => {
-        const expiryDate = new Date(warning.date);
-        const warningType = warningTypes.find(
-          (type) => type.id === warning.typeId
-        );
-        expiryDate.setDate(expiryDate.getDate() + warningType.expiryDays);
-        return expiryDate > currentDate;
-      })
-    );
-  }, [warningTypes]);
+    console.log(refresh);
+  }, [refresh]);
 
-  const handleNewWarning = () => {
-    if (
-      newWarning.employeeId &&
-      newWarning.typeId &&
-      newWarning.description &&
-      newWarning.date
-    ) {
-      setWarnings([...warnings, { ...newWarning, id: Date.now() }]);
-      setNewWarning({
-        employeeId: "",
-        typeId: "",
-        description: "",
-        date: "",
-        attachments: [],
-      });
-      console.log(warnings);
+  const handleAppeal = async (warningId) => {
+    if (confirm("Confirm Case Closure !!")) {
+      try {
+        console.log(warningId);
+        const data = { id: warningId };
+        const url = "http://localhost:5174/api/deletewarning";
+        const response = await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        if (result.message === "warning deleted") {
+          const url2 = "http://localhost:5174/api/warnings";
+
+          const response2 = await fetch(url2);
+
+          const { warnings } = await response2.json();
+          setWarnings(warnings);
+        }
+        console.log(result);
+      } catch (error) {
+        console.log(error);
+      }
     } else {
-      alert("Please fill in all fields");
+      alert("Closure canceld");
     }
-  };
-
-  const handleAppeal = (warningId) => {
-    const appealDescription = prompt("Enter appeal description:");
-    if (appealDescription) {
-      setAppeals([
-        ...appeals,
-        {
-          warningId,
-          description: appealDescription,
-          date: new Date().toISOString(),
-        },
-      ]);
-    }
-  };
-
-  const handleFileUpload = (event) => {
-    setNewWarning({
-      ...newWarning,
-      attachments: [...newWarning.attachments, ...event.target.files],
-    });
   };
 
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-2">Warnings</h1>
-
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Issue New Warning</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              placeholder="Employee ID"
-              value={newWarning.employeeId}
-              onChange={(e) =>
-                setNewWarning({ ...newWarning, employeeId: e.target.value })
-              }
-            />
-            <select
-              value={newWarning.typeId}
-              onChange={(e) =>
-                setNewWarning({
-                  ...newWarning,
-                  typeId: parseInt(e.target.value),
-                })
-              }
-              className="border border-gray-300 rounded-md p-2"
-            >
-              <option value="">Select Warning Type</option>
-              {warningTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name} expires in {type.expiryDays} Days
-                </option>
-              ))}
-            </select>
-            <Textarea
-              placeholder="Warning Description"
-              value={newWarning.description}
-              onChange={(e) =>
-                setNewWarning({ ...newWarning, description: e.target.value })
-              }
-              className="col-span-2"
-            />
-            <Input
-              type="date"
-              value={newWarning.date}
-              onChange={(e) =>
-                setNewWarning({ ...newWarning, date: e.target.value })
-              }
-            />
-            <Input type="file" multiple onChange={handleFileUpload} />
-            <Button onClick={handleNewWarning} className="col-span-2">
-              Issue Warning
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <Form ref={formRef} method="post" encType="multipart/form-data">
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>Issue New Warning</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <Input placeholder="Employee Name" name="employeeName" required />
+              <Input placeholder="Employee ID" name="employeeId" required />
+              <Textarea
+                placeholder="Warning Description"
+                name="description"
+                className="col-span-2"
+                required
+              />
+              <Input type="date" name="date" required />
+              <Input type="file" multiple name="file" />
+              <Button type="submit" className="col-span-2">
+                {isSubmitting || isLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
+                )}
+                {isSubmitting ? "Uploading..." : "Upload Warning"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </Form>
 
       <Card>
         <CardHeader>
@@ -150,25 +148,42 @@ const WarningModule = () => {
         <CardContent>
           {warnings.map((warning) => (
             <Alert key={warning.id} className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Warning for Employee {warning.employeeId}</AlertTitle>
+              <AlertCircle className="h-5 w-5 text-red-700" />
+              <AlertTitle>
+                Warning for Employee {warning.employee_number}
+              </AlertTitle>
               <AlertDescription>
-                <p>{warning.description}</p>
-                <p>Date: {new Date(warning.date).toLocaleDateString()}</p>
+                <p className="text-red-500">{warning.description}</p>
                 <p>
-                  Type:{" "}
-                  {
-                    warningTypes.find((type) => type.id === warning.typeId)
-                      ?.name
-                  }
+                  <span className="font-bold">Name:</span> {warning.name}
                 </p>
-                <p>Attachments: {warning.attachments.length}</p>
-                <Button
-                  onClick={() => handleAppeal(warning.id)}
-                  className="mt-2"
-                >
-                  Appeal
-                </Button>
+                <p>
+                  <span className="font-bold">Date: </span>
+                  {new Date(warning.date).toLocaleDateString()}
+                </p>
+
+                <p>
+                  <span className="font-bold">Attachments:</span>{" "}
+                  {warning.attachments.length}
+                </p>
+                <div className="flex justify-between mt-2">
+                  <Button
+                    onClick={() =>
+                      handleDownload(warning.id, warning.attachments)
+                    }
+                    className="mt-2"
+                  >
+                    <Paperclip size={18} />
+                    Download Attachment
+                  </Button>
+                  <Button
+                    onClick={() => handleAppeal(warning.id)}
+                    className="mt-2"
+                    variant="destructive"
+                  >
+                    Close Case
+                  </Button>
+                </div>
               </AlertDescription>
             </Alert>
           ))}

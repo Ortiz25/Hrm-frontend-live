@@ -23,6 +23,7 @@ import {
   CardTitle,
 } from "../components/ui/card.jsx";
 import PerformanceOverview from "./ui/perOverview.jsx";
+import { formatCurrency } from "../util/helpers.jsx";
 
 const mockData = [
   {
@@ -81,18 +82,30 @@ const DashboardCard = ({ title, value, icon: Icon }) => (
   </Card>
 );
 
-const DashboardContent = () => (
+const DashboardContent = ({ dashData }) => (
   <div className="p-4">
     <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <DashboardCard title="Total Employees" value="1,234" icon={Users} />
+      <DashboardCard
+        title="Total Employees"
+        value={dashData.totalEmployees}
+        icon={Users}
+      />
       <DashboardCard
         title="Total Payroll"
-        value="KES 2,130,000"
+        value={`${formatCurrency(dashData.totalPayroll)}`}
         icon={DollarSign}
       />
-      <DashboardCard title="Leave Requests" value="190" icon={Calendar} />
-      <DashboardCard title="Open Requisitions" value="19" icon={UserPlus} />
+      <DashboardCard
+        title="Leave Requests"
+        value={dashData.leaveRequests}
+        icon={Calendar}
+      />
+      <DashboardCard
+        title="Open Requisitions"
+        value={dashData.openRequisitions}
+        icon={UserPlus}
+      />
     </div>
     <Card className="mb-8 shadow-2xl">
       <CardHeader>
@@ -100,7 +113,7 @@ const DashboardContent = () => (
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={mockData}>
+          <BarChart data={dashData.results} className="p-2">
             <XAxis dataKey="month" />
             <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
             <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
@@ -129,7 +142,7 @@ const DashboardContent = () => (
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={mockData}>
+            <BarChart data={dashData.results}>
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
@@ -144,7 +157,7 @@ const DashboardContent = () => (
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={mockData}>
+            <BarChart data={dashData.results}>
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />

@@ -8,8 +8,8 @@ import Holidays from "date-holidays";
 import SidebarLayout from "../components/layout/sidebarLayout";
 import { useStore } from "../store/store.jsx";
 import { Menu } from "lucide-react";
-
 import { Button } from "../components/ui/button.jsx";
+import { redirect } from "react-router-dom";
 
 const localizer = momentLocalizer(moment);
 
@@ -34,7 +34,7 @@ const HolidayCalendar = () => {
     description: "",
   });
   const [isHRM, setIsHRM] = useState(true); // Toggle this value to simulate HRM role
-  const { activeModule, changeModule } = useStore();
+  const { activeModule, changeModule, role } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
@@ -90,44 +90,6 @@ const HolidayCalendar = () => {
     );
   };
 
-  // Custom Yearly View
-  const CustomYearView = ({ date, events }) => {
-    const year = moment(date).year();
-    const months = Array.from({ length: 12 }, (_, i) =>
-      moment().month(i).format("MMMM")
-    );
-
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {months.map((month) => (
-          <div key={month} className="border p-4 rounded shadow">
-            <h3 className="text-2xl font-bold mb-2">{month}</h3>
-            {events
-              .filter(
-                (event) =>
-                  moment(event.start).format("MMMM") === month &&
-                  moment(event.start).year() === year
-              )
-              .map((event) => (
-                <div key={event.title} className="mb-2">
-                  <strong>{moment(event.start).format("DD")}:</strong>{" "}
-                  {event.title} - {event.description}
-                  {isHRM && (
-                    <button
-                      onClick={() => handleRemoveHoliday(event)}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="flex h-screen">
       {sidebarOpen && (
@@ -162,7 +124,7 @@ const HolidayCalendar = () => {
             className="border shadow-2xl rounded"
           />
 
-          {isHRM && (
+          {role !== "employee" && (
             <div className="mt-10 mb-5 p-4 border rounded shadow-lg w-2/4">
               <h2 className="text-2xl font-bold mb-4 text-center">
                 Add Holiday
@@ -232,3 +194,34 @@ const HolidayCalendar = () => {
 };
 
 export default HolidayCalendar;
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return redirect("/");
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  // const url2 = "http://localhost:5174/attendance";
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  // const response2 = await fetch(url2);
+
+  const userData = await response.json();
+  // if (userData.role === "employee") {
+  //   return redirect("/employeedashboard");
+  // }
+  // const attendanceData = await response2.json();
+
+  if (userData.message === "token expired") {
+    return redirect("/");
+  }
+  return { role: userData.role };
+}

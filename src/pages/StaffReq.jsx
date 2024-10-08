@@ -1,68 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Button } from "@headlessui/react"; // Assuming Button is from Headless UI or similar library
+import {
+  Dialog as DDialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../components/ui/dialog";
 import SidebarLayout from "../components/layout/sidebarLayout";
 import { Menu } from "lucide-react";
 import { Input } from "../components/ui/input.jsx";
 import { useStore } from "../store/store.jsx";
 import { X } from "lucide-react";
 import { Label } from "../components/ui/label.jsx";
-
-// Dummy data for staff
-const initialStaffData = [
-  {
-    id: 1,
-    name: "John Doe",
-    position: "Software Engineer",
-    department: "IT",
-    workSchedule: "Full-time",
-    reason: "Expansion of development team to handle new projects",
-    status: "Pending",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    position: "Project Manager",
-    department: "Operations",
-    workSchedule: "Full-time",
-    reason:
-      "Need for a project manager to streamline cross-department projects",
-    status: "Accepted",
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    position: "UI/UX Designer",
-    department: "Design",
-    workSchedule: "Full-time",
-    reason: "UI/UX design expertise required for new product launch",
-    status: "Pending",
-  },
-  {
-    id: 4,
-    name: "Alice Brown",
-    position: "Data Analyst",
-    department: "Analytics",
-    workSchedule: "Part-time",
-    reason: "Data analysis support needed to improve decision-making processes",
-    status: "Rejected",
-  },
-  {
-    id: 5,
-    name: "Charlie Davis",
-    position: "HR Specialist",
-    department: "Human Resources",
-    workSchedule: "Part-time",
-    reason: "Support required in recruitment and employee relations",
-    status: "Pending",
-  },
-];
+import { redirect, useLoaderData } from "react-router-dom";
+import { formatDate } from "../util/helpers.jsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 const StaffManagementModule = () => {
-  const [staffData, setStaffData] = useState(initialStaffData);
+  const staffReq = useLoaderData();
+  const [staffData, setStaffData] = useState(staffReq.staffReq);
   const { activeModule, changeModule } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  console.log(staffData);
 
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -95,15 +63,6 @@ const StaffManagementModule = () => {
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
-
-  const filteredStaffData = staffData.filter(
-    (entry) =>
-      entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.workSchedule.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.reason.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleAddStaff = () => {
     const id = staffData.length + 1;
@@ -138,33 +97,76 @@ const StaffManagementModule = () => {
   };
 
   // New functions for accept/deny actions
-  const handleAcceptRequisition = (staff) => {
-    setSelectedStaff(staff);
-    setIsAcceptDialogOpen(true);
+  const handleRequisition = (staff, status) => {
+    console.log(staff, status);
+    if (status === "accept") {
+      setIsAcceptDialogOpen(!isAcceptDialogOpen);
+      setSelectedStaff(staff);
+    }
+    if (status === "reject") {
+      setIsDenyDialogOpen(!isDenyDialogOpen);
+      setSelectedStaff(staff);
+    }
   };
+  async function getRequistions() {
+    try {
+      const url2 = "http://localhost:5174/api/staffreq";
 
-  const handleDenyRequisition = (staff) => {
-    setSelectedStaff(staff);
-    setIsDenyDialogOpen(true);
-  };
+      const response2 = await fetch(url2);
 
-  const confirmAcceptRequisition = () => {
-    setStaffData(
-      staffData.map((staff) =>
-        staff.id === selectedStaff.id ? { ...staff, status: "Accepted" } : staff
-      )
-    );
-    setIsAcceptDialogOpen(false);
-  };
+      const { staffReq } = await response2.json();
+      console.log(staffReq);
+      setStaffData(staffReq);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-  const confirmDenyRequisition = () => {
-    setStaffData(
-      staffData.map((staff) =>
-        staff.id === selectedStaff.id ? { ...staff, status: "Denied" } : staff
-      )
-    );
-    setIsDenyDialogOpen(false);
+  async function handleRequest(status, id) {
+    try {
+      const url = "http://localhost:5174/api/handlerequest";
+
+      const data = { status: status, id: id };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const userData = await response.json();
+      console.log(userData.message);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const confirmRequisition = (status) => {
+    console.log(status, selectedStaff);
+    if (status === "accept") {
+      handleRequest((status = "approved"), selectedStaff.id);
+      setIsAcceptDialogOpen(false);
+      setSelectedStaff(null);
+      getRequistions();
+    }
+    if (status === "reject") {
+      handleRequest((status = "rejected"), selectedStaff.id);
+      setIsDenyDialogOpen(false);
+      setSelectedStaff(null);
+      getRequistions();
+    }
   };
+  const filteredStaffData = staffData?.filter(
+    (entry) =>
+      entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // entry.workSchedule.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.justification.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="flex h-screen">
       {sidebarOpen && (
@@ -201,124 +203,177 @@ const StaffManagementModule = () => {
               />
             </div>
             <div className="overflow-x-auto w-full">
-              <div className="min-w-full">
-                <div className="min-w-full">
-                  <div className="grid grid-cols-7 gap-2 font-bold py-2 bg-gray-100 text-sm md:text-base">
-                    <div className="px-2">Supervisor/Manager</div>
-                    <div className="px-2">Position</div>
-                    <div className="px-2">Department</div>
-                    <div className="px-2">Work Schedule</div>
-                    <div className="px-2">Reason</div>
-                    <div className="px-2">Status</div>
-                    <div className="px-2">Actions</div>
-                  </div>
-                  {filteredStaffData.map((staff) => (
-                    <div
-                      key={staff.id}
-                      className="grid grid-cols-7 gap-2 py-2 border-b text-sm md:text-base items-center"
-                    >
-                      <div className="px-2 truncate">{staff.name}</div>
-                      <div className="px-2 truncate">{staff.position}</div>
-                      <div className="px-2 truncate">{staff.department}</div>
-                      <div className="px-2 truncate">{staff.workSchedule}</div>
-                      <div className="px-2 truncate">{staff.reason}</div>
-                      <div className="px-2 truncate">{staff.status}</div>
-                      <div className="px-2 flex flex-col sm:flex-row gap-2">
-                        {staff.status === "Pending" ? (
-                          <>
-                            <Button
-                              onClick={() => handleAcceptRequisition(staff)}
-                              className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              onClick={() => handleDenyRequisition(staff)}
-                              className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
-                            >
-                              Deny
-                            </Button>
-                          </>
-                        ) : (
-                          "Closed"
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <table className="min-w-full">
+                <thead>
+                  <tr className="grid grid-cols-7 gap-2 font-bold py-2 bg-gray-100 text-sm md:text-base">
+                    <th className="px-2">Supervisor/Manager</th>
+                    <th className="px-2">Position</th>
+                    <th className="px-2">Department</th>
+                    <th className="px-2">Request Date</th>
+                    <th className="px-2">Reason</th>
+                    <th className="px-2">Status</th>
+                    <th className="px-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {searchTerm
+                    ? filteredStaffData.map((staff) => (
+                        <tr
+                          key={staff.id}
+                          className="grid grid-cols-7 gap-2 py-2 border-b text-sm md:text-base items-center"
+                        >
+                          <td className="px-2 truncate">{staff.name}</td>
+                          <td className="px-2 truncate">{staff.position}</td>
+                          <td className="px-2 truncate">{staff.department}</td>
+                          <td className="px-2 truncate">
+                            {formatDate(staff.requested_date)}
+                          </td>
+                          <td className="px-2 truncate">
+                            {staff.justification}
+                          </td>
+                          <td className="px-2 truncate">{staff.status}</td>
+                          <td className="px-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              {staff.status === "pending" ? (
+                                <>
+                                  <Button
+                                    onClick={() =>
+                                      handleRequisition(staff, "accept")
+                                    }
+                                    className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
+                                  >
+                                    Accept
+                                  </Button>
+                                  <Button
+                                    onClick={() =>
+                                      handleRequisition(staff, "reject")
+                                    }
+                                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                                  >
+                                    Deny
+                                  </Button>
+                                </>
+                              ) : (
+                                "Closed"
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    : staffData.map((staff) => (
+                        <tr
+                          key={staff.id}
+                          className="grid grid-cols-7 gap-2 py-2 border-b text-sm md:text-base items-center"
+                        >
+                          <td className="px-2 truncate">{staff.name}</td>
+                          <td className="px-2 truncate">{staff.position}</td>
+                          <td className="px-2 truncate">{staff.department}</td>
+                          <td className="px-2 truncate">
+                            {formatDate(staff.requested_date)}
+                          </td>
+                          <td className="px-2 truncate">
+                            {staff.justification}
+                          </td>
+                          <td className="px-2 truncate">{staff.status}</td>
+                          <td className="px-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              {staff.status === "pending" ? (
+                                <>
+                                  <Button
+                                    onClick={() =>
+                                      handleRequisition(staff, "accept")
+                                    }
+                                    className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
+                                  >
+                                    Accept
+                                  </Button>
+                                  <Button
+                                    onClick={() =>
+                                      handleRequisition(staff, "reject")
+                                    }
+                                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                                  >
+                                    Deny
+                                  </Button>
+                                </>
+                              ) : (
+                                "Closed"
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Add Dialog */}
-          <Dialog
+          <DDialog
             open={isAddDialogOpen}
             onClose={() => setIsAddDialogOpen(false)}
           >
-            <div
-              className="fixed inset-0 bg-black bg-opacity-30"
-              aria-hidden="true"
-            ></div>
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-              <div className="relative bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <DialogContent className="sm:max-w-[425px] bg-white">
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl font-bold">
+                  Add New Requisition
+                </DialogTitle>
+
                 <X
-                  className="absolute top-2 right-5 hover:border-2 hover:border-gray-900"
+                  className="h-4 w-4 absolute right-4 top-4"
                   onClick={() => setIsAddDialogOpen(false)}
                 />
-
-                <h3 className="text-center text-2xl font-bold mb-4">
-                  Add New Requisition
-                </h3>
-
-                <div className="space-y-4">
-                  {["Supervisor", "position", "department"].map((field) => (
-                    <div key={field} className="flex items-center space-x-4">
-                      <Label htmlFor={field} className="text w-1/4 font-medium">
-                        {field.charAt(0).toUpperCase() + field.slice(1)}
-                      </Label>
-                      <Input
-                        id={field}
-                        name={field}
-                        value={newStaff[field]}
-                        onChange={handleInputChange}
-                        type="text"
-                        className="border border-gray-300 p-2 w-full"
-                      />
-                    </div>
-                  ))}
-                  <Label
-                    htmlFor="workschedule"
-                    className="inline-block text w-1/4 font-medium"
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                {["Supervisor", "position", "department"].map((field) => (
+                  <div
+                    key={field}
+                    className="grid grid-cols-4 items-center gap-4"
                   >
+                    <Label htmlFor={field} className="text-right">
+                      {field.charAt(0).toUpperCase() + field.slice(1)}
+                    </Label>
+                    <Input
+                      id={field}
+                      name={field}
+                      value={newStaff[field]}
+                      onChange={handleInputChange}
+                      className="col-span-3"
+                    />
+                  </div>
+                ))}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="workSchedule" className="text-right">
                     Work Schedule
                   </Label>
-                  <select
-                    className="inline-block w-2\4 border border-gray-300 p-2 ml-2 "
-                    name="work-schedule"
-                    id="work"
+                  <Select
+                    onValueChange={(value) =>
+                      handleInputChange({
+                        target: { name: "workSchedule", value },
+                      })
+                    }
                   >
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                  </select>
-                </div>
-
-                <div className="mt-6 flex justify-end space-x-2">
-                  <Button
-                    onClick={() => setIsAddDialogOpen(false)}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleAddStaff}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                  >
-                    Add
-                  </Button>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select schedule" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">Full-time</SelectItem>
+                      <SelectItem value="part-time">Part-time</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            </div>
-          </Dialog>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAddDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleAddStaff}>Add</Button>
+              </DialogFooter>
+            </DialogContent>
+          </DDialog>
 
           {/* Edit Dialog */}
           <Dialog
@@ -352,7 +407,7 @@ const StaffManagementModule = () => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={confirmAcceptRequisition}
+                    onClick={() => confirmRequisition("accept")}
                     className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
                   >
                     Accept
@@ -386,7 +441,7 @@ const StaffManagementModule = () => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={confirmDenyRequisition}
+                    onClick={() => confirmRequisition("reject")}
                     className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                   >
                     Deny
@@ -402,3 +457,33 @@ const StaffManagementModule = () => {
 };
 
 export default StaffManagementModule;
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return redirect("/");
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/staffreq";
+
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const response2 = await fetch(url2);
+
+  const userData = await response.json();
+
+  const { staffReq } = await response2.json();
+
+  if (userData.message === "token expired") {
+    return redirect("/");
+  }
+  return { staffReq: staffReq, role: userData };
+}

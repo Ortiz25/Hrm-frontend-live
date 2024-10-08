@@ -35,106 +35,7 @@ import {
 import SidebarLayout from "../components/layout/sidebarLayout";
 import { useStore } from "../store/store";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../components/ui/popover";
-
-// Extended dummy data
-const dummyAttendanceData = [
-  {
-    id: 1,
-    name: "John Doe",
-    department: "IT",
-    date: "2024-09-23",
-    checkIn: "09:00",
-    checkOut: "17:00",
-    status: "Present",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    department: "HR",
-    date: "2024-09-23",
-    checkIn: "08:55",
-    checkOut: "17:05",
-    status: "Present",
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    department: "Finance",
-    date: "2024-09-23",
-    checkIn: "09:10",
-    checkOut: "16:55",
-    status: "Present",
-  },
-  {
-    id: 4,
-    name: "Emily Brown",
-    department: "Marketing",
-    date: "2024-09-23",
-    checkIn: "",
-    checkOut: "",
-    status: "Absent",
-  },
-  {
-    id: 5,
-    name: "David Lee",
-    department: "Sales",
-    date: "2024-09-23",
-    checkIn: "09:05",
-    checkOut: "17:10",
-    status: "Present",
-  },
-  // Additional data for different dates
-  {
-    id: 6,
-    name: "John Doe",
-    department: "IT",
-    date: "2024-09-24",
-    checkIn: "08:50",
-    checkOut: "17:15",
-    status: "Present",
-  },
-  {
-    id: 7,
-    name: "Jane Smith",
-    department: "HR",
-    date: "2024-09-24",
-    checkIn: "09:05",
-    checkOut: "16:55",
-    status: "Present",
-  },
-  {
-    id: 8,
-    name: "Mike Johnson",
-    department: "Finance",
-    date: "2024-09-24",
-    checkIn: "",
-    checkOut: "",
-    status: "Absent",
-  },
-  {
-    id: 9,
-    name: "Emily Brown",
-    department: "Marketing",
-    date: "2024-09-24",
-    checkIn: "09:00",
-    checkOut: "17:00",
-    status: "Present",
-  },
-  {
-    id: 10,
-    name: "David Lee",
-    department: "Sales",
-    date: "2024-09-24",
-    checkIn: "08:45",
-    checkOut: "17:30",
-    status: "Present",
-  },
-];
+import { redirect, useLoaderData } from "react-router-dom";
 
 const formatDate = (date, format = "long") => {
   if (format === "long") {
@@ -149,20 +50,24 @@ const formatDate = (date, format = "long") => {
 };
 
 const HRMSAttendanceModule = () => {
+  const { attendanceData, role } = useLoaderData();
   const [selectedDepartment, setSelectedDepartment] = useState("all");
-  const [currentDate, setCurrentDate] = useState(new Date(2024, 8, 23)); // September 23, 2024
-  const { activeModule, changeModule } = useStore();
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const [attendance, setAttendance] = useState(attendanceData.attendanceData);
 
   useEffect(() => {
     changeModule("Attendance");
+    changeRole(role);
   }, []);
 
-  const filteredData = dummyAttendanceData.filter(
+  const filteredData = attendance.filter(
     (item) =>
       (selectedDepartment === "all" ||
         item.department.toLowerCase() === selectedDepartment) &&
-      item.date === formatDate(currentDate, "yyyy-MM-dd")
+      item.formatted_date === formatDate(currentDate, "yyyy-MM-dd")
   );
   const handleDateChange = (event) => {
     setCurrentDate(new Date(event.target.value));
@@ -279,9 +184,9 @@ const HRMSAttendanceModule = () => {
                     <TableRow key={item.id}>
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.department}</TableCell>
-                      <TableCell>{item.date}</TableCell>
-                      <TableCell>{item.checkIn}</TableCell>
-                      <TableCell>{item.checkOut}</TableCell>
+                      <TableCell>{item.formatted_date}</TableCell>
+                      <TableCell>{item.check_in}</TableCell>
+                      <TableCell>{item.check_out}</TableCell>
                       <TableCell>{item.status}</TableCell>
                     </TableRow>
                   ))}
@@ -289,23 +194,24 @@ const HRMSAttendanceModule = () => {
               </Table>
             </CardContent>
           </Card>
-
-          <div className="flex justify-between">
-            <Button variant="outline" className="shadow-lg bg-gray-100">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              Generate Current Report
-            </Button>
-            <div className="space-x-2">
+          {role !== "employee" && (
+            <div className="flex justify-between">
               <Button variant="outline" className="shadow-lg bg-gray-100">
-                <Upload className="mr-2 h-4 w-4" />
-                Import Biometric Data
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                Generate Current Report
               </Button>
-              <Button variant="outline" className="shadow-lg bg-gray-100">
-                <Download className="mr-2 h-4 w-4" />
-                Export to Payroll
-              </Button>
+              <div className="space-x-2">
+                <Button variant="outline" className="shadow-lg bg-gray-100">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import Biometric Data
+                </Button>
+                <Button variant="outline" className="shadow-lg bg-gray-100">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export to Payroll
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
@@ -313,3 +219,34 @@ const HRMSAttendanceModule = () => {
 };
 
 export default HRMSAttendanceModule;
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return redirect("/");
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/attendance";
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const response2 = await fetch(url2);
+
+  const userData = await response.json();
+  // if (userData.role === "employee") {
+  //   return redirect("/employeedashboard");
+  // }
+  const attendanceData = await response2.json();
+
+  if (userData.message === "token expired") {
+    return redirect("/");
+  }
+  return { attendanceData: attendanceData, role: userData.role };
+}

@@ -246,7 +246,7 @@ const Perfomance = () => {
                   <TabsTrigger value="results">Results</TabsTrigger>
                 </TabsList>
                 <RefreshCcw
-                  className="inline-block mr-4 mt-2 float-right hover:cursor-pointer"
+                  className="inline-block mr-4 mt-2 float-right hover:cursor-pointer text-gray-600"
                   onClick={() => {
                     setSelectedEmployee(null);
                   }}

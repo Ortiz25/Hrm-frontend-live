@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Menu, X, Calendar, TriangleAlert } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Menu, X, Calendar, TriangleAlert, Loader } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,53 +12,58 @@ import { Label } from "../components/ui/label.jsx";
 import { useStore } from "../store/store.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { Dialog } from "@headlessui/react";
-import { NavLink } from "react-router-dom";
-
-// Sample data for disciplinary actions
-const initialDisciplinaryData = [
-  {
-    id: 1,
-    employeeName: "John Doe",
-    actionType: "Warning",
-    date: "2024-09-01",
-    reason: "Late to work",
-    status: "Open",
-  },
-  {
-    id: 2,
-    employeeName: "Jane Smith",
-    actionType: "Suspension",
-    date: "2024-09-10",
-    reason: "Unapproved leave",
-    status: "In Progress",
-  },
-  {
-    id: 3,
-    employeeName: "Emily Johnson",
-    actionType: "Termination",
-    date: "2024-09-15",
-    reason: "Misconduct",
-    status: "Closed",
-  },
-];
+import {
+  Form,
+  NavLink,
+  redirect,
+  useLoaderData,
+  useNavigation,
+} from "react-router-dom";
+import EmployeeSuggestions from "../components/layout/suggestions.jsx";
 
 const DisciplinaryModule = () => {
   const { activeModule, changeModule } = useStore();
-
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const isLoading = navigation.state === "loading";
+  const loaderData = useLoaderData();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [disciplinaryData, setDisciplinaryData] = useState(
-    initialDisciplinaryData
-  );
+  const [disciplinaryData, setDisciplinaryData] = useState(loaderData.cases);
   const [selectedAction, setSelectedAction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAction, setNewAction] = useState({
     employeeName: "",
+    employeeId: "",
     actionType: "",
     date: "",
     reason: "",
     status: "Open",
   });
+  const [employeeSuggestions, setEmployeeSuggestions] = useState([]);
+  const slicedCases = disciplinaryData.slice(0, 5);
+
+  // New function to fetch employee data
+  const fetchEmployeeData = async (searchTerm) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5174/api/employees?search=${searchTerm}`
+      );
+      const data = await response.json();
+
+      setEmployeeSuggestions(data);
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (newAction.employeeName.length > 2) {
+      fetchEmployeeData(newAction.employeeName);
+    } else {
+      setEmployeeSuggestions([]);
+    }
+  }, [newAction.employeeName]);
 
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -74,12 +79,32 @@ const DisciplinaryModule = () => {
     setSelectedAction(null);
   };
 
-  const handleUpdateStatus = (id, newStatus) => {
-    setDisciplinaryData((prevData) =>
-      prevData.map((entry) =>
-        entry.id === id ? { ...entry, status: newStatus } : entry
-      )
-    );
+  const handleUpdateStatus = async (id, newStatus) => {
+    console.log(id, newStatus);
+
+    try {
+      const url = "http://localhost:5174/api/updatecase";
+      const data = { status: newStatus, id: id };
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const userData = await response.json();
+      console.log(userData);
+      if (userData.message === "updated successfully") {
+        setIsModalOpen(false);
+        setDisciplinaryData((prevData) =>
+          prevData.map((item) =>
+            item.id === id ? { ...item, status: newStatus } : item
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleNewActionChange = (e) => {
@@ -87,29 +112,20 @@ const DisciplinaryModule = () => {
     setNewAction((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNewActionSubmit = (e) => {
-    e.preventDefault();
-    const id = disciplinaryData.length + 1;
-    const newActionEntry = {
-      id,
-      ...newAction,
-    };
-    setDisciplinaryData((prev) => [...prev, newActionEntry]);
-    setNewAction({
-      employeeName: "",
-      employeeId: "",
-      actionType: "",
-      date: "",
-      reason: "",
-      status: "Open",
-    });
+  const handleEmployeeSelect = (employee) => {
+    setNewAction((prev) => ({
+      ...prev,
+      employeeName: employee.first_name + " " + employee.last_name,
+      employeeId: employee.employee_number,
+    }));
+    setEmployeeSuggestions([]);
   };
 
   const filteredData = disciplinaryData.filter(
     (entry) =>
-      entry.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.actionType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.action_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -163,20 +179,22 @@ const DisciplinaryModule = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredData.map((entry) => (
+                    {(searchTerm ? filteredData : slicedCases).map((entry) => (
                       <tr key={entry.id} className="hover:bg-gray-50">
-                        <td className="border p-2">{entry.employeeName}</td>
-                        <td className="border p-2">{entry.actionType}</td>
-                        <td className="border p-2">{entry.date}</td>
-                        <td className="border p-2">{entry.reason}</td>
+                        <td className="border p-2">{entry.name}</td>
+                        <td className="border p-2">{entry.action_type}</td>
+                        <td className="border p-2">{entry.action_date}</td>
+                        <td className="border p-2">{entry.description}</td>
                         <td className="border p-2">{entry.status}</td>
                         <td className="border p-2">
-                          <Button
-                            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 rounded"
-                            onClick={() => handleOpenModal(entry)}
-                          >
-                            Actions
-                          </Button>
+                          {entry.status === "open" && (
+                            <Button
+                              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 rounded"
+                              onClick={() => handleOpenModal(entry)}
+                            >
+                              Actions
+                            </Button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -191,9 +209,9 @@ const DisciplinaryModule = () => {
               <CardTitle>Record Disciplinary Case</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleNewActionSubmit} className="space-y-4">
+              <Form method="post" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 relative">
                     <Label htmlFor="employeeName">Employee Name</Label>
                     <Input
                       id="employeeName"
@@ -202,14 +220,26 @@ const DisciplinaryModule = () => {
                       onChange={handleNewActionChange}
                       required
                     />
+                    {employeeSuggestions.length > 0 && (
+                      <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 max-h-40 overflow-y-auto">
+                        {employeeSuggestions.map((employee) => (
+                          <li
+                            key={employee.id}
+                            className="p-2 hover:bg-gray-100 bg-gray-300 cursor-pointer"
+                            onClick={() => handleEmployeeSelect(employee)}
+                          >
+                            {employee.first_name + " " + employee.last_name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="employeeId">Employee Id</Label>
+                    <Label htmlFor="employeeId">Employee Id/No</Label>
                     <Input
                       id="employeeId"
                       name="employeeId"
                       value={newAction.employeeId}
-                      onChange={handleNewActionChange}
                       required
                     />
                   </div>
@@ -219,8 +249,6 @@ const DisciplinaryModule = () => {
                       id="actionType"
                       name="actionType"
                       className="border-4 rounded-md p-2 w-full"
-                      value={newAction.actionType}
-                      onChange={handleNewActionChange}
                       required
                     >
                       <option value="">Select Action Type</option>
@@ -231,38 +259,26 @@ const DisciplinaryModule = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="date">Date</Label>
-                    <Input
-                      id="date"
-                      name="date"
-                      type="date"
-                      value={newAction.date}
-                      onChange={handleNewActionChange}
-                      required
-                    />
+                    <Input id="date" name="date" type="date" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="reason">Reason</Label>
-                    <Input
-                      id="reason"
-                      name="reason"
-                      value={newAction.reason}
-                      onChange={handleNewActionChange}
-                      required
-                    />
+                    <Input id="reason" name="reason" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="status">Status</Label>
-                    <Input
-                      id="status"
-                      name="status"
-                      value={newAction.reason}
-                      onChange={handleNewActionChange}
-                      required
-                    />
+                    <Input id="status" name="status" required />
                   </div>
                 </div>
-                <Button type="submit">Submit Disciplinary Action</Button>
-              </form>
+                <Button type="submit">
+                  {isSubmitting || isLoading ? (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <></>
+                  )}
+                  {isSubmitting ? "Submiting..." : "Submit Disciplinary Action"}
+                </Button>
+              </Form>
             </CardContent>
           </Card>
         </div>
@@ -280,42 +296,32 @@ const DisciplinaryModule = () => {
             {selectedAction && (
               <div>
                 <p>
-                  <strong>Employee Name:</strong> {selectedAction.employeeName}
+                  <strong>Employee Name:</strong> {selectedAction.name}
                 </p>
                 <p>
-                  <strong>Action Type:</strong> {selectedAction.actionType}
+                  <strong>Action Type:</strong> {selectedAction.action_type}
                 </p>
                 <p>
-                  <strong>Date:</strong> {selectedAction.date}
+                  <strong>Date:</strong> {selectedAction.action_date}
                 </p>
                 <p>
-                  <strong>Reason:</strong> {selectedAction.reason}
+                  <strong>Reason:</strong> {selectedAction.description}
                 </p>
                 <p>
                   <strong>Status:</strong> {selectedAction.status}
                 </p>
                 <div className="mt-4 flex justify-end space-x-2">
-                  {selectedAction.status === "Open" && (
-                    <Button
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                  {selectedAction.status === "open" && (
+                    <button
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 "
                       onClick={() =>
-                        handleUpdateStatus(selectedAction.id, "In Progress")
+                        handleUpdateStatus(selectedAction.id, "closed")
                       }
                     >
-                      Mark as In Progress
-                    </Button>
+                      Close Case
+                    </button>
                   )}
-                  {selectedAction.status === "In Progress" && (
-                    <Button
-                      className="bg-green-500 hover:bg-green-600 text-white"
-                      onClick={() =>
-                        handleUpdateStatus(selectedAction.id, "Closed")
-                      }
-                    >
-                      Mark as Closed
-                    </Button>
-                  )}
-                  <Button variant="destructive" onClick={handleCloseModal}>
+                  <Button variant="ghost" onClick={handleCloseModal}>
                     Close
                   </Button>
                 </div>
@@ -329,3 +335,62 @@ const DisciplinaryModule = () => {
 };
 
 export default DisciplinaryModule;
+
+export async function action({ request, params }) {
+  const data = await request.formData();
+
+  const caseData = {
+    employeeId: data.get("employeeId"),
+    employeeName: data.get("employeeName"),
+    actionType: data.get("actionType"),
+    date: data.get("date"),
+    status: data.get("status"),
+    reason: data.get("reason"),
+  };
+  console.log(caseData);
+
+  let url = "http://localhost:5174/api/recordcase";
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(caseData),
+  });
+  const resData = await response.json();
+
+  if (resData.message === "updated succesfully") {
+    return redirect("/dashboard");
+  }
+  return null;
+}
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return redirect("/");
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/discplinary";
+
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const response2 = await fetch(url2);
+
+  const userData = await response.json();
+
+  const { cases } = await response2.json();
+
+  if (userData.message === "token expired") {
+    return redirect("/");
+  }
+  return { cases: cases, role: userData };
+}

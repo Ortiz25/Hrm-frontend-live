@@ -1,20 +1,97 @@
 import React, { useEffect, useState } from "react";
-import { Menu } from "lucide-react";
+import {
+  Menu,
+  Moon,
+  Sun,
+  PlusCircle,
+  Trash2,
+  UserPlus,
+  MoreHorizontal,
+  Key,
+  Edit,
+  TriangleAlert,
+  Loader,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import {
+  Description,
+  Dialog as Dialog1,
+  DialogPanel as DialogPanel1,
+  DialogTitle as DialogTitle1,
+} from "@headlessui/react";
 import { useStore } from "../store/store.jsx";
-import { Button } from "../components/ui/button.jsx";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Switch } from "../components/ui/switch";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
+import { Label } from "../components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Button1,
+} from "../components/ui/dropdownMenu.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout";
+import { AlertTriangle } from "lucide-react";
+import {
+  Form,
+  redirect,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "react-router-dom";
 
 const AdminSettingsModule = () => {
-  const [leaveTypes, setLeaveTypes] = useState(["Annual", "Sick", "Personal"]);
-  const { activeModule, changeModule, discplinaryAction } = useStore();
+  const { activeModule, changeModule, disciplinaryAction, changeUser } =
+    useStore();
+  const [error, updateError] = useState({});
+  const actionData = useActionData();
+  const [isDeleting, updateDelete] = useState(false);
+  const adminData = useLoaderData();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const isLoading = navigation.state === "loading";
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [disciplinaryActionTypes, setDisciplinaryActionTypes] = useState([
-    "Verbal Warning",
-    "Written Warning",
-    "Performance Improvement Plan",
-    "Suspension",
-    "Final Warning",
-  ]);
+  const [leaveTypes, setLeaveTypes] = useState(adminData.leaveTypes);
   const [newLeaveType, setNewLeaveType] = useState("");
   const [newActionType, setNewActionType] = useState("");
   const [settings, setSettings] = useState({
@@ -23,17 +100,54 @@ const AdminSettingsModule = () => {
     notifyManagerOnLeaveRequest: true,
     enforceProgressiveDiscipline: true,
     theme: "light",
-    activeTab: "leave",
   });
-  const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", role: "Admin" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User" },
-  ]);
-  const [newUser, setNewUser] = useState({ name: "", email: "", role: "User" });
+  const [users, setUsers] = useState(adminData.users);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [showPassword, updateShowPassword] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isUserActionModalOpen, setIsUserActionModalOpen] = useState(false);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] =
+    useState(false);
+  const [editUserData, setEditUserData] = useState({
+    name: "",
+    email: "",
+    role: "User",
+    password: "",
+    confirmPassword: "",
+  });
+
+  function handleClick() {
+    updateShowPassword(!showPassword);
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const url2 = "http://localhost:5174/api/adminsettings";
+      const response2 = await fetch(url2);
+
+      const userData = await response2.json();
+      setUsers(userData.users);
+    };
+    if (actionData?.message === "user update succesful") {
+      fetchData();
+      setIsEditUserModalOpen(!isEditUserModalOpen);
+    }
+
+    if (actionData?.message === "password Mismatch") {
+      updateError({ message: "password Mismatch" });
+    }
+
+    if (actionData?.message === "password update succesful") {
+      fetchData();
+      setIsResetPasswordModalOpen(!isResetPasswordModalOpen);
+    }
+  }, [actionData]);
 
   useEffect(() => {
     changeModule("Admin Settings");
-  }, []);
+    changeUser(adminData.role);
+  }, [changeModule]);
 
   const handleAddLeaveType = () => {
     if (newLeaveType && !leaveTypes.includes(newLeaveType)) {
@@ -43,10 +157,61 @@ const AdminSettingsModule = () => {
   };
 
   const handleAddActionType = () => {
-    if (newActionType && !disciplinaryActionTypes.includes(newActionType)) {
-      setDisciplinaryActionTypes([...disciplinaryActionTypes, newActionType]);
+    if (newActionType && !disciplinaryAction.includes(newActionType)) {
+      useStore.setState({
+        disciplinaryAction: [...disciplinaryAction, newActionType],
+      });
       setNewActionType("");
     }
+  };
+
+  const handleDeleteUser = async (user) => {
+    try {
+      updateDelete(!isDeleting);
+      const url = "http://localhost:5174/api/deleteuser";
+      const data = { userId: user.id };
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const deleteData = await response.json();
+
+      if (deleteData.message === "user deleted") {
+        updateDelete(!isDeleting);
+        setIsUserActionModalOpen(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const openUserActionModal = (user) => {
+    setSelectedUser(user);
+    setIsUserActionModalOpen(true);
+  };
+
+  const openEditUserModal = (user) => {
+    setSelectedUser(user);
+    setIsEditUserModalOpen(true);
+  };
+
+  const closeEditUserModal = () => {
+    setIsEditUserModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const openResetPasswordModal = (user) => {
+    setSelectedUser(user);
+    setIsResetPasswordModalOpen(true);
+  };
+
+  const closeResetPasswordModal = () => {
+    setIsResetPasswordModalOpen(false);
+    setSelectedUser(null);
   };
 
   const handleRemoveLeaveType = (type) => {
@@ -54,329 +219,669 @@ const AdminSettingsModule = () => {
   };
 
   const handleRemoveActionType = (type) => {
-    setDisciplinaryActionTypes(
-      disciplinaryActionTypes.filter((t) => t !== type)
-    );
+    useStore.setState({
+      disciplinaryAction: disciplinaryAction.filter((t) => t !== type),
+    });
   };
 
-  const handleSettingChange = (setting) => {
-    setSettings((prev) => ({ ...prev, [setting]: !prev[setting] }));
-  };
-
-  const handleMaxLeavesChange = (e) => {
-    setSettings((prev) => ({
-      ...prev,
-      maxConsecutiveLeaves: parseInt(e.target.value) || 0,
-    }));
-  };
-
-  const handleThemeChange = () => {
-    setSettings((prev) => ({
-      ...prev,
-      theme: prev.theme === "light" ? "dark" : "light",
-    }));
-  };
-
-  const handleAddUser = () => {
-    if (newUser.name && newUser.email) {
-      setUsers([...users, { ...newUser, id: users.length + 1 }]);
-      setNewUser({ name: "", email: "", role: "User" });
-    }
-  };
-
-  const handleResetPassword = (userId) => {
-    console.log(`Password reset for user ${userId}`);
+  const handleSettingChange = (setting, value) => {
+    setSettings((prev) => ({ ...prev, [setting]: value }));
   };
 
   return (
-    <div className="flex h-screen">
+    <div className={`flex h-screen`}>
       {sidebarOpen && (
         <SidebarLayout
           activeModule={activeModule}
           setActiveModule={changeModule}
         />
       )}
-      <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+      <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900">
+        <div className="p-4 bg-white dark:bg-gray-800 shadow-md flex justify-between items-center">
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="h-6 w-6" />
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-xl font-bold dark:text-white">{activeModule}</h1>
         </div>
-        <div
-          className={`p-4 h-full ${
-            settings.theme === "dark"
-              ? "bg-gray-900 text-gray-100"
-              : "bg-gray-100 text-gray-900"
-          }`}
-        >
-          <div className="bg-white rounded-lg shadow-2xl">
-            <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Admin Settings</h2>
-              <button
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-                onClick={handleThemeChange}
-              ></button>
-            </div>
-            <div className="p-4">
-              <div className="flex border-b border-gray-200 mb-4">
-                {["leave", "disciplinary", "general", "users"].map((tab) => (
-                  <button
-                    key={tab}
-                    className={`py-2 px-4 mx-4 font-medium ${
-                      settings.activeTab === tab
-                        ? "text-blue-600 border-b-2 border-blue-600"
-                        : "text-gray-600 hover:text-blue-600"
-                    } transition-colors`}
-                    onClick={() => setSettings({ ...settings, activeTab: tab })}
-                  >
-                    {tab.charAt(0).toUpperCase() +
-                      tab.slice(1).replace("-", " ")}{" "}
-                    Settings
-                  </button>
-                ))}
-              </div>
-              <div>
-                {settings.activeTab === "leave" && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold mb-2">Leave Types</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      {leaveTypes.map((type) => (
-                        <li
-                          key={type}
-                          className="flex justify-between items-center"
+        <div className="p-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Admin Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="leave">
+                <TabsList className="grid w-full grid-cols-4 bg-gray-200">
+                  <TabsTrigger value="leave">Leave</TabsTrigger>
+                  <TabsTrigger value="disciplinary">Disciplinary</TabsTrigger>
+                  <TabsTrigger value="general">General</TabsTrigger>
+                  <TabsTrigger value="users">Users</TabsTrigger>
+                </TabsList>
+                <TabsContent value="leave" className="space-y-4">
+                  <h3 className="text-lg font-semibold mb-2">Leave Types</h3>
+                  <ul className="space-y-2">
+                    {leaveTypes.map((type) => (
+                      <li
+                        key={type}
+                        className="flex justify-between items-center"
+                      >
+                        {type.leave_type}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveLeaveType(type)}
                         >
-                          {type}
-                          <button
-                            className="text-red-500 hover:text-red-700 text-sm transition-colors"
-                            onClick={() => handleRemoveLeaveType(type)}
-                          >
-                            Remove
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex space-x-2">
-                      <input
-                        type="text"
-                        value={newLeaveType}
-                        onChange={(e) => setNewLeaveType(e.target.value)}
-                        placeholder="New leave type"
-                        className="border border-gray-300 p-2 rounded-md flex-1"
-                      />
-                      <button
-                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-                        onClick={handleAddLeaveType}
-                      >
-                        Add
-                      </button>
-                    </div>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex space-x-2">
+                    <Input
+                      value={newLeaveType}
+                      onChange={(e) => setNewLeaveType(e.target.value)}
+                      placeholder="New leave type"
+                    />
+                    <Button onClick={handleAddLeaveType}>
+                      <PlusCircle className="h-4 w-4 mr-2" /> Add
+                    </Button>
                   </div>
-                )}
-                {settings.activeTab === "disciplinary" && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      Disciplinary Action Types
-                    </h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      {discplinaryAction.map((type) => (
-                        <li
-                          key={type}
-                          className="flex justify-between items-center"
+                </TabsContent>
+                <TabsContent value="disciplinary" className="space-y-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Disciplinary Action Types
+                  </h3>
+                  <ul className="space-y-2">
+                    {disciplinaryAction?.map((type) => (
+                      <li
+                        key={type}
+                        className="flex justify-between items-center"
+                      >
+                        {type}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveActionType(type)}
                         >
-                          {type}
-                          <button
-                            className="text-red-500 hover:text-red-700 text-sm transition-colors"
-                            onClick={() => handleRemoveActionType(type)}
-                          >
-                            Remove
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex space-x-2">
-                      <input
-                        type="text"
-                        value={newActionType}
-                        name="leave"
-                        onChange={(e) => setNewActionType(e.target.value)}
-                        placeholder="New action type"
-                        className="border border-gray-300 p-2 rounded-md flex-1"
-                      />
-                      <button
-                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-                        onClick={handleAddActionType}
-                      >
-                        Add
-                      </button>
-                    </div>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex space-x-2">
+                    <Input
+                      value={newActionType}
+                      onChange={(e) => setNewActionType(e.target.value)}
+                      placeholder="New action type"
+                    />
+                    <Button onClick={handleAddActionType}>
+                      <PlusCircle className="h-4 w-4 mr-2" /> Add
+                    </Button>
                   </div>
-                )}
-                {settings.activeTab === "general" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="auto-approve"
-                        className="flex items-center space-x-2"
-                      >
-                        <span>Auto-approve leave requests</span>
-                        <input
-                          id="auto-approve"
-                          type="checkbox"
-                          checked={settings.autoApproveLeaves}
-                          onChange={() =>
-                            handleSettingChange("autoApproveLeaves")
-                          }
-                          className="form-checkbox h-5 w-5 text-blue-600"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="max-leaves" className="flex-1">
-                        Maximum consecutive leave days
-                      </label>
-                      <input
-                        id="max-leaves"
-                        type="number"
-                        value={settings.maxConsecutiveLeaves}
-                        onChange={handleMaxLeavesChange}
-                        className="border border-gray-300 p-2 rounded-md w-20"
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="notify-manager"
-                        className="flex items-center space-x-2"
-                      >
-                        <span>Notify manager on leave request</span>
-                        <input
-                          id="notify-manager"
-                          type="checkbox"
-                          checked={settings.notifyManagerOnLeaveRequest}
-                          onChange={() =>
-                            handleSettingChange("notifyManagerOnLeaveRequest")
-                          }
-                          className="form-checkbox h-5 w-5 text-blue-600"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="progressive-discipline"
-                        className="flex items-center space-x-2"
-                      >
-                        <span>Enforce progressive discipline</span>
-                        <input
-                          id="progressive-discipline"
-                          type="checkbox"
-                          checked={settings.enforceProgressiveDiscipline}
-                          onChange={() =>
-                            handleSettingChange("enforceProgressiveDiscipline")
-                          }
-                          className="form-checkbox h-5 w-5 text-blue-600"
-                        />
-                      </label>
-                    </div>
+                </TabsContent>
+                <TabsContent value="general" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span>Auto-approve leave requests</span>
+                    <Switch
+                      checked={settings.autoApproveLeaves}
+                      onCheckedChange={(value) =>
+                        handleSettingChange("autoApproveLeaves", value)
+                      }
+                    />
                   </div>
-                )}
-                {settings.activeTab === "users" && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      User Management
-                    </h3>
-                    <ul className="list-decimal pl-5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span>Maximum consecutive leave days</span>
+                    <Input
+                      type="number"
+                      value={settings.maxConsecutiveLeaves}
+                      onChange={(e) =>
+                        handleSettingChange(
+                          "maxConsecutiveLeaves",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className="w-20"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Notify manager on leave request</span>
+                    <Switch
+                      checked={settings.notifyManagerOnLeaveRequest}
+                      onCheckedChange={(value) =>
+                        handleSettingChange(
+                          "notifyManagerOnLeaveRequest",
+                          value
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Enforce progressive discipline</span>
+                    <Switch
+                      checked={settings.enforceProgressiveDiscipline}
+                      onCheckedChange={(value) =>
+                        handleSettingChange(
+                          "enforceProgressiveDiscipline",
+                          value
+                        )
+                      }
+                    />
+                  </div>
+                </TabsContent>
+                <TabsContent value="users" className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold">User Management</h3>
+                    <Dialog
+                      open={isAddUserModalOpen}
+                      onOpenChange={setIsAddUserModalOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                          <UserPlus className="h-4 w-4 mr-2" /> Add User
+                        </Button>
+                      </DialogTrigger>
+
+                      <DialogContent className="bg-white dark:bg-gray-800">
+                        <Form method="put">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl text-center">
+                              Add New User
+                            </DialogTitle>
+                            <DialogDescription className="text-center">
+                              Fill in the details to add a new user to the
+                              system.
+                            </DialogDescription>
+                          </DialogHeader>
+
+                          <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="name" className="text-right">
+                                Name
+                              </Label>
+                              <Input
+                                id="name"
+                                name="name"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label
+                                htmlFor="employee-id"
+                                className="text-right"
+                              >
+                                Employee ID/No:
+                              </Label>
+                              <Input
+                                id="employeeId"
+                                name="employeeId"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="email" className="text-right">
+                                Email
+                              </Label>
+                              <Input
+                                id="email"
+                                type="email"
+                                name="email"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="password" className="text-right">
+                                Password
+                              </Label>
+                              <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="cpassword" className="text-right">
+                                Confirm Password
+                              </Label>
+                              <Input
+                                id="cpassword"
+                                type="password"
+                                name="cpassword"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="role" className="text-right">
+                                Role
+                              </Label>
+                              <Select name="role">
+                                <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-200">
+                                  <SelectItem value="employee">
+                                    Employee
+                                  </SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="super_admin">
+                                    Super Admin
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <button
+                              type="submit"
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            >
+                              Add User
+                            </button>
+                          </DialogFooter>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-lg font-bold">
+                          Name
+                        </TableHead>
+                        <TableHead className="text-lg font-bold">
+                          Email
+                        </TableHead>
+                        <TableHead className="text-lg font-bold">
+                          Role
+                        </TableHead>
+                        <TableHead className="text-right text-lg font-bold">
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {users.map((user) => (
-                        <li
-                          key={user.id}
-                          className="flex justify-between items-center"
-                        >
-                          {user.name} ({user.email}) - {user.role}
-                          <button
-                            className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700 text-sm transition-colors"
-                            onClick={() => handleResetPassword(user.id)}
-                          >
-                            Reset Password
-                          </button>
-                        </li>
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">
+                            {user.first_name + " " + user.last_name}
+                          </TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.role}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button1
+                                  variant="ghost"
+                                  className="h-8 w-8 p-1"
+                                >
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal className="h-6 w-6" />
+                                </Button1>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="bg-gray-200"
+                              >
+                                <DropdownMenuLabel className="font-bold text-md">
+                                  Actions
+                                </DropdownMenuLabel>
+                                <DropdownMenuItem
+                                  onClick={() => openEditUserModal(user)}
+                                  className="hover:bg-gray-400"
+                                >
+                                  <Edit className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="hover:bg-gray-400"
+                                  onClick={() => openResetPasswordModal(user)}
+                                >
+                                  <Key className="mr-2 h-4 w-4" /> Reset
+                                  Password
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="hover:bg-gray-400"
+                                  onClick={() => openUserActionModal(user)}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </ul>
-                    <h3 className="text-lg font-semibold mb-2 border-t pt-4">
-                      Add New Admin/User:
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        name="name"
-                        value={newUser.name}
-                        required
-                        onChange={(e) =>
-                          setNewUser({ ...newUser, name: e.target.value })
-                        }
-                        placeholder="Name"
-                        className="border border-gray-300 p-2 rounded-md"
-                      />
-                      <input
-                        type="email"
-                        name="email"
-                        value={newUser.email}
-                        required
-                        onChange={(e) =>
-                          setNewUser({ ...newUser, email: e.target.value })
-                        }
-                        placeholder="Email"
-                        className="border border-gray-300 p-2 rounded-md"
-                      />
-                      <input
-                        type="password"
-                        name="password"
-                        required
-                        value={newUser.password}
-                        onChange={(e) =>
-                          setNewUser({ ...newUser, password: e.target.value })
-                        }
-                        placeholder="New password"
-                        className="border border-gray-300 p-2 rounded-md"
-                      />
-                      <input
-                        type="password"
-                        name="cpassword"
-                        value={newUser.cpassword}
-                        required
-                        onChange={(e) =>
-                          setNewUser({ ...newUser, cpassword: e.target.value })
-                        }
-                        placeholder="Confirm password"
-                        className="border border-gray-300 p-2 rounded-md"
-                      />
-                      <select
-                        value={newUser.role}
-                        name="options"
-                        onChange={(e) =>
-                          setNewUser({ ...newUser, role: e.target.value })
-                        }
-                        className="border border-gray-300 p-2 rounded-md"
-                      >
-                        <option value="User">User</option>
-                        <option value="employee">Employee</option>
-                        <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
-                      </select>
-                      <button
-                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors col-span-1 sm:col-span-2"
-                        onClick={handleAddUser}
-                      >
-                        Add User
-                      </button>
-                    </div>
-                  </div>
+                    </TableBody>
+                  </Table>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Disable User */}
+      <Dialog1
+        open={isUserActionModalOpen}
+        onClose={() => {
+          setIsUserActionModalOpen(!isUserActionModalOpen);
+        }}
+      >
+        <div
+          className="fixed inset-0 bg-gray-900 bg-opacity-30"
+          aria-hidden="true"
+        ></div>
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-4 text-center">
+              <AlertTriangle className="inline mr-4 size-10 text-red-500" />
+              Delete User !!
+            </h3>
+            <p>
+              Are you sure you want to delete{" "}
+              <span className="text-red-500 font-bold">
+                {selectedUser?.first_name + " " + selectedUser?.last_name}
+              </span>
+              ? This action cannot be undone !!!
+            </p>
+            <div className="mt-6 flex justify-between">
+              <Button
+                onClick={() => handleDeleteUser(selectedUser)}
+                variant="destructive"
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {isDeleting ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
                 )}
-              </div>
+                {isDeleting ? "Deleting.." : "Delete User"}
+              </Button>
+              <Button
+                variant="outlinehandleResetPassword"
+                onClick={() => setIsUserActionModalOpen(false)}
+                className="outline outline-offset-2 outline-1"
+              >
+                Cancel
+              </Button>
             </div>
           </div>
         </div>
-      </div>
+      </Dialog1>
+
+      {/* Edit User */}
+      <Dialog1
+        open={isEditUserModalOpen}
+        onClose={() => {
+          setIsEditUserModalOpen(isEditUserModalOpen);
+        }}
+      >
+        <div
+          className="fixed inset-0 bg-gray-900 bg-opacity-30"
+          aria-hidden="true"
+        ></div>
+        <Form
+          method="put"
+          className="fixed inset-0 flex items-center justify-center p-4"
+        >
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-4 text-center">Edit User !</h3>
+            <p>Modify the user details below</p>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-name" className="text-left">
+                  User ID:
+                </Label>
+                <Input
+                  id="userId"
+                  name="userId"
+                  value={selectedUser?.id}
+                  className="col-span-3"
+                  readOnly
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-name" className="text-left">
+                  Name:
+                </Label>
+                <Input
+                  id="editName"
+                  name="editName"
+                  value={
+                    selectedUser?.first_name + " " + selectedUser?.last_name
+                  }
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-email" className="text-left">
+                  Email:
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={selectedUser?.email}
+                  name="email"
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-role" className="text-left">
+                  Role:
+                </Label>
+                <Select name="role">
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder={selectedUser?.role} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-200">
+                    <SelectItem value="employee">Employee</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="super_admin">Super Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-between">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+              >
+                {isSubmitting || isLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
+                )}
+                {isSubmitting ? "Saving.." : "Save Changes"}
+              </button>
+              <Button
+                variant="outline"
+                onClick={closeEditUserModal}
+                className="outline outline-1"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Form>
+      </Dialog1>
+
+      {/* Reset Password Modal */}
+      <Dialog1
+        open={isResetPasswordModalOpen}
+        onClose={() => {
+          setIsResetPasswordModalOpen(!isResetPasswordModalOpen);
+        }}
+      >
+        <div
+          className="fixed inset-0 bg-gray-900 bg-opacity-30"
+          aria-hidden="true"
+        ></div>
+        <Form
+          method="put"
+          className="fixed inset-0 flex items-center justify-center p-4"
+        >
+          <div className="relative bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-4 text-center">
+              Reset Password !
+            </h3>
+            <p>
+              Enter a new password for{" "}
+              <span className="font-bold text-red-500">
+                {selectedUser?.name}
+              </span>{" "}
+              .
+            </p>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-name" className="text-left">
+                  User ID:
+                </Label>
+                <Input
+                  id="userId"
+                  name="userId"
+                  value={selectedUser?.id}
+                  className="col-span-3"
+                  readOnly
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="new-password" className="text-right">
+                  New Password
+                </Label>
+                <Input
+                  id="new-password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  minLength="8"
+                  className="col-span-3"
+                />
+                {showPassword ? (
+                  <EyeOff
+                    className={`absolute right-9`}
+                    onClick={handleClick}
+                  />
+                ) : (
+                  <Eye
+                    className={`absolute right-9
+                      }`}
+                    onClick={handleClick}
+                  />
+                )}
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="confirm-password" className="text-right">
+                  Confirm Password
+                </Label>
+                <Input
+                  id="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  name="confirm-password"
+                  minLength="8"
+                  className="col-span-3"
+                />
+                {showPassword ? (
+                  <EyeOff
+                    className={`absolute right-9`}
+                    onClick={handleClick}
+                  />
+                ) : (
+                  <Eye
+                    className={`absolute right-9 
+                      }`}
+                    onClick={handleClick}
+                  />
+                )}
+              </div>
+            </div>
+            {error?.message === "password Mismatch" && (
+              <p className="text-red-500 text-md text-bold italic text-center">
+                password Missmatch !!
+              </p>
+            )}
+
+            <div className="mt-6 flex justify-between">
+              <button
+                type="submit"
+                className="bg-green-500 hover:bg-red-600 text-white px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+              >
+                {isSubmitting || isLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
+                )}
+                {isSubmitting ? "Reseting.." : "Reset Password"}
+              </button>
+              <Button
+                variant="outline"
+                onClick={closeResetPasswordModal}
+                className="outline outline-2"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Form>
+      </Dialog1>
     </div>
   );
 };
 
 export default AdminSettingsModule;
+
+export async function action({ request, params }) {
+  const data = await request.formData();
+
+  const adminData = {
+    employeeId: data.get("employeeId"),
+    name: data.get("name"),
+    userId: data.get("userId"),
+    editName: data.get("editName"),
+    role: data.get("role"),
+    email: data.get("email"),
+    cpassword: data.get("confirm-password"),
+    password: data.get("password"),
+  };
+
+  if (adminData.password && adminData.password !== adminData.cpassword) {
+    return { message: "password Mismatch" };
+  }
+  let url = "http://localhost:5174/api/updateuser";
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(adminData),
+  });
+  const resData = await response.json();
+  return resData;
+}
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return redirect("/");
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/adminsettings";
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const response2 = await fetch(url2);
+
+  const userData = await response.json();
+  if (userData.role === "employee") {
+    return redirect("/employeedashboard");
+  }
+  const { users, leaveTypes } = await response2.json();
+
+  if (userData.message === "token expired") {
+    return redirect("/");
+  }
+  return { users: users, leaveTypes: leaveTypes, role: userData.role };
+}

@@ -21,89 +21,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog.jsx";
-
-const dummyEmployees = [
-  {
-    id: 21,
-    username: "johndoe",
-    email: "johndoe@example.com",
-    phone: "123-456-7890",
-    department: "IT",
-    position: "Senior Developer",
-    company: "TechCorp",
-    role: "admin",
-    status: "active",
-  },
-  {
-    id: 22,
-    username: "janedoe",
-    email: "janedoe@example.com",
-    phone: "987-654-3210",
-    department: "HR",
-    position: "HR Manager",
-    company: "TechCorp",
-    role: "employee",
-    status: "active",
-  },
-  {
-    id: 23,
-    username: "alice",
-    email: "alice@example.com",
-    phone: "555-123-4567",
-    department: "Marketing",
-    position: "Marketing Specialist",
-    company: "HealthPlus",
-    role: "employee",
-    status: "active",
-  },
-  {
-    id: 25,
-    username: "brian",
-    email: "brian@example.com",
-    phone: "222-333-4444",
-    department: "Finance",
-    position: "Financial Analyst",
-    company: "HealthPlus",
-    role: "admin",
-    status: "active",
-  },
-  {
-    id: 33,
-    username: "Tom",
-    email: "tom@example.com",
-    phone: "777-888-9999",
-    department: "IT",
-    position: "Junior Developer",
-    company: "TechCorp",
-    role: "employee",
-    status: "active",
-  },
-  {
-    id: 34,
-    username: "Lisa",
-    email: "lisa@example.com",
-    phone: "333-222-1111",
-    department: "IT",
-    position: "System Administrator",
-    company: "TechCorp",
-    role: "employee",
-    status: "active",
-  },
-  {
-    id: 24,
-    username: "Duke",
-    email: "duke@example.com",
-    phone: "444-555-6666",
-    department: "Operations",
-    position: "Operations Manager",
-    company: "HealthPlus",
-    role: "employee",
-    status: "active",
-  },
-];
+import { redirect, useLoaderData } from "react-router-dom";
 
 const Onboarding = () => {
-  const [employees, setEmployees] = useState(dummyEmployees);
+  const employeesData = useLoaderData();
+  const [employees, setEmployees] = useState(employeesData.employees);
   const [searchTerm, setSearchTerm] = useState("");
   const [newEmployee, setNewEmployee] = useState({
     username: "",
@@ -122,8 +44,14 @@ const Onboarding = () => {
     firstName: "",
     lastName: "",
     idNumber: "",
+    gender: "",
     dob: "",
     employeeNumber: "",
+    bankName: "",
+    bankAccount: "",
+    kraPin: "",
+    nhifNo: "",
+    nssfNo: "",
     department: "",
     position: "",
     hire_date: "",
@@ -149,7 +77,9 @@ const Onboarding = () => {
 
   const filteredEmployees = employees.filter(
     (entry) =>
-      entry.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.employee_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -159,6 +89,7 @@ const Onboarding = () => {
 
   const handleEmployeeIdChange = (e) => {
     const id = parseInt(e.target.value);
+    console.log(e.target.value);
     setEmployeeIdToRemove(e.target.value);
     const employee = employees.find((emp) => emp.id === id);
     setEmployeeToRemove(employee || null);
@@ -166,15 +97,13 @@ const Onboarding = () => {
 
   const handleRemoveEmployee = (e) => {
     e.preventDefault();
-    if (employeeToRemove) {
-      setShowConfirmDialog(true);
-    }
+    console.log(employeeToRemove);
+    // if (employeeToRemove) {
+    //   setShowConfirmDialog(true);
+    // }
   };
 
   const confirmRemoveEmployee = () => {
-    setEmployees(
-      employees.filter((employee) => employee.id !== employeeToRemove.id)
-    );
     setEmployeeIdToRemove("");
     setEmployeeToRemove(null);
     setShowConfirmDialog(false);
@@ -254,6 +183,7 @@ const Onboarding = () => {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border p-2 text-left">ID</th>
+                      <th className="border p-2 text-left">Employee No</th>
                       <th className="border p-2 text-left">Username</th>
                       <th className="border p-2 text-left">Email</th>
                       <th className="border p-2 text-left">position</th>
@@ -266,7 +196,12 @@ const Onboarding = () => {
                     {filteredEmployees.map((employee) => (
                       <tr key={employee.id} className="hover:bg-gray-50">
                         <td className="border p-2">{employee.id}</td>
-                        <td className="border p-2">{employee.username}</td>
+                        <td className="border p-2">
+                          {employee.employee_number}
+                        </td>
+                        <td className="border p-2">
+                          {employee.first_name + " " + employee.last_name}
+                        </td>
                         <td className="border p-2">{employee.email}</td>
                         <td className="border p-2">{employee.position}</td>
                         <td className="border p-2">{employee.department}</td>
@@ -299,7 +234,7 @@ const Onboarding = () => {
                   <Input
                     id="employeeId"
                     name="employeeId"
-                    value={employeeIdToRemove}
+                    //value={employeeIdToRemove}
                     onChange={handleEmployeeIdChange}
                     required
                   />
@@ -322,7 +257,9 @@ const Onboarding = () => {
                       <span className="text-lg font-semibold mr-2">Name:</span>
 
                       <span className="text-lg font-normal italic">
-                        {employeeToRemove.username}
+                        {employeeToRemove.first_name +
+                          " " +
+                          employeeToRemove.last_name}
                       </span>
                     </div>
                     <div className="m-2">
@@ -342,9 +279,11 @@ const Onboarding = () => {
                       </span>
                     </div>
                     <div className="m-2">
-                      <span className="text-lg font-semibold mr-2">Role:</span>
+                      <span className="text-lg font-semibold mr-2">
+                        Position:
+                      </span>
                       <span className="text-lg font-normal italic">
-                        {employeeToRemove.role}
+                        {employeeToRemove.position}
                       </span>
                     </div>
                   </div>
@@ -420,3 +359,31 @@ const Onboarding = () => {
 };
 
 export default Onboarding;
+
+export async function loader() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return redirect("/");
+  }
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/getemployees";
+
+  const data = { token: token };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const response2 = await fetch(url2);
+
+  const userData = await response.json();
+  const employees = await response2.json();
+  if (userData.message === "token expired") {
+    return redirect("/");
+  }
+  return { employees: employees, role: userData };
+}
