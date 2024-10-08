@@ -18,7 +18,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "http://localhost:5174/api/discplinary";
+        const url = "https://hrmbackend.livecrib.pro/api/discplinary";
 
         const data = { employeeId: employeeId };
 
