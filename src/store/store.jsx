@@ -11,7 +11,7 @@ export const useStore = create((set) => ({
 
 export const generatePassword = (length = 8) => {
   const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#";
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$";
   let password = "";
 
   for (let i = 0; i < length; i++) {
