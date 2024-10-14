@@ -210,8 +210,10 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
                     setShowUserMenu(false);
                   }}
                 >
-                  <LogOut className="inline-block mr-2" size={16} />
-                  <NavLink onClick={handleLogout}>Logout</NavLink>
+                  <NavLink onClick={handleLogout}>
+                    <LogOut className="inline-block mr-2" size={16} />
+                    Logout
+                  </NavLink>
                 </button>
               </div>
             )}
