@@ -50,7 +50,7 @@ const EmployeeDashboard = () => {
   const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data, user } = useLoaderData();
-
+  console.log(data, user);
   useEffect(() => {
     changeRole(user.role);
     changeModule("Employee Dashboard");
@@ -204,12 +204,16 @@ const EmployeeDashboard = () => {
                         <th className="border p-2 text-left">
                           Gross Salary (KES)
                         </th>
-                        <th className="border p-2 text-left">Bonus (KES)</th>
+                        <th className="border p-2 text-left">PAYE (KES)</th>
                         <th className="border p-2 text-left">
                           Deductions (KES)
                         </th>
-                        <th className="border p-2 text-left">Overtime (hrs)</th>
-                        <th className="border p-2 text-left">Leave (days)</th>
+                        <th className="border p-2 text-left">
+                          Housing leavy (KES)
+                        </th>
+                        <th className="border p-2 text-left">
+                          Taxable Income (KES)
+                        </th>
                         <th className="border p-2 text-left">Net Pay (KES)</th>
                         <th className="border p-2 text-left">Actions</th>
                       </tr>
@@ -224,21 +228,21 @@ const EmployeeDashboard = () => {
                             {entry.gross_pay.toLocaleString()}
                           </td>
                           <td className="border p-2">
-                            {entry.benefits.toLocaleString()}
+                            {entry.paye.toLocaleString()}
                           </td>
                           <td className="border p-2">
                             {+entry.paye +
-                              +entry.nssf_contribution +
-                              +entry.nhif_contribution +
-                              +entry.helb_deduction +
-                              +entry.pension_fund_contribution +
-                              +entry.mortgage_contribution +
-                              +entry.hosp_contribution +
+                              +entry.nssf_tier_i +
+                              +entry.nssf_tier_ii +
+                              +entry.nhif +
+                              +entry.housing_levy +
                               +entry.other_deductions}
                           </td>
-                          <td className="border p-2">0</td>
                           <td className="border p-2">
-                            {entry.annual_leave_balance}
+                            {entry?.housing_levy.toLocaleString()}
+                          </td>
+                          <td className="border p-2">
+                            {entry.taxable_income.toLocaleString()}
                           </td>
                           <td className="border p-2">
                             {entry.net_pay.toLocaleString()}

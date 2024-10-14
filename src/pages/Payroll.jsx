@@ -57,7 +57,7 @@ const PayrollModule = () => {
   const [paymentType, setPaymentType] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const slicedData = payrollData.slice(0, 5);
-
+  console.log(employees);
   const calculateNetSalary = (employee) => {
     return (
       employee.grossSalary -
@@ -247,7 +247,7 @@ const PayrollModule = () => {
                         </th>
                         <th className="border p-2 text-left">PAYE (KES)</th>
                         <th className="border p-2 text-left">
-                          Income Tax (KES)
+                          House Levy (KES)
                         </th>
                         <th className="border p-2 text-left">NHIF (KES)</th>
                         <th className="border p-2 text-left">NSSF (KES)</th>
@@ -269,12 +269,12 @@ const PayrollModule = () => {
                             <td className="border p-2">
                               {entry.paye.toLocaleString()}
                             </td>
-                            <td className="border p-2">{entry.income_tax}</td>
+                            <td className="border p-2">{entry.housing_levy}</td>
+                            <td className="border p-2">{entry.nhif}</td>
                             <td className="border p-2">
-                              {entry.nhif_contribution}
-                            </td>
-                            <td className="border p-2">
-                              {entry.nssf_contribution}
+                              {entry.nssf_tier_i
+                                ? entry.nssf_tier_i
+                                : entry.nssf_tier_ii}
                             </td>
                             <td className="border p-2">{entry.net_pay}</td>
                             <td className="border p-2">
@@ -558,12 +558,12 @@ const PayrollModule = () => {
             </div>
             {/* Bonus Field */}
             <div className="space-y-2">
-              <Label htmlFor="editBonus">Helb Deduction (KES)</Label>
+              <Label htmlFor="editBonus">Insurance Relief (KES)</Label>
               <Input
                 id="editBonus"
                 name="bonus"
                 type="number"
-                value={currentEntry?.helb_deduction}
+                value={currentEntry?.insurance_relief}
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
@@ -575,14 +575,12 @@ const PayrollModule = () => {
             </div>
             {/* Tax Deduction Field */}
             <div className="space-y-2">
-              <Label htmlFor="editTaxDeduction">
-                Pension Fund Contribution (KES)
-              </Label>
+              <Label htmlFor="editTaxDeduction">Other Deductions (KES)</Label>
               <Input
                 id="editTaxDeduction"
                 name="tax"
                 type="number"
-                value={currentEntry?.pension_fund_contribution}
+                value={currentEntry?.other_deductions}
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
@@ -598,13 +596,13 @@ const PayrollModule = () => {
             {/* Insurance Deduction Field */}
             <div className="space-y-2">
               <Label htmlFor="editInsuranceDeduction">
-                Personal Tax Relief (KES)
+                Other Allowance (KES)
               </Label>
               <Input
                 id="editInsuranceDeduction"
                 name="insurance"
                 type="number"
-                value={currentEntry?.personal_tax_relief}
+                value={currentEntry?.other_allowances}
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,

@@ -8,6 +8,7 @@ import {
   Upload,
   Menu,
 } from "lucide-react";
+import { formatTime } from "../util/helpers";
 
 import Calendar from "../components/ui/calender";
 import {
@@ -57,7 +58,7 @@ const HRMSAttendanceModule = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [attendance, setAttendance] = useState(attendanceData.attendanceData);
-
+  console.log(attendance);
   useEffect(() => {
     changeModule("Attendance");
     changeRole(role);
@@ -185,8 +186,8 @@ const HRMSAttendanceModule = () => {
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.department}</TableCell>
                       <TableCell>{item.formatted_date}</TableCell>
-                      <TableCell>{item.check_in}</TableCell>
-                      <TableCell>{item.check_out}</TableCell>
+                      <TableCell>{formatTime(item.check_in)}</TableCell>
+                      <TableCell>{formatTime(item.check_out)}</TableCell>
                       <TableCell>{item.status}</TableCell>
                     </TableRow>
                   ))}

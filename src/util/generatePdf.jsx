@@ -13,18 +13,16 @@ export const generatePayslipPDF = (entry) => {
   // Create an image element
   const img = new Image();
   img.src = logo; // Using the imported logo
-
+  console.log(entry);
   img.onload = function () {
     try {
       const logoUrl = getBase64Image(img);
       const deductions =
         +entry.paye +
-        +entry.nssf_contribution +
-        +entry.nhif_contribution +
-        +entry.helb_deduction +
-        +entry.pension_fund_contribution +
-        +entry.mortgage_contribution +
-        +entry.hosp_contribution +
+        +entry.nssf_tier_i +
+        +entry.nssf_tier_i +
+        +entry.nhif +
+        +entry.housing_levy +
         +entry.other_deductions;
 
       doc.addImage(logoUrl, "PNG", 10, 10, 30, 30); // X, Y, Width, Height
@@ -54,8 +52,8 @@ export const generatePayslipPDF = (entry) => {
         130
       );
       doc.text(
-        `Bonus: KES ${
-          entry.benefits ? entry.benefits.toLocaleString() : "N/A"
+        `Taxable Income: KES ${
+          entry.taxable_income ? entry.taxable_income.toLocaleString() : "N/A"
         }`,
         10,
         140
@@ -66,7 +64,7 @@ export const generatePayslipPDF = (entry) => {
         150
       );
       doc.text(`Overtime (hours): ${entry.overtime || "N/A"}`, 10, 160);
-      doc.text(`Leave (days): ${entry.annual_leave_bal || "N/A"}`, 10, 170);
+      doc.text(`Leave (days): ${entry.annual_leave_balance || "N/A"}`, 10, 170);
       doc.text(
         `Net Pay: KES ${
           entry.net_pay ? entry.net_pay.toLocaleString() : "N/A"

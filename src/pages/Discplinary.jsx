@@ -20,6 +20,7 @@ import {
   useNavigation,
 } from "react-router-dom";
 import EmployeeSuggestions from "../components/layout/suggestions.jsx";
+import { formatDate } from "../util/helpers.jsx";
 
 const DisciplinaryModule = () => {
   const { activeModule, changeModule } = useStore();
@@ -42,7 +43,6 @@ const DisciplinaryModule = () => {
   });
   const [employeeSuggestions, setEmployeeSuggestions] = useState([]);
   const slicedCases = disciplinaryData.slice(0, 5);
-
   // New function to fetch employee data
   const fetchEmployeeData = async (searchTerm) => {
     try {
@@ -183,7 +183,9 @@ const DisciplinaryModule = () => {
                       <tr key={entry.id} className="hover:bg-gray-50">
                         <td className="border p-2">{entry.name}</td>
                         <td className="border p-2">{entry.action_type}</td>
-                        <td className="border p-2">{entry.action_date}</td>
+                        <td className="border p-2">
+                          {formatDate(entry.action_date)}
+                        </td>
                         <td className="border p-2">{entry.description}</td>
                         <td className="border p-2">{entry.status}</td>
                         <td className="border p-2">

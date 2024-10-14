@@ -7,6 +7,7 @@ import {
   useActionData,
   useNavigation,
 } from "react-router-dom";
+import { Mail } from "lucide-react";
 
 const LoginPage = () => {
   const [showPassword, updateShowPassword] = useState(false);

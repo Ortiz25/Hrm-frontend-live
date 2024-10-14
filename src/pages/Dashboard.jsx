@@ -11,6 +11,7 @@ const HRDashboard = () => {
   const { activeModule, changeModule, role, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dashData = useLoaderData();
+
   useEffect(() => {
     changeModule("Dashboard");
     changeRole(dashData.role);

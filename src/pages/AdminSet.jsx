@@ -79,6 +79,7 @@ import {
   useLoaderData,
   useNavigation,
 } from "react-router-dom";
+import { generatePassword } from "../store/store.jsx";
 
 const AdminSettingsModule = () => {
   const { activeModule, changeModule, disciplinaryAction, changeUser } =
@@ -91,7 +92,7 @@ const AdminSettingsModule = () => {
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [leaveTypes, setLeaveTypes] = useState(adminData.leaveTypes);
+  const [leaveTypes, setLeaveTypes] = useState(["Annual", "Sick", "Personal"]);
   const [newLeaveType, setNewLeaveType] = useState("");
   const [newActionType, setNewActionType] = useState("");
   const [settings, setSettings] = useState({
@@ -116,6 +117,7 @@ const AdminSettingsModule = () => {
     password: "",
     confirmPassword: "",
   });
+  const generatedPass = generatePassword();
 
   function handleClick() {
     updateShowPassword(!showPassword);
@@ -264,7 +266,7 @@ const AdminSettingsModule = () => {
                         key={type}
                         className="flex justify-between items-center"
                       >
-                        {type.leave_type}
+                        {type}
                         <Button
                           variant="ghost"
                           size="sm"
@@ -429,23 +431,13 @@ const AdminSettingsModule = () => {
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="password" className="text-right">
-                                Password
+                                Reg Password
                               </Label>
                               <Input
                                 id="password"
-                                type="password"
+                                type="text"
                                 name="password"
-                                className="col-span-3"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="cpassword" className="text-right">
-                                Confirm Password
-                              </Label>
-                              <Input
-                                id="cpassword"
-                                type="password"
-                                name="cpassword"
+                                value={generatedPass}
                                 className="col-span-3"
                               />
                             </div>
@@ -879,7 +871,7 @@ export async function loader() {
     return redirect("/employeedashboard");
   }
   const { users, leaveTypes } = await response2.json();
-
+  console.log(users, leaveTypes);
   if (userData.message === "token expired") {
     return redirect("/");
   }

@@ -460,7 +460,7 @@ export default StaffManagementModule;
 
 export async function loader() {
   const token = localStorage.getItem("token");
-
+  console.log(token);
   if (!token) {
     return redirect("/");
   }
@@ -481,7 +481,7 @@ export async function loader() {
   const userData = await response.json();
 
   const { staffReq } = await response2.json();
-
+  console.log(staffReq, userData);
   if (userData.message === "token expired") {
     return redirect("/");
   }

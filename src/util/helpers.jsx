@@ -5,11 +5,29 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+export const isLeaveActive = (leave) => {
+  const currentDate = new Date();
+  const startDate = new Date(leave.start_date);
+  const endDate = new Date(leave.end_date);
+
+  // Check if the current date falls within the start and end dates (inclusive)
+  return currentDate >= startDate && currentDate <= endDate;
+};
+
 export const formatCurrency = (value) => {
   return new Intl.NumberFormat("en-KE", {
     style: "currency",
     currency: "KES",
   }).format(value);
+};
+
+export const formatTime = (timestamp) => {
+  const dateObject = new Date(timestamp);
+
+  // Extract the time in 'HH:MM:SS' format
+  const extractedTime = dateObject.toTimeString().split(" ")[0];
+
+  return extractedTime;
 };
 
 export const formatDate = (timestamp) => {
@@ -44,7 +62,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `https://hrmbackend.livecrib.pro/approve/${id}`,
+      `https://hrmbackend.livecrib.pro/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {

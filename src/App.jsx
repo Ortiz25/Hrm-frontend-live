@@ -39,6 +39,9 @@ import {
   loader as loaderAdmin,
   action as actionAdmin,
 } from "./pages/AdminSet.jsx";
+import LeaveDashboard, {
+  loader as leaveDashLoader,
+} from "./pages/LeaveDash.jsx";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +95,11 @@ const router = createBrowserRouter([
         path: "/attendance",
         element: <HRMSAttendanceModule />,
         loader: attendanceLoader,
+      },
+      {
+        path: "/leavedash",
+        element: <LeaveDashboard />,
+        loader: leaveDashLoader,
       },
       {
         path: "/admin",

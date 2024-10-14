@@ -25,51 +25,6 @@ import {
 import PerformanceOverview from "./ui/perOverview.jsx";
 import { formatCurrency } from "../util/helpers.jsx";
 
-const mockData = [
-  {
-    month: "Jan",
-    payroll: 500000,
-    leaves: 45,
-    disciplinary: 2,
-    requisitions: 5,
-  },
-  {
-    month: "Feb",
-    payroll: 520000,
-    leaves: 50,
-    disciplinary: 1,
-    requisitions: 3,
-  },
-  {
-    month: "Mar",
-    payroll: 510000,
-    leaves: 55,
-    disciplinary: 3,
-    requisitions: 7,
-  },
-  {
-    month: "Apr",
-    payroll: 530000,
-    leaves: 40,
-    disciplinary: 0,
-    requisitions: 4,
-  },
-  {
-    month: "May",
-    payroll: 530000,
-    leaves: 40,
-    disciplinary: 0,
-    requisitions: 4,
-  },
-  {
-    month: "June",
-    payroll: 520000,
-    leaves: 40,
-    disciplinary: 2,
-    requisitions: 4,
-  },
-];
-
 const DashboardCard = ({ title, value, icon: Icon }) => (
   <Card className="shadow-2xl">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
