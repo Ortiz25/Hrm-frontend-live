@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -27,19 +27,13 @@ const Onboarding = () => {
   const employeesData = useLoaderData();
   const [employees, setEmployees] = useState(employeesData.employees);
   const [searchTerm, setSearchTerm] = useState("");
-  const [newEmployee, setNewEmployee] = useState({
-    username: "",
-    email: "",
-    company: "",
-    role: "employee",
-  });
   const [employeeToRemove, setEmployeeToRemove] = useState(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [employeeIdToRemove, setEmployeeIdToRemove] = useState("");
-  const { activeModule, changeModule, discplinaryAction } = useStore();
+  const { activeModule, changeModule } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [currentEntry, setCurrentEntry] = useState(null);
   const [step, setStep] = useState(1);
+  const [isAddingEmployee, setIsAddingEmployee] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -54,23 +48,97 @@ const Onboarding = () => {
     nssfNo: "",
     department: "",
     position: "",
-    hire_date: "",
-    salary: "",
+    hireDate: "",
+    basicSalary: "",
+    houseAllowance: "",
+    transportAllowance: "",
+    otherAllowances: "",
+    personalRelief: "",
+    insuranceRelief: "",
+    helbDeduction: "",
     bonus: "",
-    deductions: { tax: "", insurance: "", other: "" },
-    company: "",
-    policiesAgreed: false,
+    saccoDeduction: "",
     email: "",
     phoneNumber: "",
-    status: "",
+    location: "",
   });
-
-  const handleAddEmployee = (e) => {
-    e.preventDefault();
-    const newId = employees.length ? employees[employees.length - 1].id + 1 : 1;
-    setEmployees([...employees, { ...newEmployee, id: newId }]);
-    setNewEmployee({ username: "", email: "", company: "", role: "employee" });
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch("http://localhost:5174/api/getemployees");
+      const data = await response.json();
+      if (response.ok) {
+        setEmployees(data);
+      }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
   };
+
+  const handleAddEmployee = async () => {
+    try {
+      // Start adding employee - disable the button
+      setIsAddingEmployee(true);
+
+      const url = "http://localhost:5174/api/adduser";
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const addUser = await response.json();
+
+      if (addUser.message === "user added Successfully") {
+        console.log("Employee added successfully");
+
+        // Reset the form fields
+        setFormData({
+          firstName: "",
+          lastName: "",
+          idNumber: "",
+          gender: "",
+          dob: "",
+          employeeNumber: "",
+          bankName: "",
+          bankAccount: "",
+          kraPin: "",
+          nhifNo: "",
+          nssfNo: "",
+          department: "",
+          position: "",
+          hireDate: "",
+          basicSalary: "",
+          houseAllowance: "",
+          transportAllowance: "",
+          otherAllowances: "",
+          personalRelief: "",
+          insuranceRelief: "",
+          helbDeduction: "",
+          bonus: "",
+          saccoDeduction: "",
+          email: "",
+          phoneNumber: "",
+          location: "",
+        });
+        setStep(1);
+        alert("Employee Registration Successful");
+      } else {
+        alert("Employee Registration Failed");
+        setStep(1);
+      }
+    } catch (error) {
+      console.error("Error adding employee:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      // End adding employee - enable the button
+      setIsAddingEmployee(false);
+      fetchEmployees();
+      console.log("isAddingEmployee reset to false");
+    }
+  };
+
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -80,7 +148,6 @@ const Onboarding = () => {
       entry.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.employee_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,18 +156,39 @@ const Onboarding = () => {
 
   const handleEmployeeIdChange = (e) => {
     const id = parseInt(e.target.value);
-    console.log(e.target.value);
     setEmployeeIdToRemove(e.target.value);
     const employee = employees.find((emp) => emp.id === id);
     setEmployeeToRemove(employee || null);
   };
 
-  const handleRemoveEmployee = (e) => {
+  const handleRemoveEmployee = async (e) => {
     e.preventDefault();
     console.log(employeeToRemove);
-    // if (employeeToRemove) {
-    //   setShowConfirmDialog(true);
-    // }
+    try {
+      console.log("Removing employee with ID:", employeeToRemove);
+
+      const url = "http://localhost:5174/api/deleteemployee";
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ employeeId: employeeToRemove.id }), // Send employee ID as body
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.message === "User deleted successfully") {
+        alert("Employee removed successfully");
+        // Add any state updates or UI refresh logic here, e.g., refreshing the employee list
+        fetchEmployees();
+      } else {
+        alert("Failed to remove employee");
+      }
+    } catch (error) {
+      console.error("Error removing employee:", error);
+      alert("An error occurred while removing the employee");
+    }
   };
 
   const confirmRemoveEmployee = () => {
@@ -141,7 +229,11 @@ const Onboarding = () => {
     },
     {
       component: (
-        <Step4 prevStep={() => setStep(step - 1)} formData={formData} />
+        <Step4
+          prevStep={() => setStep(step - 1)}
+          handleAddEmployee={handleAddEmployee}
+          isAddingEmployee={isAddingEmployee}
+        />
       ),
     },
   ];
@@ -185,7 +277,7 @@ const Onboarding = () => {
                       <th className="border p-2 text-left">ID</th>
                       <th className="border p-2 text-left">Employee No</th>
                       <th className="border p-2 text-left">Username</th>
-                      <th className="border p-2 text-left">Email</th>
+                      <th className="border p-2 text-left">Phone Number</th>
                       <th className="border p-2 text-left">position</th>
                       <th className="border p-2 text-left">Department</th>
                       <th className="border p-2 text-left">Company</th>
@@ -202,7 +294,7 @@ const Onboarding = () => {
                         <td className="border p-2">
                           {employee.first_name + " " + employee.last_name}
                         </td>
-                        <td className="border p-2">{employee.email}</td>
+                        <td className="border p-2">{employee.phone_number}</td>
                         <td className="border p-2">{employee.position}</td>
                         <td className="border p-2">{employee.department}</td>
                         <td className="border p-2">{employee.company}</td>
@@ -264,10 +356,10 @@ const Onboarding = () => {
                     </div>
                     <div className="m-2">
                       <span className="text-lg font-semibold mr-2">
-                        Email:{" "}
+                        Phone Number:{" "}
                       </span>
                       <span className="text-lg font-normal italic">
-                        {employeeToRemove.email}
+                        {employeeToRemove.phone_number}
                       </span>
                     </div>
                     <div className="m-2">
@@ -366,8 +458,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/getemployees";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/getemployees";
 
   const data = { token: token };
 

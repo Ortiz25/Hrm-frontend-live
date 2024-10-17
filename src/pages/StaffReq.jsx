@@ -3,10 +3,10 @@ import { Dialog } from "@headlessui/react";
 import { Button } from "@headlessui/react"; // Assuming Button is from Headless UI or similar library
 import {
   Dialog as DDialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+  DialogContent as DDialogContent,
+  DialogHeader as DDialogHeader,
+  DialogTitle as DDialogTitle,
+  DialogFooter as DDialogFooter,
 } from "../components/ui/dialog";
 import SidebarLayout from "../components/layout/sidebarLayout";
 import { Menu } from "lucide-react";
@@ -110,7 +110,7 @@ const StaffManagementModule = () => {
   };
   async function getRequistions() {
     try {
-      const url2 = "https://hrmbackend.livecrib.pro/api/staffreq";
+      const url2 = "http://localhost:5174/api/staffreq";
 
       const response2 = await fetch(url2);
 
@@ -124,7 +124,7 @@ const StaffManagementModule = () => {
 
   async function handleRequest(status, id) {
     try {
-      const url = "https://hrmbackend.livecrib.pro/api/handlerequest";
+      const url = "http://localhost:5174/api/handlerequest";
 
       const data = { status: status, id: id };
 
@@ -313,35 +313,37 @@ const StaffManagementModule = () => {
             open={isAddDialogOpen}
             onClose={() => setIsAddDialogOpen(false)}
           >
-            <DialogContent className="sm:max-w-[425px] bg-white">
-              <DialogHeader>
-                <DialogTitle className="text-center text-2xl font-bold">
+            <DDialogContent className="sm:max-w-[425px] bg-white">
+              <DDialogHeader>
+                <DDialogTitle className="text-center text-2xl font-bold">
                   Add New Requisition
-                </DialogTitle>
+                </DDialogTitle>
 
                 <X
-                  className="h-4 w-4 absolute right-4 top-4"
+                  className="h-4 w-4 absolute right-4 top-4 hover:pointer"
                   onClick={() => setIsAddDialogOpen(false)}
                 />
-              </DialogHeader>
+              </DDialogHeader>
               <div className="grid gap-4 py-4">
-                {["Supervisor", "position", "department"].map((field) => (
-                  <div
-                    key={field}
-                    className="grid grid-cols-4 items-center gap-4"
-                  >
-                    <Label htmlFor={field} className="text-right">
-                      {field.charAt(0).toUpperCase() + field.slice(1)}
-                    </Label>
-                    <Input
-                      id={field}
-                      name={field}
-                      value={newStaff[field]}
-                      onChange={handleInputChange}
-                      className="col-span-3"
-                    />
-                  </div>
-                ))}
+                {["Supervisor", "position", "department", "Reason"].map(
+                  (field) => (
+                    <div
+                      key={field}
+                      className="grid grid-cols-4 items-center gap-4"
+                    >
+                      <Label htmlFor={field} className="text-right">
+                        {field.charAt(0).toUpperCase() + field.slice(1)}
+                      </Label>
+                      <Input
+                        id={field}
+                        name={field}
+                        value={newStaff[field]}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                  )
+                )}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="workSchedule" className="text-right">
                     Work Schedule
@@ -363,7 +365,7 @@ const StaffManagementModule = () => {
                   </Select>
                 </div>
               </div>
-              <DialogFooter>
+              <DDialogFooter>
                 <Button
                   variant="outline"
                   onClick={() => setIsAddDialogOpen(false)}
@@ -371,8 +373,8 @@ const StaffManagementModule = () => {
                   Cancel
                 </Button>
                 <Button onClick={handleAddStaff}>Add</Button>
-              </DialogFooter>
-            </DialogContent>
+              </DDialogFooter>
+            </DDialogContent>
           </DDialog>
 
           {/* Edit Dialog */}
@@ -464,8 +466,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/staffreq";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/staffreq";
 
   const data = { token: token };
 

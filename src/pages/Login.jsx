@@ -127,7 +127,7 @@ export async function action({ request, params }) {
     password: data.get("password").trim(),
   };
 
-  let url = "https://hrmbackend.livecrib.pro/api/login";
+  let url = "http://localhost:5174/api/login";
 
   const response = await fetch(url, {
     method: "POST",
@@ -158,7 +158,7 @@ export async function loader() {
   if (!token) {
     return null;
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url = "http://localhost:5174/api/verifyToken";
   const data = { token: token };
 
   const response = await fetch(url, {

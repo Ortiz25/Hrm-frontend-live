@@ -1,6 +1,7 @@
 import { Button } from "./button";
 import { Input } from "./input";
 import { Label } from "./label";
+import { Loader } from "lucide-react";
 
 export const ProgressBar = ({ progress = 0 }) => {
   return (
@@ -37,9 +38,9 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
           type="text"
           name="lastName"
           className="mt-1 block w-full p-2 border rounded"
-          value={formData.secondName}
+          value={formData.lastName}
           onChange={(e) =>
-            setFormData({ ...formData, secondName: e.target.value })
+            setFormData({ ...formData, lastName: e.target.value })
           }
           required
         />
@@ -56,10 +57,10 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
           <option value="" className="font-semibold">
             Select Gender
           </option>
-          <option value="Annual" className="font-semibold">
+          <option value="male" className="font-semibold">
             Male
           </option>
-          <option value="Sick" className="font-semibold">
+          <option value="female" className="font-semibold">
             Female
           </option>
         </select>
@@ -85,6 +86,19 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
           value={formData.phoneNumber}
           onChange={(e) =>
             setFormData({ ...formData, phoneNumber: e.target.value })
+          }
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="phoneNumber">Location:</Label>
+        <Input
+          type="text"
+          name="Location"
+          className="mt-1 block w-full p-2 border rounded"
+          value={formData.location}
+          onChange={(e) =>
+            setFormData({ ...formData, location: e.target.value })
           }
           required
         />
@@ -175,9 +189,9 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
         />
       </div>
     </div>
-    <Button onClick={nextStep} className="mt-10">
-      Next
-    </Button>
+    <div className="mt-4">
+      <Button onClick={nextStep}>Next</Button>
+    </div>
   </div>
 );
 
@@ -193,7 +207,7 @@ export const Step2 = ({ nextStep, prevStep, formData, setFormData }) => (
           className="mt-1 block w-full p-2 border rounded"
           value={formData.employeeNumber}
           onChange={(e) =>
-            setFormData({ ...formData, position: e.target.value })
+            setFormData({ ...formData, employeeNumber: e.target.value })
           }
           required
         />
@@ -228,11 +242,11 @@ export const Step2 = ({ nextStep, prevStep, formData, setFormData }) => (
         <Label htmlFor="hire_date"> Hire date:</Label>
         <Input
           type="date"
-          name="hire_date"
+          name="hireDate"
           className="mt-1 block w-full p-2 border rounded"
-          value={formData.hire_date}
+          value={formData.hireDate}
           onChange={(e) =>
-            setFormData({ ...formData, department: e.target.value })
+            setFormData({ ...formData, hireDate: e.target.value })
           }
           required
         />
@@ -261,75 +275,106 @@ export const Step3 = ({ nextStep, prevStep, formData, setFormData }) => (
     <h3 className="text-xl font-bold mb-4">Step 3: Compensation</h3>
     <div className="grid grid-cols-2 gap-4">
       <Input
-        name="salary"
+        name="basicSalary"
         type="number"
-        placeholder="Gross Salary"
-        value={formData.salary}
+        placeholder="Basic Salary"
+        value={formData.basicSalary}
         onChange={(e) =>
-          setFormData({ ...formData, department: e.target.value })
+          setFormData({ ...formData, basicSalary: e.target.value })
         }
         required
       />
       <Input
         name="bonus"
         type="number"
-        placeholder="Bonus"
-        value={formData.bonus}
-        onChange={(e) => setFormData({ ...formData, bonus: e.target.value })}
+        placeholder="House Allowance"
+        value={formData.houseAllowance}
+        onChange={(e) =>
+          setFormData({ ...formData, houseAllowance: e.target.value })
+        }
+        required
       />
       <Input
-        name="tax"
+        name="transport allowance"
         type="number"
-        placeholder="Tax Deduction"
-        value={formData.deductions.tax}
+        placeholder="Transport Allowance"
+        value={formData.transportAllowance}
         onChange={(e) =>
           setFormData({
             ...formData,
-            deductions: {
-              ...formData.deductions, // Spread existing deductions
-              tax: e.target.value, // Update the insurance field
-            },
+            transportAllowance: e.target.value,
           })
+        }
+        required
+      />
+      <Input
+        name="Other Allowances"
+        type="number"
+        placeholder="Other Allowances"
+        value={formData.otherAllowances}
+        onChange={(e) =>
+          setFormData({
+            ...formData,
+            otherAllowances: e.target.value,
+          })
+        }
+        required
+      />
+      <Input
+        name="overtime"
+        type="number"
+        placeholder="Overtime"
+        value={formData.overtime}
+        onChange={(e) => setFormData({ ...formData, overtime: e.target.value })}
+        required
+      />
+      <Input
+        name="overtimeRate"
+        type="number"
+        placeholder="Personal Relief"
+        value={formData.personalRelief}
+        onChange={(e) =>
+          setFormData({ ...formData, personalRelief: e.target.value })
         }
         required
       />
       <Input
         name="insurance"
         type="number"
-        placeholder="Insurance Deduction"
-        value={formData.deductions.insurance}
+        placeholder="insurance Relief"
+        value={formData.insuranceRelief}
         onChange={(e) =>
-          setFormData({
-            ...formData,
-            deductions: {
-              ...formData.deductions, // Spread existing deductions
-              insurance: e.target.value, // Update the insurance field
-            },
-          })
+          setFormData({ ...formData, insuranceRelief: e.target.value })
         }
+        required
       />
       <Input
-        name="overtime"
+        name="helb"
         type="number"
-        placeholder="Overtime Hours"
-        value={formData.overtime}
-        onChange={(e) => setFormData({ ...formData, overtime: e.target.value })}
-      />
-      <Input
-        name="overtimeRate"
-        type="number"
-        placeholder="Overtime Rate"
-        value={formData.overtimeRate}
+        placeholder="Helb Deduction"
+        value={formData.helbDeduction}
         onChange={(e) =>
-          setFormData({ ...formData, overtimeRate: e.target.value })
+          setFormData({ ...formData, helbDeduction: e.target.value })
         }
+        required
       />
       <Input
-        name="leave"
+        name="sacco"
         type="number"
-        placeholder="Leave Days"
-        value={formData.leave}
-        onChange={(e) => setFormData({ ...formData, leave: e.target.value })}
+        placeholder="Sacco Deduction"
+        value={formData.saccoDeduction}
+        onChange={(e) =>
+          setFormData({ ...formData, saccoDeduction: e.target.value })
+        }
+        required
+      />
+      <Input
+        name="bonus"
+        type="number"
+        placeholder="Bonus "
+        value={formData.bonus}
+        onChange={(e) => setFormData({ ...formData, bonus: e.target.value })}
+        required
       />
     </div>
     <div className="flex justify-between mt-5">
@@ -339,13 +384,25 @@ export const Step3 = ({ nextStep, prevStep, formData, setFormData }) => (
   </div>
 );
 
-export const Step4 = ({ prevStep, formData }) => (
+export const Step4 = ({
+  prevStep,
+  handleAddEmployee,
+
+  isAddingEmployee,
+}) => (
   <div>
     <h3 className="text-xl font-bold mb-4">Step 4: Complete Onboarding</h3>
     <p className="mb-4">Thank you for completing the onboarding process!</p>
     <div className="flex justify-between">
       <Button onClick={prevStep}>Previous</Button>
-      <Button onClick={() => alert("Onboarding Complete!")}>Complete</Button>
+      <Button onClick={() => handleAddEmployee()}>
+        {isAddingEmployee ? (
+          <Loader className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <></>
+        )}
+        {isAddingEmployee ? "Registering Employee..." : "Complete"}
+      </Button>
     </div>
   </div>
 );

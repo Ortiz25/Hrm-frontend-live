@@ -25,48 +25,32 @@ import { Select } from "../components/ui/select";
 import SidebarLayout from "../components/layout/sidebarLayout";
 import { useStore } from "../store/store";
 import Modal from "../components/ui/modal";
-import { generateAndDownloadExcel } from "../util/generateXL";
+import {
+  generateAndDownloadExcel,
+  generateAndDownloadExcelInfo,
+} from "../util/generateXL";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { redirect, useLoaderData } from "react-router-dom";
+import { formatMonth } from "../util/helpers";
 
 const PayrollModule = () => {
   const payrollInfo = useLoaderData();
-  const [payrollData, setPayrollData] = useState(payrollInfo.payrollData);
+  const [payrollData, setPayrollData] = useState(payrollInfo.payrollInfo);
+  const [payrollHistory, setPayrollHistory] = useState(payrollInfo.payrollData);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCriteria, setFilterCriteria] = useState("all");
   const { activeModule, changeModule, role } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const [newEntry, setNewEntry] = useState({
-    name: "",
-    position: "",
-    salary: "",
-    bonus: "",
-    deductions: { tax: "", insurance: "", other: "" },
-    overtime: "",
-    overtimeRate: "",
-    leave: "",
-    joinDate: "",
-  });
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEntry, setCurrentEntry] = useState(null);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [employees] = useState(payrollInfo.payrollData);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [paymentType, setPaymentType] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const slicedHistory = payrollHistory.slice(0, 5);
   const slicedData = payrollData.slice(0, 5);
-  console.log(employees);
-  const calculateNetSalary = (employee) => {
-    return (
-      employee.grossSalary -
-      employee.paye -
-      employee.insurance -
-      employee.nhifDeduction -
-      employee.nssfDeduction
-    );
-  };
+  console.log(payrollInfo);
 
   useEffect(() => {
     changeModule("Payroll");
@@ -77,11 +61,23 @@ const PayrollModule = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleFilterChange = (e) => {
-    setFilterCriteria(e.target.value);
-  };
-
   const filteredPayrollData = payrollData.filter((entry) => {
+    const matchesSearch =
+      entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.position.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (filterCriteria === "all") return matchesSearch;
+    if (filterCriteria === "highEarners")
+      return matchesSearch && entry.salary > 80000;
+    if (filterCriteria === "recentJoins") {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      return matchesSearch && new Date(entry.joinDate) > sixMonthsAgo;
+    }
+    return matchesSearch;
+  });
+
+  const filteredPayrollHistory = payrollHistory.filter((entry) => {
     const matchesSearch =
       entry.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,53 +94,7 @@ const PayrollModule = () => {
     return matchesSearch;
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewEntry((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleDeductionChange = (e) => {
-    const { name, value } = e.target;
-    setNewEntry((prev) => ({
-      ...prev,
-      deductions: { ...prev.deductions, [name]: value },
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const id = payrollData.length + 1;
-    const newPayrollEntry = {
-      id,
-      ...newEntry,
-      salary: Number(newEntry.salary),
-      bonus: Number(newEntry.bonus),
-      deductions: {
-        tax: Number(newEntry.deductions.tax),
-        insurance: Number(newEntry.deductions.insurance),
-        other: Number(newEntry.deductions.other),
-      },
-      overtime: Number(newEntry.overtime),
-      overtimeRate: Number(newEntry.overtimeRate),
-      leave: Number(newEntry.leave),
-    };
-    setPayrollData((prev) => [...prev, newPayrollEntry]);
-    setNewEntry({
-      name: "",
-      position: "",
-      salary: "",
-      bonus: "",
-      deductions: { tax: "", insurance: "", other: "" },
-      overtime: "",
-      overtimeRate: "",
-      leave: "",
-      joinDate: "",
-    });
-    setShowAddForm(false);
-  };
-
   const handleEditClick = (entry) => {
-    console.log(entry);
     setCurrentEntry(entry);
     setEditModalOpen(true);
   };
@@ -153,28 +103,13 @@ const PayrollModule = () => {
     setCurrentEntry(entry);
   };
 
-  const handleUpdate = () => {
-    setPayrollData((prev) =>
-      prev.map((item) => (item.id === currentEntry.id ? currentEntry : item))
-    );
-    setEditModalOpen(false);
+  const handleUpdate = (e) => {
+    console.log(currentEntry);
+    // setPayrollData((prev) =>
+    //   prev.map((item) => (item.id === currentEntry.id ? currentEntry : item))
+    // );
+    // setEditModalOpen(false);
   };
-
-  const generatePayslip = (employee) => {
-    const netSalary = calculateNetSalary(employee);
-    return `
-      Payslip for ${employee.name}
-      ------------------------------
-      Gross Salary: $${employee.grossSalary}
-      PAYE: $${employee.paye}
-      Insurance: $${employee.insurance}
-      NHIF: $${employee.nhifDeduction}
-      NSSF: $${employee.nssfDeduction}
-      ------------------------------
-      Net Salary: $${netSalary}
-    `;
-  };
-
   const handleMakePayments = () => {
     setPaymentModalOpen(true);
   };
@@ -184,11 +119,6 @@ const PayrollModule = () => {
     setSelectedEmployee(null);
   };
 
-  const handleEmployeeSelect = (event) => {
-    const employeeId = parseInt(event.target.value);
-    const employee = employees.find((emp) => emp.id === employeeId);
-    setSelectedEmployee(employee);
-  };
   const handleProcessPayment = () => {
     if (paymentType === "mass") {
       // Process mass payment logic here
@@ -242,45 +172,63 @@ const PayrollModule = () => {
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left">Name</th>
                         <th className="border p-2 text-left">Position</th>
+                        <th className="border p-2 text-left">Department</th>
                         <th className="border p-2 text-left">
-                          Gross Salary (KES)
+                          Basic Salary (KES)
                         </th>
-                        <th className="border p-2 text-left">PAYE (KES)</th>
                         <th className="border p-2 text-left">
-                          House Levy (KES)
+                          House Allowance (KES)
                         </th>
-                        <th className="border p-2 text-left">NHIF (KES)</th>
-                        <th className="border p-2 text-left">NSSF (KES)</th>
-                        <th className="border p-2 text-left">Net Pay (KES)</th>
-                        <th className="border p-2 text-left">Actions</th>
+                        <th className="border p-2 text-left">
+                          Transport Allowance (KES)
+                        </th>
+                        <th className="border p-2 text-left">
+                          Personal Relief (KES)
+                        </th>
+                        <th className="border p-2 text-left">
+                          Insurance Relief (KES)
+                        </th>
+                        <th className="border p-2 text-left">
+                          HELB Deduction (KES)
+                        </th>
+                        <th className="border p-2 text-left">
+                          Sacoo Deduction (KES)
+                        </th>
+                        <th className="border p-2 text-left">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {(searchTerm ? filteredPayrollData : slicedData).map(
                         (entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="border p-2">
-                              {entry.first_name + " " + entry.last_name}
-                            </td>
+                            <td className="border p-2">{entry.name}</td>
                             <td className="border p-2">{entry.position}</td>
+                            <td className="border p-2">{entry.department}</td>
                             <td className="border p-2">
-                              {entry.gross_pay.toLocaleString()}
+                              {entry.basic_salary.toLocaleString()}
                             </td>
                             <td className="border p-2">
-                              {entry.paye.toLocaleString()}
+                              {entry.house_allowance.toLocaleString()}
                             </td>
-                            <td className="border p-2">{entry.housing_levy}</td>
-                            <td className="border p-2">{entry.nhif}</td>
                             <td className="border p-2">
-                              {entry.nssf_tier_i
-                                ? entry.nssf_tier_i
-                                : entry.nssf_tier_ii}
+                              {entry.transport_allowance.toLocaleString()}
                             </td>
-                            <td className="border p-2">{entry.net_pay}</td>
+                            <td className="border p-2">
+                              {entry.personal_relief.toLocaleString()}
+                            </td>
+                            <td className="border p-2">
+                              {entry.insurance_relief.toLocaleString()}
+                            </td>
+                            <td className="border p-2">
+                              {entry.helb_deduction}
+                            </td>
+                            <td className="border p-2">
+                              {entry.sacco_deduction}
+                            </td>
                             <td className="border p-2">
                               <Button
                                 variant="outline"
-                                className="text-red-500 border-blue-500 hover:bg-blue-100"
+                                className="text-blue-500 border-blue-500 hover:bg-blue-100"
                                 onClick={() => handleEditClick(entry)}
                               >
                                 Edit
@@ -292,17 +240,19 @@ const PayrollModule = () => {
                     </tbody>
                   </table>
                 </div>
-                <Button
-                  onClick={() =>
-                    generateAndDownloadExcel(
-                      searchTerm === "" ? payrollData : filteredPayrollData
-                    )
-                  }
-                  className="bg-blue-500 text-white mt-4"
-                >
-                  <Download className="mr-2" />
-                  Download Excel
-                </Button>
+                <div className="mt-4">
+                  <Button
+                    onClick={() =>
+                      generateAndDownloadExcelInfo(
+                        searchTerm === "" ? payrollData : filteredPayrollData
+                      )
+                    }
+                    className="bg-blue-500 text-white mt-4"
+                  >
+                    <Download className="mr-2" />
+                    Download Excel
+                  </Button>
+                </div>
               </CardContent>
             </Card>
             {role === "super_admin" && (
@@ -319,6 +269,87 @@ const PayrollModule = () => {
                 </CardContent>
               </Card>
             )}
+            <Card className="shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-2xl">Payroll History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4">
+                  <Input
+                    type="text"
+                    placeholder="Search by employee name or position"
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                  />
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border p-2 text-left">Name</th>
+                        <th className="border p-2 text-left">Position</th>
+                        <th className="border p-2 text-left">Month</th>
+                        <th className="border p-2 text-left">
+                          Gross Salary (KES)
+                        </th>
+                        <th className="border p-2 text-left">PAYE (KES)</th>
+                        <th className="border p-2 text-left">
+                          House Levy (KES)
+                        </th>
+                        <th className="border p-2 text-left">NHIF (KES)</th>
+                        <th className="border p-2 text-left">NSSF (KES)</th>
+                        <th className="border p-2 text-left">Net Pay (KES)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(searchTerm
+                        ? filteredPayrollHistory
+                        : slicedHistory
+                      ).map((entry) => (
+                        <tr key={entry.id} className="hover:bg-gray-50">
+                          <td className="border p-2">
+                            {entry.first_name + " " + entry.last_name}
+                          </td>
+                          <td className="border p-2">{entry.position}</td>
+                          <td className="border p-2">
+                            {formatMonth(entry.month)}
+                          </td>
+                          <td className="border p-2">
+                            {entry.gross_pay.toLocaleString()}
+                          </td>
+                          <td className="border p-2">
+                            {entry.paye.toLocaleString()}
+                          </td>
+                          <td className="border p-2">{entry.housing_levy}</td>
+                          <td className="border p-2">{entry.nhif}</td>
+                          <td className="border p-2">
+                            {entry.nssf_tier_i
+                              ? entry.nssf_tier_i
+                              : entry.nssf_tier_ii}
+                          </td>
+                          <td className="border p-2">{entry.net_pay}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-4">
+                  <Button
+                    onClick={() =>
+                      generateAndDownloadExcel(
+                        searchTerm === ""
+                          ? payrollHistory
+                          : filteredPayrollHistory
+                      )
+                    }
+                    className="bg-blue-500 text-white mt-4"
+                  >
+                    <Download className="mr-2" />
+                    Download Excel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -445,9 +476,7 @@ const PayrollModule = () => {
                       <tbody>
                         {filteredPayrollData.map((entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="border p-2">
-                              {entry.first_name + " " + entry.last_name}
-                            </td>
+                            <td className="border p-2">{entry.name}</td>
                             <td className="border p-2">{entry.position}</td>
 
                             <td className="border p-2">
@@ -512,7 +541,7 @@ const PayrollModule = () => {
                 id="editName"
                 name="name"
                 disabled
-                value={currentEntry?.first_name + " " + currentEntry?.last_name}
+                value={currentEntry?.name}
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
@@ -541,16 +570,16 @@ const PayrollModule = () => {
             </div>
             {/* Salary Field */}
             <div className="space-y-2">
-              <Label htmlFor="editSalary">Gross Salary (KES)</Label>
+              <Label htmlFor="editSalary">Basic Salary (KES)</Label>
               <Input
                 id="editSalary"
                 name="salary"
                 type="number"
-                value={currentEntry?.gross_pay}
+                value={currentEntry?.basic_salary}
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
-                    salary: Number(e.target.value),
+                    basic_salary: Number(e.target.value),
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md"
@@ -567,7 +596,7 @@ const PayrollModule = () => {
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
-                    bonus: Number(e.target.value),
+                    insurance_relief: Number(e.target.value),
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md"
@@ -584,10 +613,7 @@ const PayrollModule = () => {
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
-                    deductions: {
-                      ...prev.deductions,
-                      tax: Number(e.target.value),
-                    },
+                    other_deductions: Number(e.target.value),
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md"
@@ -606,10 +632,7 @@ const PayrollModule = () => {
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
-                    deductions: {
-                      ...prev.deductions,
-                      insurance: Number(e.target.value),
-                    },
+                    other_allowances: Number(e.target.value),
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md"
@@ -626,10 +649,39 @@ const PayrollModule = () => {
                 onChange={(e) =>
                   setCurrentEntry((prev) => ({
                     ...prev,
-                    deductions: {
-                      ...prev.deductions,
-                      other: Number(e.target.value),
-                    },
+                    house_allowance: Number(e.target.value),
+                  }))
+                }
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editOtherDeduction">HELB Deduction (KES)</Label>
+              <Input
+                id="editOtherDeduction"
+                name="other"
+                type="number"
+                value={currentEntry?.helb_deduction}
+                onChange={(e) =>
+                  setCurrentEntry((prev) => ({
+                    ...prev,
+                    helb_deduction: Number(e.target.value),
+                  }))
+                }
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editOtherDeduction">sacco Deduction (KES)</Label>
+              <Input
+                id="editOtherDeduction"
+                name="other"
+                type="number"
+                value={currentEntry?.sacco_deduction}
+                onChange={(e) =>
+                  setCurrentEntry((prev) => ({
+                    ...prev,
+                    sacco_deduction: Number(e.target.value),
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md"
@@ -660,8 +712,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -678,16 +730,22 @@ export async function loader() {
     },
     body: JSON.stringify(data),
   });
+  const response3 = await fetch(url2);
 
   const userData = await response.json();
   if (userData.role === "employee") {
     return redirect("/employeedashboard");
   }
   const { payroll } = await response2.json();
-  console.log(payroll);
+
+  const payrollInfo = await response3.json();
 
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { payrollData: payroll, role: userData.role };
+  return {
+    payrollData: payroll,
+    role: userData.role,
+    payrollInfo: payrollInfo,
+  };
 }

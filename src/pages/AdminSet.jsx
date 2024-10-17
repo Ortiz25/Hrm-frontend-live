@@ -125,7 +125,7 @@ const AdminSettingsModule = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const url2 = "https://hrmbackend.livecrib.pro/api/adminsettings";
+      const url2 = "http://localhost:5174/api/adminsettings";
       const response2 = await fetch(url2);
 
       const userData = await response2.json();
@@ -170,7 +170,7 @@ const AdminSettingsModule = () => {
   const handleDeleteUser = async (user) => {
     try {
       updateDelete(!isDeleting);
-      const url = "https://hrmbackend.livecrib.pro/api/deleteuser";
+      const url = "http://localhost:5174/api/deleteuser";
       const data = { userId: user.id };
       const response = await fetch(url, {
         method: "DELETE",
@@ -835,7 +835,7 @@ export async function action({ request, params }) {
   if (adminData.password && adminData.password !== adminData.cpassword) {
     return { message: "password Mismatch" };
   }
-  let url = "https://hrmbackend.livecrib.pro/api/updateuser";
+  let url = "http://localhost:5174/api/updateuser";
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -853,8 +853,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/adminsettings";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/adminsettings";
   const data = { token: token };
 
   const response = await fetch(url, {
