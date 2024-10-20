@@ -42,15 +42,14 @@ const ProfilePage = () => {
   const userDetails = useLoaderData();
   const data = useActionData();
   const navigation = useNavigation();
-  console.log(data);
   const isSubmitting = navigation.state === "submitting";
-  console.log(isEditing);
+
   useEffect(() => {
     changeRole(userDetails.role);
     changeModule("Profile");
     if (data?.message === "Profile updated") {
       setUser(data.user);
-      console.log(isEditing);
+
       setIsEditing(false);
     }
   }, [data]);
@@ -61,7 +60,7 @@ const ProfilePage = () => {
       const data = { token: token };
 
       try {
-        const url = "http://localhost:5174/api/profile";
+        const url = "https://hrmbackend.livecrib.pro/api/profile";
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -217,7 +216,7 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://localhost:5174/api/verifyToken";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -249,7 +248,7 @@ export async function action({ request, params }) {
     token: token,
   };
 
-  const url = "http://localhost:5174/api/updateprofile";
+  const url = "https://hrmbackend.livecrib.pro/api/updateprofile";
   const response = await fetch(url, {
     method: "POST",
     headers: {
