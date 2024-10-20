@@ -61,15 +61,18 @@ export const handleLeaveRequest = async (
   try {
     console.log(id, status);
 
-    const response = await fetch(`http://localhost:5174/api/approve/${id}`, {
-      method: "PUT", // Using PUT to update the approval status
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        status: status, // Set the leave status to 'approved'
-      }),
-    });
+    const response = await fetch(
+      `https://hrmbackend.livecrib.pro/api/approve/${id}`,
+      {
+        method: "PUT", // Using PUT to update the approval status
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: status, // Set the leave status to 'approved'
+        }),
+      }
+    );
 
     // Check if the response is successful
     if (response.ok) {
