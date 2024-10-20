@@ -20,11 +20,11 @@ import "./tooltip.css";
 import { useStore } from "../../store/store";
 
 const SidebarLayout = ({ activeModule, setActiveModule }) => {
-  const { role, changeRole, user, changeUser } = useStore();
-
-  const navigate = useNavigate();
+  const user = localStorage.getItem("name");
+  const { role, changeRole, changeUser } = useStore();
   const [hoveredModule, setHoveredModule] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -190,7 +190,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
             >
               <UserCircle className="mr-0 md:mr-2 text-white " size={24} />
               <span className="hidden md:block text-white ">
-                {user ? user.first_name + " " + user.last_name : "User"}
+                {user ? user : "User"}
               </span>
             </button>
             {showUserMenu && (

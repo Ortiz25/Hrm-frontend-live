@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Shield, Eye, EyeOff, Loader } from "lucide-react";
 import {
   Form,
   Link,
   redirect,
   useActionData,
+  useNavigate,
   useNavigation,
 } from "react-router-dom";
 import { Mail } from "lucide-react";
@@ -14,8 +15,21 @@ const LoginPage = () => {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
+  const navigate = useNavigate();
 
   const errors = useActionData();
+
+  useEffect(() => {
+    if (
+      errors?.email ===
+      "Please reset your Registration Password, Redirecting..."
+    ) {
+      const timeoutId = setTimeout(() => {
+        navigate("/resetpassword");
+      }, 5000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [errors]);
 
   function handleClick() {
     updateShowPassword(!showPassword);
@@ -147,7 +161,16 @@ export async function action({ request, params }) {
     return errors;
   }
 
+  if (
+    resData.message ===
+    "Please reset your Registration Password, Redirecting..."
+  ) {
+    errors.email = "Please reset your Registration Password, Redirecting...";
+    return errors;
+  }
+  console.log(resData);
   localStorage.setItem("token", resData.token);
+  localStorage.setItem("name", resData.name);
 
   return redirect("/dashboard");
 }
@@ -170,7 +193,7 @@ export async function loader() {
   });
 
   const userData = await response.json();
-  // console.log(userData);
+  console.log(userData);
   if (userData.message === "token expired") {
     return null;
   }

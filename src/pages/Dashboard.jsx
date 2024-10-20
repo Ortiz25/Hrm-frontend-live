@@ -8,13 +8,13 @@ import { useStore } from "../store/store.jsx";
 import { redirect, useLoaderData } from "react-router-dom";
 
 const HRDashboard = () => {
-  const { activeModule, changeModule, role, changeRole } = useStore();
+  const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dashData = useLoaderData();
-
+  console.log(dashData.user);
   useEffect(() => {
     changeModule("Dashboard");
-    changeRole(dashData.role);
+    changeRole(dashData.user.role);
   }, []);
 
   return (
@@ -67,13 +67,15 @@ export async function loader() {
   });
 
   const userData = await response.json();
-  if (userData.role === "employee") {
+
+  if (userData.user.role === "employee") {
     return redirect("/employeedashboard");
   }
   const dashData = await response2.json();
+  console.log(userData);
 
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { dashData: dashData, role: userData.role };
+  return { dashData: dashData, user: userData.user };
 }

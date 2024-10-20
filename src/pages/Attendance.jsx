@@ -249,5 +249,5 @@ export async function loader() {
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { attendanceData: attendanceData, role: userData.role };
+  return { attendanceData: attendanceData, role: userData.user.role };
 }

@@ -195,7 +195,13 @@ export const Step1 = ({ nextStep, formData, setFormData }) => (
   </div>
 );
 
-export const Step2 = ({ nextStep, prevStep, formData, setFormData }) => (
+export const Step2 = ({
+  nextStep,
+  prevStep,
+  formData,
+  setFormData,
+  nextEmployeeNo,
+}) => (
   <div>
     <h3 className="text-xl font-bold mb-4">Step 2: Position Information: </h3>
     <div className="grid grid-cols-2 gap-4">
@@ -257,8 +263,10 @@ export const Step2 = ({ nextStep, prevStep, formData, setFormData }) => (
           type="text"
           name="company"
           className="mt-1 block w-full p-2 border rounded"
-          value="Alibaba"
-          diasabled
+          value={formData.company}
+          onChange={(e) =>
+            setFormData({ ...formData, company: e.target.value })
+          }
           required
         />
       </div>

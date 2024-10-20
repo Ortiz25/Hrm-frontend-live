@@ -17,7 +17,7 @@ const RestPass = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5174/api/reset-password", {
+      const response = await fetch("http://localhost:5174/api/forgotpassword", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ const RestPass = () => {
         setError(data.error || "An error occurred. Please try again.");
       }
     } catch (error) {
-      setError("Network error. Please try again later.");
+      setError("Network error. Please try again later.", error);
     } finally {
       setIsLoading(false);
     }

@@ -48,9 +48,10 @@ const LeaveManagementModule = () => {
   const slicedBalance = employeeLeaveData.slice(0, 5);
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
+  console.log(leaves);
 
   useEffect(() => {
-    changeRole(leaves.role.role);
+    changeRole(leaves.role);
     changeModule("Leave Management");
     if (role === "super_admin" || role === "admin") {
       setViewMgt(true);
@@ -608,5 +609,9 @@ export async function loader() {
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { leaveData: leaveData, role: userData, leaveBalance: leaveBalance };
+  return {
+    leaveData: leaveData,
+    role: userData.user.role,
+    leaveBalance: leaveBalance,
+  };
 }

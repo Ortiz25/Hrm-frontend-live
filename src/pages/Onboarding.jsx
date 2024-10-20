@@ -34,6 +34,7 @@ const Onboarding = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [step, setStep] = useState(1);
   const [isAddingEmployee, setIsAddingEmployee] = useState(false);
+  const [nextEmployeeNo, setNextEmployeeNo] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -61,7 +62,9 @@ const Onboarding = () => {
     email: "",
     phoneNumber: "",
     location: "",
+    company: "",
   });
+
   const fetchEmployees = async () => {
     try {
       const response = await fetch("http://localhost:5174/api/getemployees");
@@ -74,11 +77,19 @@ const Onboarding = () => {
     }
   };
 
+  useEffect(() => {
+    setNextEmployeeNo(employeesData.userData.nextEmployeeNo);
+    setFormData((prevData) => ({
+      ...prevData,
+      employeeNumber: employeesData.userData.nextEmployeeNo,
+      company: "TechCorp",
+    }));
+  }, []);
+
   const handleAddEmployee = async () => {
     try {
       // Start adding employee - disable the button
       setIsAddingEmployee(true);
-
       const url = "http://localhost:5174/api/adduser";
       const response = await fetch(url, {
         method: "PUT",
@@ -87,12 +98,9 @@ const Onboarding = () => {
         },
         body: JSON.stringify(formData),
       });
-
       const addUser = await response.json();
-
       if (addUser.message === "user added Successfully") {
         console.log("Employee added successfully");
-
         // Reset the form fields
         setFormData({
           firstName: "",
@@ -214,6 +222,7 @@ const Onboarding = () => {
           prevStep={() => setStep(step - 1)}
           formData={formData}
           setFormData={setFormData}
+          nextEmployeeNo={employeesData.userData.nextEmployeeNo}
         />
       ),
     },
@@ -474,8 +483,9 @@ export async function loader() {
 
   const userData = await response.json();
   const employees = await response2.json();
+  console.log(userData);
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { employees: employees, role: userData };
+  return { employees: employees, userData: userData.user };
 }

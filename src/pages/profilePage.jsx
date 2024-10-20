@@ -22,7 +22,7 @@ import {
 import { Button } from "../components/ui/button.jsx";
 import { Input } from "../components/ui/input.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
-import { useStore } from "../store/store";
+import { useStore } from "../store/store.jsx";
 import {
   Form,
   redirect,
@@ -37,17 +37,21 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { activeModule, changeModule, changeRole } = useStore();
+  const { activeModule, changeModule, changeRole, role } = useStore();
   const [isSaving, setIsSaving] = useState(false);
   const userDetails = useLoaderData();
   const data = useActionData();
   const navigation = useNavigation();
+  console.log(data);
   const isSubmitting = navigation.state === "submitting";
-
+  console.log(isEditing);
   useEffect(() => {
+    changeRole(userDetails.role);
+    changeModule("Profile");
     if (data?.message === "Profile updated") {
-      setUser(data?.user[0]);
-      setIsEditing(!isEditing);
+      setUser(data.user);
+      console.log(isEditing);
+      setIsEditing(false);
     }
   }, [data]);
 
@@ -58,7 +62,6 @@ const ProfilePage = () => {
 
       try {
         const url = "http://localhost:5174/api/profile";
-
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -66,19 +69,13 @@ const ProfilePage = () => {
           },
           body: JSON.stringify(data),
         });
-
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-
-        const { result } = await response.json();
+        const result = await response.json();
 
         // Set the user state with the fetched or mock data
-        setUser(result[0]);
-        changeRole(userDetails.role);
-
-        // Update the module
-        changeModule("Profile");
+        setUser(result.result);
       } catch (error) {
         console.error("Error fetching the profile:", error);
       }
@@ -86,10 +83,6 @@ const ProfilePage = () => {
 
     fetchData();
   }, []); // Empty dependency array to run only on mount
-
-  if (!user) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -235,11 +228,11 @@ export async function loader() {
     body: JSON.stringify(data),
   });
   const userData = await response.json();
-
+  console.log(userData.user);
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return userData.user[0];
+  return userData.user;
 }
 
 export async function action({ request, params }) {
@@ -256,8 +249,6 @@ export async function action({ request, params }) {
     token: token,
   };
 
-  console.log(profileData);
-
   const url = "http://localhost:5174/api/updateprofile";
   const response = await fetch(url, {
     method: "POST",
@@ -267,7 +258,7 @@ export async function action({ request, params }) {
     body: JSON.stringify(profileData),
   });
   const userData = await response.json();
-
+  console.log(userData);
   if (userData.message === "Profile updated") {
     return userData;
   }

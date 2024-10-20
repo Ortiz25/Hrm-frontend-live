@@ -110,12 +110,11 @@ const AdminSettingsModule = () => {
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] =
     useState(false);
-  const [editUserData, setEditUserData] = useState({
+  const [editNewUserData, setNewUserData] = useState({
     name: "",
     email: "",
-    role: "User",
-    password: "",
-    confirmPassword: "",
+    employeeId: "",
+    role: "",
   });
   const generatedPass = generatePassword();
 
@@ -123,14 +122,15 @@ const AdminSettingsModule = () => {
     updateShowPassword(!showPassword);
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const url2 = "http://localhost:5174/api/adminsettings";
-      const response2 = await fetch(url2);
+  const fetchData = async () => {
+    const url2 = "http://localhost:5174/api/adminsettings";
+    const response2 = await fetch(url2);
 
-      const userData = await response2.json();
-      setUsers(userData.users);
-    };
+    const userData = await response2.json();
+    setUsers(userData.users);
+  };
+
+  useEffect(() => {
     if (actionData?.message === "user update succesful") {
       fetchData();
       setIsEditUserModalOpen(!isEditUserModalOpen);
@@ -164,6 +164,47 @@ const AdminSettingsModule = () => {
         disciplinaryAction: [...disciplinaryAction, newActionType],
       });
       setNewActionType("");
+    }
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    console.log(editNewUserData);
+    try {
+      updateDelete(!isDeleting);
+      const url = "http://localhost:5174/api/adduser";
+      const data = {
+        employeeId: editNewUserData.employeeId,
+        password: generatedPass,
+        email: editNewUserData.email,
+        role: editNewUserData.role,
+        name: editNewUserData.name,
+        company: "TechCorp",
+      };
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const addData = await response.json();
+      console.log(addData);
+      if (addData.message === "User added successfully and email sent") {
+        updateDelete(!isDeleting);
+        setNewUserData({
+          name: "",
+          email: "",
+          employeeId: "",
+          role: "",
+        });
+        setIsAddUserModalOpen(!isAddUserModalOpen);
+        fetchData();
+        // setIsUserActionModalOpen(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -383,7 +424,7 @@ const AdminSettingsModule = () => {
                       </DialogTrigger>
 
                       <DialogContent className="bg-white dark:bg-gray-800">
-                        <Form method="put">
+                        <form onSubmit={handleAddUser}>
                           <DialogHeader>
                             <DialogTitle className="text-2xl text-center">
                               Add New User
@@ -402,6 +443,13 @@ const AdminSettingsModule = () => {
                               <Input
                                 id="name"
                                 name="name"
+                                value={editNewUserData.name}
+                                onChange={(e) => {
+                                  setNewUserData((prev) => ({
+                                    ...prev,
+                                    name: e.target.value,
+                                  }));
+                                }}
                                 className="col-span-3"
                               />
                             </div>
@@ -415,6 +463,13 @@ const AdminSettingsModule = () => {
                               <Input
                                 id="employeeId"
                                 name="employeeId"
+                                value={editNewUserData.employeeId}
+                                onChange={(e) => {
+                                  setNewUserData((prev) => ({
+                                    ...prev,
+                                    employeeId: e.target.value,
+                                  }));
+                                }}
                                 className="col-span-3"
                               />
                             </div>
@@ -426,39 +481,56 @@ const AdminSettingsModule = () => {
                                 id="email"
                                 type="email"
                                 name="email"
+                                value={editNewUserData.email}
+                                onChange={(e) => {
+                                  setNewUserData((prev) => ({
+                                    ...prev,
+                                    email: e.target.value,
+                                  }));
+                                }}
                                 className="col-span-3"
                               />
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
+                            {/* <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="password" className="text-right">
                                 Reg Password
                               </Label>
                               <Input
                                 id="password"
                                 type="text"
-                                name="password"
+                                name="gpassword"
                                 value={generatedPass}
+                                onChange={(e) => {
+                                  setNewUserData((prev) => ({
+                                    ...prev,
+                                    regPass: generatedPass,
+                                  }));
+                                }}
                                 className="col-span-3"
                               />
-                            </div>
+                            </div> */}
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="role" className="text-right">
                                 Role
                               </Label>
-                              <Select name="role">
-                                <SelectTrigger className="col-span-3">
-                                  <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-gray-200">
-                                  <SelectItem value="employee">
-                                    Employee
-                                  </SelectItem>
-                                  <SelectItem value="admin">Admin</SelectItem>
-                                  <SelectItem value="super_admin">
-                                    Super Admin
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <select
+                                name="role"
+                                className="border-4 rounded-md col-span-3 p-2"
+                                required
+                                value={editNewUserData.role}
+                                onChange={(e) => {
+                                  setNewUserData((prev) => ({
+                                    ...prev,
+                                    role: e.target.value,
+                                  }));
+                                }}
+                              >
+                                <option value="">Select Role</option>
+                                <option value="employee">Employee</option>
+                                <option value="admin">Admin</option>
+
+                                <option value="super_admin">Super Admin</option>
+                              </select>
                             </div>
                           </div>
                           <DialogFooter>
@@ -466,10 +538,15 @@ const AdminSettingsModule = () => {
                               type="submit"
                               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
                             >
-                              Add User
+                              {isDeleting ? (
+                                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <></>
+                              )}
+                              {isDeleting ? "Adding User.." : "Add User"}
                             </button>
                           </DialogFooter>
-                        </Form>
+                        </form>
                       </DialogContent>
                     </Dialog>
                   </div>

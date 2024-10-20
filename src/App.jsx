@@ -3,14 +3,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./pages/Login.jsx";
 import PayrollModule from "./pages/Payroll.jsx";
 import HRDashboard from "./pages/Dashboard.jsx";
-import RestPass from "./pages/resetPass.jsx";
+import RestPass from "./pages/ResetPass.jsx";
 import LeaveManagementModule from "./pages/LeaveMgt.jsx";
 import DisciplinaryModule from "./pages/Discplinary.jsx";
 import AdminSettingsModule from "./pages/AdminSet.jsx";
 import StaffManagementModule from "./pages/StaffReq.jsx";
 import Onboarding from "./pages/Onboarding.jsx";
 import HRDocumentModule from "./pages/Hrdocuments.jsx";
-import ProfilePage from "./pages/profilePage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import EmployeeDashboard from "./pages/EmployeeDash.jsx";
 import Perfomance from "./pages/Performance.jsx";
 import HolidayCalendar from "./pages/HolidayCalender.jsx";
@@ -22,8 +22,8 @@ import { action as loginAction } from "./pages/Login.jsx";
 import { loader as loginLoader } from "./pages/Login.jsx";
 import { loader as mainDashLoader } from "./pages/Dashboard.jsx";
 import { loader as employLoader } from "./pages/EmployeeDash.jsx";
-import { loader as profileLoader } from "./pages/profilePage.jsx";
-import { action as profileAction } from "./pages/profilePage.jsx";
+import { loader as profileLoader } from "./pages/ProfilePage.jsx";
+import { action as profileAction } from "./pages/ProfilePage.jsx";
 import { loader as payrollLoader } from "./pages/Payroll.jsx";
 import { loader as attendanceLoader } from "./pages/Attendance.jsx";
 import { loader as leaveLoader } from "./pages/LeaveMgt.jsx";
@@ -42,6 +42,8 @@ import {
 import LeaveDashboard, {
   loader as leaveDashLoader,
 } from "./pages/LeaveDash.jsx";
+import PasswordRecovery from "./pages/ForgotPassPage.jsx";
+import { action as forgotAction } from "./pages/ForgotPassPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +60,16 @@ const router = createBrowserRouter([
         path: "/resetpassword",
         element: <RestPass />,
       },
+      {
+        path: "/forgotpassword",
+        element: <PasswordRecovery />,
+        action: forgotAction,
+      },
+      {
+        path: "/fogot",
+        element: <RestPass />,
+      },
+
       {
         path: "/dashboard",
         element: <HRDashboard />,

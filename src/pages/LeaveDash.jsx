@@ -199,9 +199,9 @@ export async function loader() {
   const leaveData = await response2.json();
 
   const userData = await response.json();
-  console.log(userData);
+  console.log(userData.user.role);
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { leaveData: leaveData, role: userData.role };
+  return { leaveData: leaveData, role: userData.user.role };
 }

@@ -50,11 +50,12 @@ const EmployeeDashboard = () => {
   const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data, user } = useLoaderData();
-  console.log(data, user);
+  console.log(data);
   useEffect(() => {
-    changeRole(user.role);
+    changeRole(user.user.role);
     changeModule("Employee Dashboard");
   }, [data]);
+  console.log(data);
 
   return (
     <div className="flex h-screen">
@@ -188,8 +189,8 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
 
-            <LeaveStatusCard employeeId={user.user[0].employee_id} />
-            <DisciplinarySummaryCard employeeId={user.user[0].employee_id} />
+            <LeaveStatusCard employeeId={data[0].employee_id} />
+            <DisciplinarySummaryCard employeeId={data[0].employee_id} />
 
             <Card>
               <CardHeader>
@@ -222,13 +223,13 @@ const EmployeeDashboard = () => {
                       {data.map((entry, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="border p-2">
-                            {formatMonth(entry.month)}
+                            {formatMonth(entry?.month)}
                           </td>
                           <td className="border p-2">
-                            {entry.gross_pay.toLocaleString()}
+                            {(entry?.gross_pay ?? 0).toLocaleString()}
                           </td>
                           <td className="border p-2">
-                            {entry.paye.toLocaleString()}
+                            {(entry?.paye ?? 0).toLocaleString() || 0}
                           </td>
                           <td className="border p-2">
                             {+entry.paye +
@@ -236,16 +237,16 @@ const EmployeeDashboard = () => {
                               +entry.nssf_tier_ii +
                               +entry.nhif +
                               +entry.housing_levy +
-                              +entry.other_deductions}
+                              +entry.other_deductions || 0}
                           </td>
                           <td className="border p-2">
-                            {entry?.housing_levy.toLocaleString()}
+                            {(entry?.housing_levy ?? 0).toLocaleString() || 0}
                           </td>
                           <td className="border p-2">
-                            {entry.taxable_income.toLocaleString()}
+                            {(entry?.taxable_income ?? 0).toLocaleString() || 0}
                           </td>
                           <td className="border p-2">
-                            {entry.net_pay.toLocaleString()}
+                            {(entry?.net_pay ?? 0).toLocaleString() || 0}
                           </td>
                           <td className="border p-2">
                             <Button
@@ -334,7 +335,7 @@ export async function loader() {
   const userData = await response.json();
 
   const dashData = await response2.json();
-
+  console.log(dashData, userData.user);
   if (userData.message === "token expired") {
     return redirect("/");
   }
