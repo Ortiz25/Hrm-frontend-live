@@ -239,8 +239,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmlive.livecrib.pro/api/attendance";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmbackend.livecrib.pro/api/attendance";
   const data = { token: token };
 
   const response = await fetch(url, {

@@ -68,7 +68,7 @@ const Onboarding = () => {
   const fetchEmployees = async () => {
     try {
       const response = await fetch(
-        "https://hrmlive.livecrib.pro/api/getemployees"
+        "https://hrmbackend.livecrib.pro/api/getemployees"
       );
       const data = await response.json();
       if (response.ok) {
@@ -92,7 +92,7 @@ const Onboarding = () => {
     try {
       // Start adding employee - disable the button
       setIsAddingEmployee(true);
-      const url = "https://hrmlive.livecrib.pro/api/adduser";
+      const url = "https://hrmbackend.livecrib.pro/api/adduser";
       const response = await fetch(url, {
         method: "PUT",
         headers: {
@@ -177,7 +177,7 @@ const Onboarding = () => {
     try {
       console.log("Removing employee with ID:", employeeToRemove);
 
-      const url = "https://hrmlive.livecrib.pro/api/deleteemployee";
+      const url = "https://hrmbackend.livecrib.pro/api/deleteemployee";
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -469,8 +469,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmlive.livecrib.pro/api/getemployees";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmbackend.livecrib.pro/api/getemployees";
 
   const data = { token: token };
 
