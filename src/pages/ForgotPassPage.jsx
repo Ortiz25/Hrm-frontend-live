@@ -170,13 +170,16 @@ export async function action({ request, params }) {
   }
   const data = { token: token, newPassword: newPassword };
   try {
-    const response = await fetch("http://localhost:5174/api/resetpassword", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      "https://hrmlive.livecrib.pro/api/resetpassword",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
     const dataRes = await response.json();
     if (dataRes.message === "token expired") {
