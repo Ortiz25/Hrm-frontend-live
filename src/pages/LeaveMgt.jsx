@@ -23,7 +23,7 @@ import { formatDate } from "../util/helpers.jsx";
 import { handleLeaveRequest } from "../util/helpers.jsx";
 
 const LeaveManagementModule = () => {
-  const { activeModule, changeModule, changeRole, role, user } = useStore();
+  const { activeModule, changeModule, changeRole, role } = useStore();
   const leaves = useLoaderData();
   const navigation = useNavigation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -50,7 +50,7 @@ const LeaveManagementModule = () => {
   const isLoading = navigation.state === "loading";
 
   useEffect(() => {
-    changeRole(leaves.role);
+    changeRole(leaves.user.role);
     changeModule("Leave Management");
     if (role === "super_admin" || role === "admin") {
       setViewMgt(true);
@@ -60,7 +60,7 @@ const LeaveManagementModule = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url2 = "https://hrmbackend.livecrib.pro/api/leave";
+        const url2 = "http://localhost:5174/api/leave";
         const response = await fetch(url2);
         const leavedata = await response.json();
         setLeaveData(leavedata.leaves);
@@ -78,12 +78,6 @@ const LeaveManagementModule = () => {
   const handleAdjustInputChange = (e) => {
     console.log(e.target.value);
     setSearchTermAdjust(e.target.value);
-  };
-
-  const handleAdjustmentChange = (e) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-    // setLeaveAdjustment((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleOpenModal = (leave) => {
@@ -206,16 +200,17 @@ const LeaveManagementModule = () => {
                             </td>
                             <td className="border p-2">{entry.status}</td>
                             <td className="border p-2">
-                              {entry.status === "pending" && (
-                                <div className="flex items-center space-x-2">
-                                  <Button
-                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded"
-                                    onClick={() => handleOpenModal(entry)}
-                                  >
-                                    Action
-                                  </Button>
-                                </div>
-                              )}
+                              {entry.status === "pending" &&
+                                entry.name !== leaves.user.name && (
+                                  <div className="flex items-center space-x-2">
+                                    <Button
+                                      className="bg-green-500 hover:bg-green-600 text-white px-2 py-2 rounded"
+                                      onClick={() => handleOpenModal(entry)}
+                                    >
+                                      Action
+                                    </Button>
+                                  </div>
+                                )}
                             </td>
                           </tr>
                         )
@@ -239,7 +234,7 @@ const LeaveManagementModule = () => {
                     <Input
                       type="text"
                       name="employeeId"
-                      value={user?.employee_number}
+                      value={leaves.user.employee.employee_number}
                     />
                   </div>
                   <div>
@@ -247,7 +242,7 @@ const LeaveManagementModule = () => {
                     <Input
                       type="text"
                       name="employeeName"
-                      value={user?.first_name + " " + user?.last_name}
+                      value={leaves.user?.name}
                     />
                   </div>
                   <div>
@@ -255,7 +250,7 @@ const LeaveManagementModule = () => {
                     <Input
                       type="text"
                       name="employeeDepartment"
-                      value={user?.department}
+                      value={leaves.user.employee.department}
                     />
                   </div>
                   <div>
@@ -268,8 +263,6 @@ const LeaveManagementModule = () => {
                       <option value="">Select leave type</option>
                       <option value="Annual">Annual</option>
                       <option value="Sick">Sick</option>
-                      {/* <option value="Paternity">Paternal</option>
-                      <option value="Maternity">Maternal</option> */}
                       <option value="Compassionate">Compassionate</option>
                     </select>
                   </div>
@@ -295,7 +288,12 @@ const LeaveManagementModule = () => {
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
                 >
-                  Request Leave
+                  {isSubmitting || isLoading ? (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <></>
+                  )}
+                  {isSubmitting ? "Requesting..." : "Request Leave"}
                 </button>
               </Form>
             </CardContent>
@@ -331,8 +329,8 @@ const LeaveManagementModule = () => {
                         <option value="">Select leave type</option>
                         <option value="Annual">Annual</option>
                         <option value="Sick">Sick</option>
-                        <option value="Paternity">Paternal</option>
-                        <option value="Maternity">Maternal</option>
+                        {/* <option value="Paternity">Paternal</option>
+                        <option value="Maternity">Maternal</option> */}
                         <option value="Compassionate">Compassionate</option>
                       </select>
                     </div>
@@ -546,7 +544,7 @@ export async function action({ request, params }) {
   if (!leaveData.startDate) {
     console.log("Adjusting");
     console.log(leaveData);
-    let url = "https://hrmbackend.livecrib.pro/api/adjustleave";
+    let url = "http://localhost:5174/api/adjustleave";
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -561,7 +559,7 @@ export async function action({ request, params }) {
     return null;
   }
 
-  let url = "https://hrmbackend.livecrib.pro/api/requestLeave";
+  let url = "http://localhost:5174/api/requestLeave";
 
   const response = await fetch(url, {
     method: "POST",
@@ -585,9 +583,9 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/leave";
-  const url3 = "https://hrmbackend.livecrib.pro/api/leavebalances";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/leave";
+  const url3 = "http://localhost:5174/api/leavebalances";
 
   const data = { token: token };
 
@@ -608,9 +606,10 @@ export async function loader() {
   if (userData.message === "token expired") {
     return redirect("/");
   }
+
   return {
     leaveData: leaveData,
-    role: userData.user.role,
+    user: userData.user,
     leaveBalance: leaveBalance,
   };
 }

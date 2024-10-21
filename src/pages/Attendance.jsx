@@ -51,18 +51,25 @@ const formatDate = (date, format = "long") => {
 };
 
 const HRMSAttendanceModule = () => {
-  const { attendanceData, role } = useLoaderData();
+  const { attendanceData, role, id } = useLoaderData();
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [currentDate, setCurrentDate] = useState(new Date());
   const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [attendance, setAttendance] = useState(attendanceData.attendanceData);
-  console.log(attendance);
+
   useEffect(() => {
     changeModule("Attendance");
     changeRole(role);
   }, []);
+
+  const filteredEmployeeData = attendance.filter((item) => {
+    return (
+      item.employee_id == id &&
+      item.formatted_date === formatDate(currentDate, "yyyy-MM-dd")
+    );
+  });
 
   const filteredData = attendance.filter(
     (item) =>
@@ -99,22 +106,24 @@ const HRMSAttendanceModule = () => {
           <h1 className="text-2xl font-bold mb-4 text-center">Attendance</h1>
 
           <div className="flex justify-between items-center mb-4">
-            <Select
-              value={selectedDepartment}
-              onValueChange={setSelectedDepartment}
-            >
-              <SelectTrigger className="w-[180px] bg-white border-2 border-gray-300 shadow-sm">
-                <SelectValue placeholder="Select department" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-200">
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="it">IT</SelectItem>
-                <SelectItem value="hr">HR</SelectItem>
-                <SelectItem value="finance">Finance</SelectItem>
-                <SelectItem value="marketing">Marketing</SelectItem>
-                <SelectItem value="sales">Sales</SelectItem>
-              </SelectContent>
-            </Select>
+            {role !== "employee" && (
+              <Select
+                value={selectedDepartment}
+                onValueChange={setSelectedDepartment}
+              >
+                <SelectTrigger className="w-[180px] bg-white border-2 border-gray-300 shadow-sm">
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-200">
+                  <SelectItem value="all">All Departments</SelectItem>
+                  <SelectItem value="it">IT</SelectItem>
+                  <SelectItem value="hr">HR</SelectItem>
+                  <SelectItem value="finance">Finance</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="sales">Sales</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
@@ -181,7 +190,10 @@ const HRMSAttendanceModule = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredData.map((item) => (
+                  {(role === "employee"
+                    ? filteredEmployeeData
+                    : filteredData
+                  ).map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.department}</TableCell>
@@ -227,8 +239,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/attendance";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/attendance";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -244,10 +256,15 @@ export async function loader() {
   // if (userData.role === "employee") {
   //   return redirect("/employeedashboard");
   // }
+
   const attendanceData = await response2.json();
 
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  return { attendanceData: attendanceData, role: userData.user.role };
+  return {
+    attendanceData: attendanceData,
+    role: userData.user.role,
+    id: userData.user.employee.id,
+  };
 }

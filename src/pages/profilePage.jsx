@@ -60,7 +60,7 @@ const ProfilePage = () => {
       const data = { token: token };
 
       try {
-        const url = "https://hrmbackend.livecrib.pro/api/profile";
+        const url = "http://localhost:5174/api/profile";
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -216,7 +216,7 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url = "http://localhost:5174/api/verifyToken";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -227,7 +227,7 @@ export async function loader() {
     body: JSON.stringify(data),
   });
   const userData = await response.json();
-  console.log(userData.user);
+
   if (userData.message === "token expired") {
     return redirect("/");
   }
@@ -248,7 +248,7 @@ export async function action({ request, params }) {
     token: token,
   };
 
-  const url = "https://hrmbackend.livecrib.pro/api/updateprofile";
+  const url = "http://localhost:5174/api/updateprofile";
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -257,7 +257,7 @@ export async function action({ request, params }) {
     body: JSON.stringify(profileData),
   });
   const userData = await response.json();
-  console.log(userData);
+
   if (userData.message === "Profile updated") {
     return userData;
   }

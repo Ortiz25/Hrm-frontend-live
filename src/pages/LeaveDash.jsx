@@ -51,7 +51,6 @@ const LeaveDashboard = () => {
   const [filterOnLeave, setFilterOnLeave] = useState(false);
   const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  console.log(leaveData, role);
 
   useEffect(() => {
     changeModule("LeaveDashboard");
@@ -183,8 +182,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/leave";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/leave";
 
   const data = { token: token };
 
@@ -199,7 +198,7 @@ export async function loader() {
   const leaveData = await response2.json();
 
   const userData = await response.json();
-  console.log(userData.user.role);
+
   if (userData.message === "token expired") {
     return redirect("/");
   }

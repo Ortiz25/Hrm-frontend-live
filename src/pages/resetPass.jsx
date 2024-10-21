@@ -17,16 +17,13 @@ const RestPass = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://hrmbackend.livecrib.pro/api/forgotpassword",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const response = await fetch("http://localhost:5174/api/forgotpassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
       const data = await response.json();
 
