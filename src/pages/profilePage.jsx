@@ -60,7 +60,7 @@ const ProfilePage = () => {
       const data = { token: token };
 
       try {
-        const url = "https://hrmlive.livecrib.pro/api/profile";
+        const url = "https://hrmbackend.livecrib.pro/api/profile";
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -216,7 +216,7 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -248,7 +248,7 @@ export async function action({ request, params }) {
     token: token,
   };
 
-  const url = "https://hrmlive.livecrib.pro/api/updateprofile";
+  const url = "https://hrmbackend.livecrib.pro/api/updateprofile";
   const response = await fetch(url, {
     method: "POST",
     headers: {

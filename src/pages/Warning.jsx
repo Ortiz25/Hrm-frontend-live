@@ -44,7 +44,7 @@ export async function action({ request, params }) {
   try {
     const data = await request.formData();
 
-    let url = "https://hrmlive.livecrib.pro/warningsupload";
+    let url = "https://hrmbackend.livecrib.pro/warningsupload";
     const response = await fetch(url, {
       method: "PUT",
       body: data,
@@ -70,8 +70,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmlive.livecrib.pro/api/warnings";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmbackend.livecrib.pro/api/warnings";
 
   const data = { token: token };
 

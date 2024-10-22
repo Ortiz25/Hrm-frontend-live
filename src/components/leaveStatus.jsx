@@ -22,7 +22,7 @@ const LeaveStatusCard = ({ employeeId }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "https://hrmlive.livecrib.pro/api/leaverequests";
+        const url = "https://hrmbackend.livecrib.pro/api/leaverequests";
         const data = { employeeId: employeeId };
 
         const response = await fetch(url, {
