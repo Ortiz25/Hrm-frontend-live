@@ -53,22 +53,22 @@ export const generateAndDownloadExcel = (initialPayrollData) => {
     [
       "Name",
       "Position",
-      "Salary ($)",
-      "Paye ($)",
-      "Deductions ($)",
-      "Net Pay ($)",
+      "Salary (KES)",
+      "Paye (KES)",
+      "Deductions (KES)",
+      "Net Pay (KES)",
     ], // Headers
     ...initialPayrollData.map((entry) => [
       entry.first_name + " " + entry.last_name,
       entry.position,
       entry.gross_pay,
       entry.paye,
-      entry.nssf_tier_ii +
-        entry.nssf_tier_i +
-        entry.paye +
-        entry.helb_deduction +
-        entry.housing_levy +
-        entry.other_deductions,
+      +entry.nssf_tier_ii +
+        +entry.nssf_tier_i +
+        +entry.paye +
+        +entry.helb_deduction +
+        +entry.housing_levy +
+        +entry.other_deductions,
       entry.net_pay, // Net Pay
     ]),
   ];

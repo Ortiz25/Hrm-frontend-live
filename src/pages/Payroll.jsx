@@ -11,6 +11,7 @@ import {
   Filter,
   UserCheck,
   UsersRound,
+  Loader,
 } from "lucide-react";
 import {
   Card,
@@ -21,7 +22,6 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Select } from "../components/ui/select";
 import SidebarLayout from "../components/layout/sidebarLayout";
 import { useStore } from "../store/store";
 import Modal from "../components/ui/modal";
@@ -42,7 +42,7 @@ const PayrollModule = () => {
   const [filterCriteria, setFilterCriteria] = useState("all");
   const { activeModule, changeModule, role } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  const [isUpdatingPayroll, setIsUpdatingPayroll] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEntry, setCurrentEntry] = useState(null);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -50,12 +50,10 @@ const PayrollModule = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const slicedHistory = payrollHistory.slice(0, 5);
   const slicedData = payrollData.slice(0, 5);
-  console.log(payrollInfo);
 
   useEffect(() => {
     changeModule("Payroll");
   }, []);
-  console.log(currentEntry);
 
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -103,12 +101,39 @@ const PayrollModule = () => {
     setCurrentEntry(entry);
   };
 
-  const handleUpdate = (e) => {
-    console.log(currentEntry);
-    // setPayrollData((prev) =>
-    //   prev.map((item) => (item.id === currentEntry.id ? currentEntry : item))
-    // );
-    // setEditModalOpen(false);
+  async function fetchData() {
+    try {
+      const url = "https://hrmlive.livecrib.pro/api/payroll";
+      const response = await fetch(url);
+      const data = await response.json();
+      setPayrollData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleUpdate = async (e) => {
+    try {
+      setIsUpdatingPayroll(true);
+      const url = "https://hrmlive.livecrib.pro/api/updatepayroll";
+      const data = currentEntry;
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const addData = await response.json();
+      if (addData.message === "Payroll updated successfully") {
+        fetchData();
+        setIsUpdatingPayroll(false);
+        setEditModalOpen(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleMakePayments = () => {
     setPaymentModalOpen(true);
@@ -119,7 +144,7 @@ const PayrollModule = () => {
     setSelectedEmployee(null);
   };
 
-  const handleProcessPayment = () => {
+  const handleProcessPayment = async () => {
     if (paymentType === "mass") {
       // Process mass payment logic here
       alert("Mass salary payment processed for all employees!");
@@ -695,7 +720,12 @@ const PayrollModule = () => {
               onClick={handleUpdate}
               className="w-full bg-green-500 text-white"
             >
-              Save Changes
+              {isUpdatingPayroll ? (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <></>
+              )}
+              {isUpdatingPayroll ? "Saving Changes..." : "Save Changes"}
             </Button>
           </div>
         </motion.div>
@@ -712,8 +742,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmlive.livecrib.pro/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {

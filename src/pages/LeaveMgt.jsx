@@ -44,10 +44,14 @@ const LeaveManagementModule = () => {
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMgt, setViewMgt] = useState(false);
-  const slicedData = leaveData.slice(0, 5);
+
   const slicedBalance = employeeLeaveData.slice(0, 5);
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
+  const seevedData = leaveData.filter((entry) => {
+    return entry.status === "pending";
+  });
+  const slicedData = seevedData.slice(0, 5);
 
   useEffect(() => {
     changeRole(leaves.user.role);
@@ -60,7 +64,7 @@ const LeaveManagementModule = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url2 = "https://hrmbackend.livecrib.pro/api/leave";
+        const url2 = "https://hrmlive.livecrib.pro/api/leave";
         const response = await fetch(url2);
         const leavedata = await response.json();
         setLeaveData(leavedata.leaves);
@@ -113,7 +117,7 @@ const LeaveManagementModule = () => {
     });
   };
 
-  const filteredLeaveData = leaveData.filter(
+  const filteredLeaveData = seevedData.filter(
     (entry) =>
       entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.leave_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -162,7 +166,7 @@ const LeaveManagementModule = () => {
           {viewMgt && (
             <Card className="shadow-2xl">
               <CardHeader>
-                <CardTitle className="text-xl">Manage Requests</CardTitle>
+                <CardTitle className="text-2xl">Manage Requests</CardTitle>
               </CardHeader>
 
               <CardContent>
@@ -224,7 +228,7 @@ const LeaveManagementModule = () => {
 
           <Card className="shadow-2xl">
             <CardHeader>
-              <CardTitle className="text-xl">Request Leave</CardTitle>
+              <CardTitle className="text-2xl">Request Leave</CardTitle>
             </CardHeader>
             <CardContent>
               <Form method="post" action="/leave" className="space-y-4">
@@ -302,7 +306,9 @@ const LeaveManagementModule = () => {
           {viewMgt && (
             <Card className="shadow-2xl">
               <CardHeader>
-                <CardTitle className="text-xl">Adjust Leave Balance</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                  Adjust Leave Balance
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <Form method="post" className="space-y-4">
@@ -544,7 +550,7 @@ export async function action({ request, params }) {
   if (!leaveData.startDate) {
     console.log("Adjusting");
     console.log(leaveData);
-    let url = "https://hrmbackend.livecrib.pro/api/adjustleave";
+    let url = "https://hrmlive.livecrib.pro/api/adjustleave";
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -559,7 +565,7 @@ export async function action({ request, params }) {
     return null;
   }
 
-  let url = "https://hrmbackend.livecrib.pro/api/requestLeave";
+  let url = "https://hrmlive.livecrib.pro/api/requestLeave";
 
   const response = await fetch(url, {
     method: "POST",
@@ -583,9 +589,9 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/leave";
-  const url3 = "https://hrmbackend.livecrib.pro/api/leavebalances";
+  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmlive.livecrib.pro/api/leave";
+  const url3 = "https://hrmlive.livecrib.pro/api/leavebalances";
 
   const data = { token: token };
 

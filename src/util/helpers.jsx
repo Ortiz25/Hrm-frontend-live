@@ -62,7 +62,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `https://hrmbackend.livecrib.pro/api/approve/${id}`,
+      `https://hrmlive.livecrib.pro/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {

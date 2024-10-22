@@ -11,7 +11,7 @@ const HRDashboard = () => {
   const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dashData = useLoaderData();
-  console.log(dashData.user);
+
   useEffect(() => {
     changeModule("Dashboard");
     changeRole(dashData.user.role);
@@ -47,8 +47,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/dashboardData";
+  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmlive.livecrib.pro/api/dashboardData";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -72,7 +72,6 @@ export async function loader() {
     return redirect("/employeedashboard");
   }
   const dashData = await response2.json();
-  console.log(userData);
 
   if (userData.message === "token expired") {
     return redirect("/");
