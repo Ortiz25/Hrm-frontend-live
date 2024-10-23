@@ -317,8 +317,8 @@ export async function loader() {
     return redirect("/");
   }
 
-  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmlive.livecrib.pro/api/employeedash";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmbackend.livecrib.pro/api/employeedash";
   const data = { token: token };
 
   const response = await fetch(url, {

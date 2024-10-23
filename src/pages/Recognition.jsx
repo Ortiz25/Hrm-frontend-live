@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Textarea } from '../components/ui/textarea';
+import { Textarea } from '../components/ui/textArea.jsx';
 import { Badge } from '../components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Trophy, ThumbsUp, Star, Heart, Target, Rocket, Award, Menu } from 'lucide-react';
@@ -349,8 +349,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmlive.livecrib.pro/api/payroll";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {
