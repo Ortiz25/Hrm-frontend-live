@@ -141,7 +141,7 @@ export async function action({ request, params }) {
     password: data.get("password").trim(),
   };
 
-  let url = "https://hrmbackend.livecrib.pro/api/login";
+  let url = "https://hrmlive.livecrib.pro/api/login";
 
   const response = await fetch(url, {
     method: "POST",
@@ -169,6 +169,11 @@ export async function action({ request, params }) {
     return errors;
   }
   console.log(resData);
+  if(resData.message === 'User does not exist'){
+    errors.email = 'User does not exist'
+    return errors
+  }
+
   localStorage.setItem("token", resData.token);
   localStorage.setItem("name", resData.name);
 
@@ -181,7 +186,7 @@ export async function loader() {
   if (!token) {
     return null;
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
   const data = { token: token };
 
   const response = await fetch(url, {

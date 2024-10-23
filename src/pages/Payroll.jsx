@@ -98,12 +98,19 @@ const PayrollModule = () => {
   };
 
   const handleSelectClick = (entry) => {
+
     setCurrentEntry(entry);
+  };
+
+  
+  const handleSelectEmployee = (entry) => {
+
+    setSelectedEmployee(entry)
   };
 
   async function fetchData() {
     try {
-      const url = "https://hrmbackend.livecrib.pro/api/payroll";
+      const url = "https://hrmlive.livecrib.pro/api/payroll";
       const response = await fetch(url);
       const data = await response.json();
       setPayrollData(data);
@@ -115,7 +122,7 @@ const PayrollModule = () => {
   const handleUpdate = async (e) => {
     try {
       setIsUpdatingPayroll(true);
-      const url = "https://hrmbackend.livecrib.pro/api/updatepayroll";
+      const url = "https://hrmlive.livecrib.pro/api/updatepayroll";
       const data = currentEntry;
       const response = await fetch(url, {
         method: "PUT",
@@ -140,11 +147,13 @@ const PayrollModule = () => {
   };
 
   const handlePaymentTypeSelect = (type) => {
+    console.log(type)
     setPaymentType(type);
     setSelectedEmployee(null);
   };
 
   const handleProcessPayment = async () => {
+    console.log(selectedEmployee)
     if (paymentType === "mass") {
       // Process mass payment logic here
       alert("Mass salary payment processed for all employees!");
@@ -508,7 +517,7 @@ const PayrollModule = () => {
                               <Button
                                 variant="outline"
                                 className="text-blue-500 border-blue-500 hover:bg-blue-100"
-                                onClick={() => handleSelectClick(entry)}
+                                onClick={() =>handleSelectEmployee(entry)}
                               >
                                 Select
                               </Button>
@@ -742,8 +751,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url = "https://hrmlive.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmlive.livecrib.pro/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {

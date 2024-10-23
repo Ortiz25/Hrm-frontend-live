@@ -14,6 +14,7 @@ import {
   Logs,
   TrendingUp,
   UserCheck,
+  Flower
 } from "lucide-react";
 import { Outlet, NavLink, useNavigate, redirect } from "react-router-dom";
 import "./tooltip.css";
@@ -28,7 +29,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "https://hrmbackend.livecrib.pro/api/profile";
+        const url = "https://hrmlive.livecrib.pro/api/profile";
         const token = localStorage.getItem("token");
         const data = { token: token };
 
@@ -85,6 +86,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
       route: "leave",
       roles: ["admin", "employee", "super_admin"],
     },
+  
     {
       name: "Disciplinary Management",
       icon: Scale,
@@ -108,6 +110,12 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
       icon: TrendingUp,
       route: "performance",
       roles: ["admin", "super_admin"],
+    },
+    {
+      name: "Recognitions",
+      icon: Flower,
+      route: "recognition",
+      roles: ["admin", "employee", "super_admin"],
     },
     {
       name: "HR Documents",
@@ -136,6 +144,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
 
   function handleLogout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("name");
     redirect("/");
   }
 

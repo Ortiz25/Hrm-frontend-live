@@ -44,6 +44,7 @@ import LeaveDashboard, {
 } from "./pages/LeaveDash.jsx";
 import PasswordRecovery from "./pages/ForgotPassPage.jsx";
 import { action as forgotAction } from "./pages/ForgotPassPage.jsx";
+import RecognitionPage, {loader as RecognitionLoader} from "./pages/Recognition.jsx";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,11 @@ const router = createBrowserRouter([
         path: "/forgotpassword",
         element: <PasswordRecovery />,
         action: forgotAction,
+      },
+      {
+        path: "/recognition",
+        element: <RecognitionPage />,
+        loader: RecognitionLoader  
       },
       {
         path: "/fogot",
