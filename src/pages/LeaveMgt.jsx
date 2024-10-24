@@ -64,7 +64,7 @@ const LeaveManagementModule = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url2 = "https://hrmbackend.livecrib.pro/api/leave";
+        const url2 = "http://localhost:5174/api/leave";
         const response = await fetch(url2);
         const leavedata = await response.json();
         setLeaveData(leavedata.leaves);
@@ -284,6 +284,15 @@ const LeaveManagementModule = () => {
                       type="number"
                       name="days"
                       placeholder="Enter Number of Days Taken"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Covering Employee No/ID:</Label>
+                    <Input
+                      type="text"
+                      name="coveringEmployeeNumber"
+                      placeholder="Enter covering Employee No/ID"
                       required
                     />
                   </div>
@@ -545,12 +554,14 @@ export async function action({ request, params }) {
     startDate: data.get("startDate"),
     endDate: data.get("endDate"),
     days: data.get("days"),
+    coveringEmployeeNumber: data.get("coveringEmployeeNumber"),
+    
   };
 
   if (!leaveData.startDate) {
     console.log("Adjusting");
     console.log(leaveData);
-    let url = "https://hrmbackend.livecrib.pro/api/adjustleave";
+    let url = "http://localhost:5174/api/adjustleave";
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -565,7 +576,7 @@ export async function action({ request, params }) {
     return null;
   }
 
-  let url = "https://hrmbackend.livecrib.pro/api/requestLeave";
+  let url = "http://localhost:5174/api/requestLeave";
 
   const response = await fetch(url, {
     method: "POST",
@@ -589,9 +600,9 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/leave";
-  const url3 = "https://hrmbackend.livecrib.pro/api/leavebalances";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/leave";
+  const url3 = "http://localhost:5174/api/leavebalances";
 
   const data = { token: token };
 

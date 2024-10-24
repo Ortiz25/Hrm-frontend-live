@@ -5,14 +5,34 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const isLeaveActive = (leave) => {
-  const currentDate = new Date();
-  const startDate = new Date(leave.start_date);
-  const endDate = new Date(leave.end_date);
+export const getEmployeeNameByNumber = async (employeeNumber) => {
+  try {
+    const response = await fetch(`http://localhost:5174/api/employees/${employeeNumber}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  // Check if the current date falls within the start and end dates (inclusive)
-  return currentDate >= startDate && currentDate <= endDate;
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data.name;  // Assuming backend sends { name: "Employee Name" }
+  } catch (error) {
+    console.error('Error fetching employee data:', error);
+    return null;
+  };
 };
+
+getEmployeeNameByNumber('EMP0012').then((name) => {
+  if (name) {
+    console.log(`Employee Name: ${name}`);
+  } else {
+    console.log('Employee not found or error occurred.');
+  }
+});
 
 export const formatCurrency = (value) => {
   return new Intl.NumberFormat("en-KE", {
@@ -62,7 +82,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `https://hrmbackend.livecrib.pro/api/approve/${id}`,
+      `http://localhost:5174/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {

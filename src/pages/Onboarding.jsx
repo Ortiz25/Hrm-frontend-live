@@ -21,16 +21,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog.jsx";
-import { redirect, useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData, useNavigate } from "react-router-dom";
 
 const Onboarding = () => {
   const employeesData = useLoaderData();
+  const navigate = useNavigate()
   const [employees, setEmployees] = useState(employeesData.employees);
   const [searchTerm, setSearchTerm] = useState("");
   const [employeeToRemove, setEmployeeToRemove] = useState(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [employeeIdToRemove, setEmployeeIdToRemove] = useState("");
-  const { activeModule, changeModule } = useStore();
+  const { activeModule, changeModule, changeOffboardEmployee, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [step, setStep] = useState(1);
   const [isAddingEmployee, setIsAddingEmployee] = useState(false);
@@ -68,7 +69,7 @@ const Onboarding = () => {
   const fetchEmployees = async () => {
     try {
       const response = await fetch(
-        "https://hrmbackend.livecrib.pro/api/getemployees"
+        "http://localhost:5174/api/getemployees"
       );
       const data = await response.json();
       if (response.ok) {
@@ -86,13 +87,15 @@ const Onboarding = () => {
       employeeNumber: employeesData.userData.nextEmployeeNo,
       company: "TechCorp",
     }));
+    changeRole(employeesData.userData.role)
+    changeModule("ON/OFF Boarding")
   }, []);
 
   const handleAddEmployee = async () => {
     try {
       // Start adding employee - disable the button
       setIsAddingEmployee(true);
-      const url = "https://hrmbackend.livecrib.pro/api/adduser";
+      const url = "http://localhost:5174/api/adduser";
       const response = await fetch(url, {
         method: "PUT",
         headers: {
@@ -174,31 +177,36 @@ const Onboarding = () => {
   const handleRemoveEmployee = async (e) => {
     e.preventDefault();
     console.log(employeeToRemove);
-    try {
-      console.log("Removing employee with ID:", employeeToRemove);
+    changeOffboardEmployee(employeeToRemove)
+    setEmployeeIdToRemove("");
+    setEmployeeToRemove(null);
+    navigate("/offboard")
+    
+    // try {
+    //   console.log("Removing employee with ID:", employeeToRemove);
 
-      const url = "https://hrmbackend.livecrib.pro/api/deleteemployee";
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ employeeId: employeeToRemove.id }), // Send employee ID as body
-      });
+    //   const url = "http://localhost:5174/api/deleteemployee";
+    //   const response = await fetch(url, {
+    //     method: "DELETE",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ employeeId: employeeToRemove.id }), // Send employee ID as body
+    //   });
 
-      const result = await response.json();
+    //   const result = await response.json();
 
-      if (response.ok && result.message === "User deleted successfully") {
-        alert("Employee removed successfully");
-        // Add any state updates or UI refresh logic here, e.g., refreshing the employee list
-        fetchEmployees();
-      } else {
-        alert("Failed to remove employee");
-      }
-    } catch (error) {
-      console.error("Error removing employee:", error);
-      alert("An error occurred while removing the employee");
-    }
+    //   if (response.ok && result.message === "User deleted successfully") {
+    //     alert("Employee removed successfully");
+    //     // Add any state updates or UI refresh logic here, e.g., refreshing the employee list
+    //     fetchEmployees();
+    //   } else {
+    //     alert("Failed to remove employee");
+    //   }
+    // } catch (error) {
+    //   console.error("Error removing employee:", error);
+    //   alert("An error occurred while removing the employee");
+    // }
   };
 
   const confirmRemoveEmployee = () => {
@@ -396,7 +404,7 @@ const Onboarding = () => {
                   className="mt-4"
                   disabled={!employeeToRemove}
                 >
-                  Remove Employee
+                  Begin Offboarding
                 </Button>
               </form>
             </CardContent>
@@ -469,8 +477,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/getemployees";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/getemployees";
 
   const data = { token: token };
 

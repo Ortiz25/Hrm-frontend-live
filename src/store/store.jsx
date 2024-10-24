@@ -7,6 +7,8 @@ export const useStore = create((set) => ({
   changeRole: (value) => set({ role: value }),
   userName: {},
   changeUser: (value) => set({ userName: value }),
+  offboardEmployee: {},
+  changeOffboardEmployee: (value) => set({ offboardEmployee: value }),
 }));
 
 export const generatePassword = (length = 8) => {
