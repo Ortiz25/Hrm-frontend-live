@@ -24,6 +24,7 @@ import {
   useNavigation,
   useSubmit,
 } from "react-router-dom";
+import { formatDate } from "../util/helpers";
 
 const WarningModule = ({ warningsData, actionData }) => {
   const navigation = useNavigation();
@@ -37,14 +38,14 @@ const WarningModule = ({ warningsData, actionData }) => {
   if (actionData) {
     formRef.current.reset();
   }
-
+  console.log(warnings)
   async function handleDownload(id, attachments) {
     try {
       // Extract the file name from the attachment
       const fileName = attachments[0].split("/").pop();
 
       // Construct the download URL
-      const url = `https://hrmbackend.livecrib.pro/api/download/${fileName}`;
+      const url = `http://localhost:5174/api/download/${fileName}`;
 
       // Fetch the file
       const response = await fetch(url);
@@ -81,7 +82,7 @@ const WarningModule = ({ warningsData, actionData }) => {
       try {
         console.log(warningId);
         const data = { id: warningId };
-        const url = "https://hrmbackend.livecrib.pro/api/deletewarning";
+        const url = "http://localhost:5174/api/deletewarning";
         const response = await fetch(url, {
           method: "DELETE",
           headers: {
@@ -92,7 +93,7 @@ const WarningModule = ({ warningsData, actionData }) => {
 
         const result = await response.json();
         if (result.message === "warning deleted") {
-          const url2 = "https://hrmbackend.livecrib.pro/api/warnings";
+          const url2 = "http://localhost:5174/api/warnings";
 
           const response2 = await fetch(url2);
 
@@ -111,7 +112,7 @@ const WarningModule = ({ warningsData, actionData }) => {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-2">Warnings</h1>
-      <Form ref={formRef} method="post" encType="multipart/form-data">
+      <Form ref={formRef} method="put" encType="multipart/form-data">
         <Card className="mb-4">
           <CardHeader>
             <CardTitle>Issue New Warning</CardTitle>
@@ -159,7 +160,7 @@ const WarningModule = ({ warningsData, actionData }) => {
                 </p>
                 <p>
                   <span className="font-bold">Date: </span>
-                  {new Date(warning.date).toLocaleDateString()}
+                  {new Date(warning.issue_date).toLocaleDateString()}
                 </p>
 
                 <p>

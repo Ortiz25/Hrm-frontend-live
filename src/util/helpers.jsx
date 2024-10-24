@@ -7,7 +7,7 @@ export function cn(...inputs) {
 
 export const getEmployeeNameByNumber = async (employeeNumber) => {
   try {
-    const response = await fetch(`https://hrmbackend.livecrib.pro/api/employees/${employeeNumber}`, {
+    const response = await fetch(`http://localhost:5174/api/employees/${employeeNumber}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `https://hrmbackend.livecrib.pro/api/approve/${id}`,
+      `http://localhost:5174/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {

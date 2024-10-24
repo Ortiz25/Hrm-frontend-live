@@ -43,8 +43,8 @@ export default WarningPage;
 export async function action({ request, params }) {
   try {
     const data = await request.formData();
-
-    let url = "https://hrmbackend.livecrib.pro/warningsupload";
+    console.log(data)
+    let url = "http://localhost:5174/warningsupload";
     const response = await fetch(url, {
       method: "PUT",
       body: data,
@@ -70,8 +70,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/warnings";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/warnings";
 
   const data = { token: token };
 

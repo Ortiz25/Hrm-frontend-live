@@ -151,7 +151,7 @@ const RecognitionPage = () => {
 
                 <main className="flex-1 overflow-y-auto p-6 space-y-6">
                     {/* Recognition Form Card */}
-                  {role !== "employee" && <Card className="max-w-4xl mx-auto">
+                  { <Card className="max-w-4xl mx-auto">
                         <CardHeader className="space-y-1">
                             <CardTitle className="text-3xl font-bold">Create Recognition</CardTitle>
                             <CardDescription>Acknowledge and celebrate your colleagues' achievements</CardDescription>
@@ -349,8 +349,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {

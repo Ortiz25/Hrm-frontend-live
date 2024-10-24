@@ -18,7 +18,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "https://hrmbackend.livecrib.pro/api/discplinary";
+        const url = "http://localhost:5174/api/discplinary";
 
         const data = { employeeId: employeeId };
 
@@ -59,7 +59,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
         <div>
           <p className="font-semibold">{warning.type}</p>
           <p className="text-sm text-gray-500">
-            {new Date(warning.date).toLocaleDateString()}
+            {new Date(warning.issue_date).toLocaleDateString()}
           </p>
         </div>
       </div>
