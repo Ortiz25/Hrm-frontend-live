@@ -5,50 +5,65 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textArea.jsx';
 import { Badge } from '../components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Trophy, ThumbsUp, Star, Heart, Target, Rocket, Award, Menu } from 'lucide-react';
+import { Trophy, ThumbsUp, Star, Heart, Target, Rocket, Award, Menu, Loader } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { useStore } from "../store/store.jsx";
 import { redirect, useLoaderData } from 'react-router-dom';
 
+
 const RecognitionPage = () => {
     const { activeModule, changeModule, changeRole, role } = useStore();
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [errors, setErrors] = useState({});
     const data = useLoaderData();
-
+    const [isLoading, setIsloading] = useState(false)
+  
     useEffect(() => {
-        changeRole(data.role);
+        changeRole(data.role.role);
         changeModule("Recognitions")
+      
     }, []);
-
+    console.log(data.recognitions)
     // Focus style class
     const focusClass = "bg-gray-900 text-white ring-2 ring-offset-2 ring-gray-600";
+
+    const today = new Date();
+
+    // Format the date as 'YYYY-MM-DD'
+    const formattedDate = today.toISOString().split('T')[0]; 
 
     // State management for recognition form
     const [recognitionForm, setRecognitionForm] = useState({
         recipientName: '',
+        recipientID: '',
         recognitionType: '',
         category: '',
         message: '',
         impact: '',
-        tags: []
+        tags: [],
+        likes: 0,
+        recognition_date:formattedDate 
     });
 
-    const [recognitionHistory, setRecognitionHistory] = useState([
-        {
-            id: 1,
-            recipientName: 'Jane Smith',
-            recognitionType: 'Kudos',
-            category: 'Innovation',
-            message: 'Outstanding work on the new feature implementation!',
-            impact: 'Team',
-            date: '2024-03-20',
-            likes: 5,
-            tags: ['technical', 'innovation']
-        }
-    ]);
+    const [recognitionHistory, setRecognitionHistory] = useState(data.recognitions);
 
     const [showSuccess, setShowSuccess] = useState(false);
+
+     // Function to fetch all recognitions from the backend
+     const fetchRecognitions = async () => {
+        try {
+            const response = await fetch('https://hrmbackend.livecrib.pro/api/recognitions');
+            if (response.ok) {
+                const data = await response.json();
+                setRecognitionHistory(data);
+            } else {
+                console.error('Failed to fetch recognitions');
+            }
+        } catch (error) {
+            console.error('Error fetching recognitions:', error);
+        }
+    };
 
     // Recognition types and their corresponding icons
     const recognitionTypes = {
@@ -83,28 +98,65 @@ const RecognitionPage = () => {
         'mentoring', 'problem-solving'
     ];
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+       
+        try {
+            setIsloading(true)
+         
+            if(recognitionForm.recipientID === data.role.employee.employee_number){
+    
+                setErrors({message: "Self Recognition Prohibited !!!"})
+                return
+            }
+            const response = await fetch('https://hrmbackend.livecrib.pro/api/recognition', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(recognitionForm)
+            });
 
-        const newRecognition = {
-            id: recognitionHistory.length + 2,
-            ...recognitionForm,
-            date: new Date().toISOString().split('T')[0],
-            likes: 0
-        };
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Recognition history updated:', result);
+                setRecognitionForm({
+                    recipientName: '',
+                    recipientID: '',
+                    recognitionType: '',
+                    category: '',
+                    message: '',
+                    impact: '',
+                    tags: [],
+                    likes: 0,
+                    recognition_date:formattedDate 
+                })
+                setIsloading(false)
+                setShowSuccess(true)
+                const myTimeout = setTimeout(()=>{setShowSuccess(false)}, 5000);
 
-        setRecognitionHistory(prev => [newRecognition, ...prev]);
-        setRecognitionForm({
-            recipientName: '',
-            recognitionType: '',
-            category: '',
-            message: '',
-            impact: '',
-            tags: []
-        });
-
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
+            } else {
+                console.error('Error updating recognition history');
+                setErrors({message: "Error updating recognition history"})
+                setRecognitionForm({
+                    recipientName: '',
+                    recipientID: '',
+                    recognitionType: '',
+                    category: '',
+                    message: '',
+                    impact: '',
+                    tags: [],
+                    likes: 0,
+                    recognition_date:formattedDate 
+                })
+                setIsloading(false)
+                fetchRecognitions();
+                alert("Recognition Submitted successfully")
+            }
+        } catch (error) {
+            console.error('Request failed:', error);
+            setIsloading(false)
+        }
     };
 
     const handleTagToggle = (tag) => {
@@ -116,12 +168,24 @@ const RecognitionPage = () => {
         }));
     };
 
-    const handleLike = (id) => {
-        setRecognitionHistory(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, likes: item.likes + 1 } : item
-            )
-        );
+    const handleLike = async (id) => {
+        console.log(id)
+        try {
+            const response = await fetch(`https://hrmbackend.livecrib.pro/api/recognition/${id}/like`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                 fetchRecognitions();
+            } else {
+                console.error('Failed to update likes');
+            }
+        } catch (error) {
+            console.error('Error updating likes:', error);
+        }
     };
 
     return (
@@ -166,6 +230,16 @@ const RecognitionPage = () => {
                                         onChange={(e) => setRecognitionForm(prev => ({
                                             ...prev,
                                             recipientName: e.target.value
+                                        }))}
+                                        required
+                                        className="w-full"
+                                    />
+                                    <Input
+                                        placeholder="Recipient's No/ID"
+                                        value={recognitionForm. recipientID}
+                                        onChange={(e) => setRecognitionForm(prev => ({
+                                            ...prev,
+                                            recipientID: e.target.value
                                         }))}
                                         required
                                         className="w-full"
@@ -259,9 +333,18 @@ const RecognitionPage = () => {
                                         ))}
                                     </div>
                                 </div>
-
+                                 
+                 {  errors && errors.message &&              <Alert className="mt-4 bg-red-100 border-red-400 text-red-700">
+                <AlertDescription>{errors.message}</AlertDescription>
+              </Alert>}
                                 <Button type="submit" className="w-full">
-                                    Submit Recognition
+                                   
+                                    {isLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
+                )}
+                {isLoading ? "Submitting..." : " Submit Recognition"}
                                 </Button>
                             </form>
 
@@ -273,7 +356,7 @@ const RecognitionPage = () => {
                         </CardContent>
                     </Card>}
 
-                    <Card className="max-w-4xl mx-auto">
+                    <Card className="max-w-4xl mx-auto shadow-lg">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl">Recognition History</CardTitle>
               <CardDescription>View and interact with recent recognitions</CardDescription>
@@ -291,15 +374,15 @@ const RecognitionPage = () => {
                           <div className="space-y-3">
                             <div className="flex items-center flex-wrap gap-2">
                               <IconComponent className="h-5 w-5 text-blue-500" />
-                              <h4 className="font-medium">{item.recipientName}</h4>
+                              <h4 className="font-bold">{item.recipient_name}</h4>
                               <Badge className="bg-blue-100 text-blue-800">
                                 {item.category}
                               </Badge>
-                              <Badge variant="outline" className="text-gray-600">
+                              <Badge variant="outline" className="text-gray-600 bg-green-100">
                                 {item.impact}
                               </Badge>
                             </div>
-                            <p className="text-gray-600 leading-relaxed">
+                            <p className="text-emerald-600 leading-relaxed">
                               {item.message}
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -350,7 +433,7 @@ export async function loader() {
     return redirect("/");
   }
   const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url2 = "https://hrmbackend.livecrib.pro/api/recognitions";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -360,30 +443,22 @@ export async function loader() {
     },
     body: JSON.stringify(data),
   });
-  // const response2 = await fetch(url2, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify(data),
-  // });
-  // const response3 = await fetch(url2);
+
+  const response2 = await fetch(url2);
 
    const userData = await response.json();
+   const recognitions = await response2.json();
 
 
    if (userData.message === "token expired") {
     return redirect("/"); 
   }
-  // const { payroll } = await response2.json();
-
-  // const payrollInfo = await response3.json();
-
   
-  console.log()
+ 
   return {
    
-    role: userData.user.role,
+    role: userData.user,
+    recognitions:recognitions
   
   };
   
