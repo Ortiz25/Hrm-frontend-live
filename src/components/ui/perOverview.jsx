@@ -54,7 +54,7 @@ const PerformanceOverview = () => {
   const [employees] = useState(initialEmployeeData);
 
   return (
-    <div className="flex-1 p-4 overflow-y-auto overflow-x-auto shadow-2xl rounded">
+    <div className="flex-1 p-4 overflow-y-auto overflow-x-auto shadow-xl rounded">
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-2xl font-semibold mb-4">{activeTab}</h2>
         {activeTab === "Overview" && (

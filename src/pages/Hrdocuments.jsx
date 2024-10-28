@@ -2,16 +2,266 @@ import React, { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Button } from "@headlessui/react";
 import SidebarLayout from "../components/layout/sidebarLayout";
-import { Menu } from "lucide-react";
+import { 
+  Menu, 
+  Download, 
+  FileText,
+  Users, 
+  UserCheck, 
+  GraduationCap, 
+  BarChart3, 
+  UsersRound,
+  ArrowUpRight,
+  ArrowDownRight,
+  X, 
+  ChevronDown, 
+  ChevronUp 
+} from "lucide-react";
 import { Input } from "../components/ui/input.jsx";
 import { useStore } from "../store/store.jsx";
-import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { Label } from "../components/ui/label.jsx";
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
+// Sample data for reports
+const sampleData = {
+  attendance: {
+    monthlyData: [
+      { month: 'January', present: 95, absent: 5, late: 2 },
+      { month: 'February', present: 93, absent: 7, late: 3 },
+      { month: 'March', present: 96, absent: 4, late: 1 },
+    ],
+    summary: { avgAttendance: 94.6, avgAbsence: 5.4, avgLate: 2 }
+  },
+  accessLevels: {
+    levels: [
+      { level: 'Admin', count: 5, permissions: 'Full Access' },
+      { level: 'Manager', count: 15, permissions: 'Department Access' },
+      { level: 'Employee', count: 80, permissions: 'Limited Access' },
+    ]
+  },
+  staffComposition: {
+    departments: [
+      { name: 'Engineering', count: 30, percentage: 30 },
+      { name: 'Sales', count: 25, percentage: 25 },
+      { name: 'Marketing', count: 20, percentage: 20 },
+      { name: 'HR', count: 15, percentage: 15 },
+      { name: 'Finance', count: 10, percentage: 10 },
+    ]
+  },
+  genderDistribution: {
+    overall: { male: 55, female: 45 },
+    byDepartment: [
+      { department: 'Engineering', male: 70, female: 30 },
+      { department: 'Sales', male: 50, female: 50 },
+      { department: 'Marketing', male: 45, female: 55 },
+    ]
+  },
+  ageDistribution: {
+    groups: [
+      { range: '20-30', percentage: 30 },
+      { range: '31-40', percentage: 40 },
+      { range: '41-50', percentage: 20 },
+      { range: '51+', percentage: 10 },
+    ]
+  },
+  attrition: {
+    quarterly: [
+      { quarter: 'Q1', rate: 4.2, voluntary: 3.1, involuntary: 1.1 },
+      { quarter: 'Q2', rate: 3.8, voluntary: 2.8, involuntary: 1.0 },
+    ]
+  },
+  education: {
+    levels: [
+      { level: 'Bachelors', percentage: 50 },
+      { level: 'Masters', percentage: 30 },
+      { level: 'PhD', percentage: 5 },
+      { level: 'Others', percentage: 15 },
+    ]
+  }
+};
+
+// Initial data for documents
 const initialExpiringDocuments = [
   { name: "Contract A", expiryDate: "2024-10-01" },
   { name: "Policy B", expiryDate: "2024-09-25" },
 ];
+
+const reportTypes = [
+  {
+    title: "Monthly Attendance Report",
+    description: "Track employee attendance patterns and trends",
+    period: "Monthly",
+    icon: FileText
+  },
+  {
+    title: "Employee Access Level Report",
+    description: "Overview of system and document access rights",
+    period: "Quarterly",
+    icon: FileText
+  },
+  {
+    title: "Staff Composition Report",
+    description: "Detailed breakdown of workforce demographics",
+    period: "Quarterly",
+    icon: FileText
+  },
+  {
+    title: "Gender Distribution Report",
+    description: "Analysis of gender diversity across departments",
+    period: "Bi-annual",
+    icon: FileText
+  },
+  {
+    title: "Age Demographics Report",
+    description: "Age distribution analysis of workforce",
+    period: "Annual",
+    icon: FileText
+  },
+  {
+    title: "Attrition Analysis Report",
+    description: "Employee turnover rates and patterns",
+    period: "Quarterly",
+    icon: FileText
+  },
+  {
+    title: "Education Profile Report",
+    description: "Educational qualification distribution",
+    period: "Annual",
+    icon: FileText
+  }
+];
+
+
+// PDF Generation Functions
+const generateHeader = (pdf, title) => {
+  pdf.setFontSize(20);
+  pdf.setTextColor(44, 62, 80);
+  pdf.text(title, 15, 20);
+  
+  pdf.setFillColor(52, 152, 219);
+  pdf.rect(160, 10, 35, 15, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(10);
+  pdf.text('COMPANY', 165, 19);
+  
+  pdf.setTextColor(44, 62, 80);
+  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 15, 30);
+  
+  pdf.setDrawColor(52, 152, 219);
+  pdf.setLineWidth(0.5);
+  pdf.line(15, 35, 195, 35);
+};
+
+const generateAttendanceReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Monthly Attendance Report');
+  
+  pdf.autoTable({
+    startY: 45,
+    head: [['Month', 'Present (%)', 'Absent (%)', 'Late (%)']],
+    body: sampleData.attendance.monthlyData.map(row => [
+      row.month,
+      row.present.toString(),
+      row.absent.toString(),
+      row.late.toString()
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  pdf.setFontSize(14);
+  pdf.text('Summary', 15, pdf.lastAutoTable.finalY + 20);
+  
+  pdf.setFontSize(10);
+  pdf.text(`Average Attendance Rate: ${sampleData.attendance.summary.avgAttendance}%`, 15, pdf.lastAutoTable.finalY + 30);
+  pdf.text(`Average Absence Rate: ${sampleData.attendance.summary.avgAbsence}%`, 15, pdf.lastAutoTable.finalY + 40);
+  pdf.text(`Average Late Rate: ${sampleData.attendance.summary.avgLate}%`, 15, pdf.lastAutoTable.finalY + 50);
+  
+  return pdf;
+};
+
+const generateAccessReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Access Level Report');
+  
+  pdf.autoTable({
+    startY: 45,
+    head: [['Access Level', 'Number of Users', 'Permissions']],
+    body: sampleData.accessLevels.levels.map(row => [
+      row.level,
+      row.count.toString(),
+      row.permissions
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  return pdf;
+};
+
+const generateStaffReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Staff Composition Report');
+  
+  pdf.autoTable({
+    startY: 45,
+    head: [['Department', 'Employee Count', 'Percentage (%)']],
+    body: sampleData.staffComposition.departments.map(row => [
+      row.name,
+      row.count.toString(),
+      row.percentage.toString()
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  return pdf;
+};
+
+const generateGenderReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Gender Distribution Report');
+  
+  pdf.setFontSize(14);
+  pdf.text('Overall Gender Distribution', 15, 45);
+  
+  pdf.autoTable({
+    startY: 55,
+    head: [['Gender', 'Percentage (%)']],
+    body: [
+      ['Male', sampleData.genderDistribution.overall.male.toString()],
+      ['Female', sampleData.genderDistribution.overall.female.toString()]
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  pdf.setFontSize(14);
+  pdf.text('Department-wise Distribution', 15, pdf.lastAutoTable.finalY + 20);
+  
+  pdf.autoTable({
+    startY: pdf.lastAutoTable.finalY + 30,
+    head: [['Department', 'Male (%)', 'Female (%)']],
+    body: sampleData.genderDistribution.byDepartment.map(row => [
+      row.department,
+      row.male.toString(),
+      row.female.toString()
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  return pdf;
+};
+
+const reportGenerators = {
+  'Monthly Attendance Report': generateAttendanceReport,
+  'Employee Access Level Report': generateAccessReport,
+  'Staff Composition Report': generateStaffReport,
+  'Gender Distribution Report': generateGenderReport,
+};
 
 const HRDocumentModule = () => {
   const { activeModule, changeModule } = useStore();
@@ -19,6 +269,8 @@ const HRDocumentModule = () => {
 
   // Document types and documents state
   const [expandedType, setExpandedType] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
+  
   const documentTypes = [
     { type: "Employment Contracts:", documents: ["Contract A", "Contract B"] },
     { type: "Company Policies:", documents: ["Policy A", "Policy B"] },
@@ -85,16 +337,31 @@ const HRDocumentModule = () => {
   // Toggle dropdown for document type
   const toggleDropdown = (type) => {
     if (expandedType === type) {
-      setExpandedType(null); // Close the dropdown if it's already open
+      setExpandedType(null);
     } else {
-      setExpandedType(type); // Open the selected dropdown
+      setExpandedType(type);
     }
   };
 
   // Handle document download
   const handleDownload = (document) => {
     console.log("Downloading document:", document);
-    // Simulate a document download process (e.g., redirect to download link)
+  };
+
+  // Handle report generation
+  const handleGenerateReport = (report) => {
+    setSelectedReport(report);
+    console.log(`Generating ${report.title}...`);
+    
+    // Generate and download PDF
+    setTimeout(() => {
+      const generator = reportGenerators[report.title];
+      if (generator) {
+        const pdf = generator();
+        pdf.save(`${report.title.toLowerCase().replace(/ /g, '_')}.pdf`);
+      }
+      setSelectedReport(null);
+    }, 1000);
   };
 
   return (
@@ -114,8 +381,50 @@ const HRDocumentModule = () => {
         </div>
 
         <div className="p-4 space-y-6">
+       
+
+          {/* Reports Generation Section */}
+          <Card className="bg-white shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Generate Reports</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {reportTypes.map((report, index) => (
+                  <div
+                    key={index}
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-lg">{report.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{report.description}</p>
+                        <p className="text-xs text-gray-500 mt-2">Period: {report.period}</p>
+                      </div>
+                      <report.icon className="text-gray-400" size={20} />
+                    </div>
+                    <Button
+                      onClick={() => handleGenerateReport(report)}
+                      className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-2"
+                      disabled={selectedReport === report}
+                    >
+                      {selectedReport === report ? (
+                        "Generating..."
+                      ) : (
+                        <>
+                          <Download size={16} />
+                          Generate Report
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Document Types Section */}
-          <div className="bg-white shadow rounded-lg p-4">
+          <div className="bg-white shadow-xl rounded-lg p-4">
             <h2 className="text-2xl font-bold">Document Types:</h2>
             <ul className="mt-4 space-y-2">
               {documentTypes.map((docType, index) => (
@@ -132,11 +441,11 @@ const HRDocumentModule = () => {
                     )}
                   </div>
                   {expandedType === docType.type && (
-                    <ul className="mt-2 pl-4 space-y-1 list-inside list-decimal  indent-4">
+                    <ul className="mt-2 pl-4 space-y-1 list-inside list-decimal indent-4">
                       {docType.documents.map((document, idx) => (
                         <li
                           key={idx}
-                          className="text-blue-600 cursor-pointer indent-4 "
+                          className="text-blue-600 cursor-pointer indent-4"
                         >
                           <a onClick={() => handleDownload(document)}>
                             {document}
@@ -151,13 +460,13 @@ const HRDocumentModule = () => {
           </div>
 
           {/* Document Upload Section */}
-          <div className="bg-white shadow rounded-lg p-4">
+          <div className="bg-white shadow-xl rounded-lg p-4">
             <h2 className="text-xl font-semibold">Upload Document</h2>
             <div className="space-y-4 mt-4">
               <input type="file" onChange={handleFileUpload} />
               <select
                 name="Document"
-                className="inline-block w-2\4 border border-gray-300 p-2 ml-2 "
+                className="inline-block w-2/4 border border-gray-300 p-2 ml-2"
               >
                 {documentTypes.map((doc, index) => (
                   <option key={index} value={doc.type}>
@@ -176,8 +485,8 @@ const HRDocumentModule = () => {
             </div>
           </div>
 
-          {/* Access Control Section */}
-          {/* <div className="bg-white shadow rounded-lg p-4">
+          {/* Access Control Section
+          <div className="bg-white shadow-xl rounded-lg p-4">
             <h2 className="text-xl font-semibold">Document Access Control</h2>
             <select
               value={selectedRole}

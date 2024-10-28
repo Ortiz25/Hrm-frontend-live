@@ -109,7 +109,7 @@ const StaffManagementModule = () => {
   };
   async function getRequistions() {
     try {
-      const url2 = "https://hrmbackend.livecrib.pro/api/staffreq";
+      const url2 = "http://localhost:5174/api/staffreq";
 
       const response2 = await fetch(url2);
 
@@ -123,7 +123,7 @@ const StaffManagementModule = () => {
 
   async function handleRequest(status, id) {
     try {
-      const url = "https://hrmbackend.livecrib.pro/api/handlerequest";
+      const url = "http://localhost:5174/api/handlerequest";
 
       const data = { status: status, id: id };
 
@@ -465,8 +465,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/staffreq";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/staffreq";
 
   const data = { token: token };
 

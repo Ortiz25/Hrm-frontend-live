@@ -24,6 +24,7 @@ import {
 } from "../components/ui/card.jsx";
 import PerformanceOverview from "./ui/perOverview.jsx";
 import { formatCurrency } from "../util/helpers.jsx";
+import ReportSummary from "./reportsSummary.jsx";
 
 const DashboardCard = ({ title, value, icon: Icon }) => (
   <Card className="shadow-2xl">
@@ -121,6 +122,7 @@ const DashboardContent = ({ dashData }) => (
           </ResponsiveContainer>
         </CardContent>
       </Card>
+      <ReportSummary/>
       <PerformanceOverview />
     </div>
   </div>
