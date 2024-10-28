@@ -1,5 +1,6 @@
 import logo from "../assets/logo.png";
 import jsPDF from "jspdf";
+import 'jspdf-autotable';
 import { formatMonth, formatDate } from "./helpers";
 
 export const generatePayslipPDF = (entry) => {
@@ -97,4 +98,128 @@ export const generatePayslipPDF = (entry) => {
     ctx.drawImage(img, 0, 0);
     return canvas.toDataURL("image/png");
   }
+};
+
+
+
+// PDF Generation Functions
+export const generateHeader = (pdf, title) => {
+  pdf.setFontSize(20);
+  pdf.setTextColor(44, 62, 80);
+  pdf.text(title, 15, 20);
+  
+  pdf.setFillColor(52, 152, 219);
+  pdf.rect(160, 10, 35, 15, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(10);
+  pdf.text('COMPANY', 165, 19);
+  
+  pdf.setTextColor(44, 62, 80);
+  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 15, 30);
+  
+  pdf.setDrawColor(52, 152, 219);
+  pdf.setLineWidth(0.5);
+  pdf.line(15, 35, 195, 35);
+};
+
+export const generateAttendanceReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Monthly Attendance Report');
+  
+  pdf.autoTable({
+    startY: 45,
+    head: [['Month', 'Present (%)', 'Absent (%)', 'Late (%)']],
+    body: sampleData.attendance.monthlyData.map(row => [
+      row.month,
+      row.present.toString(),
+      row.absent.toString(),
+      row.late.toString()
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  pdf.setFontSize(14);
+  pdf.text('Summary', 15, pdf.lastAutoTable.finalY + 20);
+  
+  pdf.setFontSize(10);
+  pdf.text(`Average Attendance Rate: ${sampleData.attendance.summary.avgAttendance}%`, 15, pdf.lastAutoTable.finalY + 30);
+  pdf.text(`Average Absence Rate: ${sampleData.attendance.summary.avgAbsence}%`, 15, pdf.lastAutoTable.finalY + 40);
+  pdf.text(`Average Late Rate: ${sampleData.attendance.summary.avgLate}%`, 15, pdf.lastAutoTable.finalY + 50);
+  
+  return pdf;
+};
+
+export const generateAccessReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Access Level Report');
+  
+  pdf.autoTable({
+    startY: 45,
+    head: [['Access Level', 'Number of Users', 'Permissions']],
+    body: sampleData.accessLevels.levels.map(row => [
+      row.level,
+      row.count.toString(),
+      row.permissions
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  return pdf;
+};
+
+export const generateStaffReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Staff Composition Report');
+  
+  pdf.autoTable({
+    startY: 45,
+    head: [['Department', 'Employee Count', 'Percentage (%)']],
+    body: sampleData.staffComposition.departments.map(row => [
+      row.name,
+      row.count.toString(),
+      row.percentage.toString()
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  return pdf;
+};
+
+export const generateGenderReport = () => {
+  const pdf = new jsPDF();
+  generateHeader(pdf, 'Gender Distribution Report');
+  
+  pdf.setFontSize(14);
+  pdf.text('Overall Gender Distribution', 15, 45);
+  
+  pdf.autoTable({
+    startY: 55,
+    head: [['Gender', 'Percentage (%)']],
+    body: [
+      ['Male', sampleData.genderDistribution.overall.male.toString()],
+      ['Female', sampleData.genderDistribution.overall.female.toString()]
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  pdf.setFontSize(14);
+  pdf.text('Department-wise Distribution', 15, pdf.lastAutoTable.finalY + 20);
+  
+  pdf.autoTable({
+    startY: pdf.lastAutoTable.finalY + 30,
+    head: [['Department', 'Male (%)', 'Female (%)']],
+    body: sampleData.genderDistribution.byDepartment.map(row => [
+      row.department,
+      row.male.toString(),
+      row.female.toString()
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [52, 152, 219] }
+  });
+  
+  return pdf;
 };
