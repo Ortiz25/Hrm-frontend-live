@@ -35,7 +35,7 @@ import { generatePayslipPDF } from "../util/generatePdf.jsx";
 import LeaveStatusCard from "../components/leaveStatus.jsx";
 import DisciplinarySummaryCard from "../components/displinarySum.jsx";
 import { formatDate, formatMonth } from "../util/helpers.jsx";
-import { generateP9PDF } from "../util/generateP9.jsx";
+import generateAndDownloadP9 from "../util/generateP9.jsx";
 
 const dataP = [
   { name: "Jan", rating: 4.2 },
@@ -288,7 +288,7 @@ const EmployeeDashboard = () => {
               <Button>
                 <FileText className="mr-2 h-4 w-4" />
 
-                <Link to="#" onClick={handleGenerateP9}> Download P9</Link>
+                <Link to="#" onClick={()=>{generateAndDownloadP9()}}> Download P9</Link>
               </Button>
               <Button>
                 <User className="mr-2 h-4 w-4" />
@@ -317,8 +317,8 @@ export async function loader() {
     return redirect("/");
   }
 
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/employeedash";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/employeedash";
   const data = { token: token };
 
   const response = await fetch(url, {

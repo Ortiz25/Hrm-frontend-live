@@ -110,7 +110,7 @@ const PayrollModule = () => {
 
   async function fetchData() {
     try {
-      const url = "https://hrmbackend.livecrib.pro/api/payroll";
+      const url = "http://localhost:5174/api/payroll";
       const response = await fetch(url);
       const data = await response.json();
       setPayrollData(data);
@@ -122,7 +122,7 @@ const PayrollModule = () => {
   const handleUpdate = async (e) => {
     try {
       setIsUpdatingPayroll(true);
-      const url = "https://hrmbackend.livecrib.pro/api/updatepayroll";
+      const url = "http://localhost:5174/api/updatepayroll";
       const data = currentEntry;
       const response = await fetch(url, {
         method: "PUT",
@@ -751,8 +751,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {
