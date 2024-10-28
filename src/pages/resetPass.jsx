@@ -18,7 +18,7 @@ const RestPass = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5174/api/forgotpassword",
+        "https://hrmbackend.livecrib.pro/api/forgotpassword",
         {
           method: "POST",
           headers: {
