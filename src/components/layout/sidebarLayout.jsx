@@ -29,7 +29,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "http://localhost:5174/api/profile";
+        const url = "https://hrmbackend.livecrib.pro/api/profile";
         const token = localStorage.getItem("token");
         const data = { token: token };
 

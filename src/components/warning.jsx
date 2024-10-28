@@ -45,7 +45,7 @@ const WarningModule = ({ warningsData, actionData }) => {
       const fileName = attachments[0].split("/").pop();
 
       // Construct the download URL
-      const url = `http://localhost:5174/api/download/${fileName}`;
+      const url = `https://hrmbackend.livecrib.pro/api/download/${fileName}`;
 
       // Fetch the file
       const response = await fetch(url);
@@ -82,7 +82,7 @@ const WarningModule = ({ warningsData, actionData }) => {
       try {
         console.log(warningId);
         const data = { id: warningId };
-        const url = "http://localhost:5174/api/deletewarning";
+        const url = "https://hrmbackend.livecrib.pro/api/deletewarning";
         const response = await fetch(url, {
           method: "DELETE",
           headers: {
@@ -93,7 +93,7 @@ const WarningModule = ({ warningsData, actionData }) => {
 
         const result = await response.json();
         if (result.message === "warning deleted") {
-          const url2 = "http://localhost:5174/api/warnings";
+          const url2 = "https://hrmbackend.livecrib.pro/api/warnings";
 
           const response2 = await fetch(url2);
 
