@@ -171,7 +171,7 @@ export async function action({ request, params }) {
   const data = { token: token, newPassword: newPassword };
   try {
     const response = await fetch(
-      "https://hrmbackend.livecrib.pro/api/resetpassword",
+      "http://localhost:5174/api/resetpassword",
       {
         method: "POST",
         headers: {
