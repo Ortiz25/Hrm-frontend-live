@@ -33,16 +33,19 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { redirect, useLoaderData } from "react-router-dom";
 import { formatMonth } from "../util/helpers";
+import { Alert, AlertDescription } from "../components/ui/alert";
 
 const PayrollModule = () => {
   const payrollInfo = useLoaderData();
+  const [message, setMessage] = useState('');
   const [payrollData, setPayrollData] = useState(payrollInfo.payrollInfo);
   const [payrollHistory, setPayrollHistory] = useState(payrollInfo.payrollData);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCriteria, setFilterCriteria] = useState("all");
-  const { activeModule, changeModule, role } = useStore();
+  const { activeModule, changeModule, role, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isUpdatingPayroll, setIsUpdatingPayroll] = useState(false);
+  const [isProcessingPayroll, setIsProcessingPayroll] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEntry, setCurrentEntry] = useState(null);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -53,12 +56,13 @@ const PayrollModule = () => {
 
   useEffect(() => {
     changeModule("Payroll");
+    changeRole(payrollInfo.role)
   }, []);
 
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
-
+    console.log(searchTerm)
   const filteredPayrollData = payrollData.filter((entry) => {
     const matchesSearch =
       entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,7 +114,7 @@ const PayrollModule = () => {
 
   async function fetchData() {
     try {
-      const url = "https://hrmbackend.livecrib.pro/api/payroll";
+      const url = "http://localhost:5174/api/payroll";
       const response = await fetch(url);
       const data = await response.json();
       setPayrollData(data);
@@ -122,7 +126,7 @@ const PayrollModule = () => {
   const handleUpdate = async (e) => {
     try {
       setIsUpdatingPayroll(true);
-      const url = "https://hrmbackend.livecrib.pro/api/updatepayroll";
+      const url = "http://localhost:5174/api/updatepayroll";
       const data = currentEntry;
       const response = await fetch(url, {
         method: "PUT",
@@ -155,8 +159,22 @@ const PayrollModule = () => {
   const handleProcessPayment = async () => {
     console.log(selectedEmployee)
     if (paymentType === "mass") {
+      setIsProcessingPayroll(true)
       // Process mass payment logic here
-      alert("Mass salary payment processed for all employees!");
+      try {
+        const response = await fetch('http://localhost:5174/api/processbulkpayroll');
+        const data = await response.json();
+        if(data.message.includes("already processed") ){
+          setMessage(data.message);
+          setIsProcessingPayroll(false)
+          return
+        }
+        setMessage(data.message);
+        alert("Mass salary payment processed for all employees!");
+      } catch (error) {
+        setMessage(error.response?.data?.message || 'Error processing payroll');
+      }
+     
     } else if (paymentType === "individual" && selectedEmployee) {
       // Process individual payment logic here
       alert(`Salary payment processed for ${selectedEmployee.name}!`);
@@ -164,6 +182,8 @@ const PayrollModule = () => {
     setPaymentModalOpen(false);
     setPaymentType("");
     setSelectedEmployee(null);
+    setIsProcessingPayroll(false)
+    setMessage("");
   };
 
   return (
@@ -313,7 +333,7 @@ const PayrollModule = () => {
                     type="text"
                     placeholder="Search by employee name or position"
                     value={searchTerm}
-                    onChange={setSearchTerm}
+                    onChange={handleSearchInputChange}
                   />
                 </div>
                 <div className="overflow-x-auto">
@@ -409,7 +429,8 @@ const PayrollModule = () => {
                   Process Salary Payment
                 </h2>
                 <Button
-                  onClick={() => setPaymentModalOpen(false)}
+                  onClick={() => {setPaymentModalOpen(false); setMessage(""); setPaymentType("");
+                    setSelectedEmployee(null);}}
                   variant="ghost"
                   className="p-1"
                 >
@@ -531,6 +552,11 @@ const PayrollModule = () => {
               )}
             </div>
             <div className="sticky bottom-0 bg-white z-10 px-6 py-4 border-t">
+            {message.length > 0 && (
+              <Alert className="mt-4 mb-4 bg-green-100 border-green-400 text-green-700">
+                <AlertDescription>{message}</AlertDescription>
+              </Alert>
+            )}
               <Button
                 onClick={handleProcessPayment}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200"
@@ -539,7 +565,13 @@ const PayrollModule = () => {
                   (paymentType === "individual" && !selectedEmployee)
                 }
               >
-                Process Payment
+               
+                {isProcessingPayroll? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <></>
+                )}
+                {isProcessingPayroll ? " Processing..." : " Process Payment"}
               </Button>
             </div>
           </motion.div>
@@ -751,8 +783,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -778,13 +810,13 @@ export async function loader() {
   const { payroll } = await response2.json();
 
   const payrollInfo = await response3.json();
-
+   
   if (userData.message === "token expired") {
     return redirect("/");
   }
   return {
     payrollData: payroll,
-    role: userData.role,
+    role: userData.user.role,
     payrollInfo: payrollInfo,
   };
 }
