@@ -114,7 +114,7 @@ const PayrollModule = () => {
 
   async function fetchData() {
     try {
-      const url = "http://localhost:5174/api/payroll";
+      const url = "https://hrmbackend.livecrib.pro/api/payroll";
       const response = await fetch(url);
       const data = await response.json();
       setPayrollData(data);
@@ -126,7 +126,7 @@ const PayrollModule = () => {
   const handleUpdate = async (e) => {
     try {
       setIsUpdatingPayroll(true);
-      const url = "http://localhost:5174/api/updatepayroll";
+      const url = "https://hrmbackend.livecrib.pro/api/updatepayroll";
       const data = currentEntry;
       const response = await fetch(url, {
         method: "PUT",
@@ -162,7 +162,7 @@ const PayrollModule = () => {
       setIsProcessingPayroll(true)
       // Process mass payment logic here
       try {
-        const response = await fetch('http://localhost:5174/api/processbulkpayroll');
+        const response = await fetch('https://hrmbackend.livecrib.pro/api/processbulkpayroll');
         const data = await response.json();
         if(data.message.includes("already processed") ){
           setMessage(data.message);
@@ -783,8 +783,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://localhost:5174/api/verifyToken";
-  const url2 = "http://localhost:5174/api/payroll";
+  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
+  const url2 = "https://hrmbackend.livecrib.pro/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {
