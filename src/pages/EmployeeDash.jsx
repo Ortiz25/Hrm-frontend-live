@@ -35,7 +35,8 @@ import { generatePayslipPDF } from "../util/generatePdf.jsx";
 import LeaveStatusCard from "../components/leaveStatus.jsx";
 import DisciplinarySummaryCard from "../components/displinarySum.jsx";
 import { formatDate, formatMonth } from "../util/helpers.jsx";
-import generateAndDownloadP9 from "../util/generateP9.jsx";
+
+import DownloadP9Modal from "../components/downloadp9.jsx";
 
 const dataP = [
   { name: "Jan", rating: 4.2 },
@@ -51,7 +52,7 @@ const EmployeeDashboard = () => {
   const { activeModule, changeModule, changeRole } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data, user } = useLoaderData();
-
+console.log(data)
   useEffect(() => {
     changeRole(user.user.role);
     changeModule("Employee Dashboard");
@@ -63,6 +64,7 @@ const EmployeeDashboard = () => {
 
   return (
     <div className="flex h-screen">
+     
       {sidebarOpen && (
         <SidebarLayout
           activeModule={activeModule}
@@ -286,9 +288,7 @@ const EmployeeDashboard = () => {
                 <Link to="/leave"> Request Leave</Link>
               </Button>
               <Button>
-                <FileText className="mr-2 h-4 w-4" />
-
-                <Link to="#" onClick={()=>{generateAndDownloadP9()}}> Download P9</Link>
+                 <DownloadP9Modal data={data}/>
               </Button>
               <Button>
                 <User className="mr-2 h-4 w-4" />
@@ -317,8 +317,8 @@ export async function loader() {
     return redirect("/");
   }
 
-  const url = "https://hrmbackend.livecrib.pro/api/verifyToken";
-  const url2 = "https://hrmbackend.livecrib.pro/api/employeedash";
+  const url = "http://localhost:5174/api/verifyToken";
+  const url2 = "http://localhost:5174/api/employeedash";
   const data = { token: token };
 
   const response = await fetch(url, {
