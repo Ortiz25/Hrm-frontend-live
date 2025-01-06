@@ -53,7 +53,7 @@ const RecognitionPage = () => {
      // Function to fetch all recognitions from the backend
      const fetchRecognitions = async () => {
         try {
-            const response = await fetch('http://hrmbackend.teqova.biz/api/recognitions');
+            const response = await fetch('https://hrmbackend.teqova.biz/api/recognitions');
             if (response.ok) {
                 const data = await response.json();
                 setRecognitionHistory(data);
@@ -109,7 +109,7 @@ const RecognitionPage = () => {
                 setErrors({message: "Self Recognition Prohibited !!!"})
                 return
             }
-            const response = await fetch('http://hrmbackend.teqova.biz/api/recognition', {
+            const response = await fetch('https://hrmbackend.teqova.biz/api/recognition', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ const RecognitionPage = () => {
     const handleLike = async (id) => {
         console.log(id)
         try {
-            const response = await fetch(`http://hrmbackend.teqova.biz/api/recognition/${id}/like`, {
+            const response = await fetch(`https://hrmbackend.teqova.biz/api/recognition/${id}/like`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -432,8 +432,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://hrmbackend.teqova.biz/api/verifyToken";
-  const url2 = "http://hrmbackend.teqova.biz/api/recognitions";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "https://hrmbackend.teqova.biz/api/recognitions";
   const data = { token: token };
 
   const response = await fetch(url, {

@@ -22,7 +22,7 @@ const LeaveStatusCard = ({ employeeId }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "http://hrmbackend.teqova.biz/api/leaverequests";
+        const url = "https://hrmbackend.teqova.biz/api/leaverequests";
         const data = { employeeId: employeeId };
 
         const response = await fetch(url, {
