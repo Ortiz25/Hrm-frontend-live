@@ -201,8 +201,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://localhost:5174/api/verifyToken";
-  // const url2 = "http://localhost:5174/attendance";
+  const url = "http://hrmbackend.teqova.biz/api/verifyToken";
+  // const url2 = "http://hrmbackend.teqova.biz/attendance";
   const data = { token: token };
 
   const response = await fetch(url, {

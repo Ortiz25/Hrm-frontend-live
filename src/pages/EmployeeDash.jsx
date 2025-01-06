@@ -317,8 +317,8 @@ export async function loader() {
     return redirect("/");
   }
 
-  const url = "http://localhost:5174/api/verifyToken";
-  const url2 = "http://localhost:5174/api/employeedash";
+  const url = "http://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "http://hrmbackend.teqova.biz/api/employeedash";
   const data = { token: token };
 
   const response = await fetch(url, {

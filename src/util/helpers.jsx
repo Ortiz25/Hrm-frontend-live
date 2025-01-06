@@ -7,7 +7,7 @@ export function cn(...inputs) {
 
 export const getEmployeeNameByNumber = async (employeeNumber) => {
   try {
-    const response = await fetch(`http://localhost:5174/api/employees/${employeeNumber}`, {
+    const response = await fetch(`http://hrmbackend.teqova.biz/api/employees/${employeeNumber}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export const formatTime = (timestamp) => {
 };
 
 export const formatDate = (timestamp) => {
-  const dateObject = new Date();
+  const dateObject = new Date(timestamp);
 
   // Extract the date in 'YYYY-MM-DD' format
   const extractedDate = dateObject.toISOString().split("T")[0];
@@ -82,7 +82,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `http://localhost:5174/api/approve/${id}`,
+      `http://hrmbackend.teqova.biz/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {
