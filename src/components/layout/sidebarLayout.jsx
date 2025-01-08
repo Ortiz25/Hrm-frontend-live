@@ -150,7 +150,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
 
   return (
     <div className="flex">
-      <div className="bg-gray-800 text-white w-20 md:w-80 min-h-screen p-4 relative">
+      <div className="bg-gray-800 text-white w-20 md:w-80 min-h-screen md:h-screen p-2 relative">
         <div className="flex items-center justify-center md:justify-start mb-10">
           <Shield className="mr-0 md:mr-2 size-10" />
           <h1 className="hidden md:block text-2xl font-bold">SecureHR</h1>

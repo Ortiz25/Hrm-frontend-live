@@ -9,8 +9,9 @@ import { redirect, useLoaderData } from "react-router-dom";
 
 
 const HRDashboard = () => {
-  const { activeModule, changeModule, changeRole } = useStore();
+  const { activeModule, changeModule, changeRole, currentYear } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const[yearToFilter, updateYear] = useState(currentYear)
   const dashData = useLoaderData();
    console.log(dashData)
   useEffect(() => {
@@ -34,7 +35,7 @@ const HRDashboard = () => {
           <h1 className="text-xl font-bold">{activeModule}</h1>
         </div>
 
-        <DashboardContent dashData={dashData.dashData} />
+        <DashboardContent dashData={dashData.dashData} yearToFilter={yearToFilter} updateYear={updateYear}/>
    
       </div>
     </div>

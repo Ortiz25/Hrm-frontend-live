@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
+
+const currentYear = new Date().getFullYear()
+
 export const useStore = create((set) => ({
+  currentYear:currentYear.toString(),
+  updateYear: (value) => set({ currentYear: value }),
   activeModule: "Dashboard",
   changeModule: (value) => set({ activeModule: value }),
   role: "employee",

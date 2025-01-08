@@ -1,21 +1,29 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-export const generateP9PDF = (data = {
-  employerName: 'Armada Human Capital',
-  employerPin: 'P051397932M',
-  employeeName: 'Samuel Deya',
-  employeeOtherNames: 'Otieno',
-  employeePin: 'A005569109C',
-  year: '2016',
-  monthlyData: Array(12).fill({
-    grossPay: 31880,
-    totalGross: 31880,
-    chargeablePay: 11680,
-    taxCharged: 5102,
-    payeTax: 3940
-  })
-}) => {
+export const generateP9PDF = (payrollData) => {
+   // Map payroll data to monthlyData schema
+const monthlyData = Array(12).fill(null).map((_, index) => {
+  const monthData = payrollData.find(data => new Date(data.month).getMonth() === index);
+  return monthData
+      ? {
+          grossPay: parseFloat(monthData.gross_pay),
+          totalGross: parseFloat(monthData.gross_pay),
+          chargeablePay: parseFloat(monthData.taxable_income),
+          taxCharged: parseFloat(monthData.paye),
+          payeTax: parseFloat(monthData.paye)
+      }
+      : { grossPay: 0, totalGross: 0, chargeablePay: 0, taxCharged: 0, payeTax: 0 };
+});
+  const data = {
+    employerName: 'Teqova Business Solutions',
+    employerPin: 'P051397932M',
+    employeeName: payrollData[0].employee_name,
+    employeePin: payrollData[0].employee_number,
+    year: '2024',
+    monthlyData
+};
+  
   // Create new PDF document
   const doc = new jsPDF({
     orientation: 'landscape',

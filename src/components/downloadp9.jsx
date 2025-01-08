@@ -18,7 +18,7 @@ import { Download } from 'lucide-react';
 import generateAndDownloadP9 from "../util/generateP9.jsx";
 const DownloadP9Modal = ({data}) => {
   const [selectedYear, setSelectedYear] = useState('');
-
+   console.log(data)
   // Generate array of years (current year - 5 to current year)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 2 }, (_, i) => currentYear - i);
@@ -33,9 +33,9 @@ const DownloadP9Modal = ({data}) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center">
           <Download className="h-4 w-4" />
-          Download P9
+          <span className='text-sm md:text-base'>Download P9 </span>
         </Button>
       </DialogTrigger>
       

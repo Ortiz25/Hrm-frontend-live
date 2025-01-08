@@ -49,10 +49,16 @@ const dataP = [
 ];
 
 const EmployeeDashboard = () => {
-  const { activeModule, changeModule, changeRole } = useStore();
+  const { activeModule, changeModule, changeRole, currentYear} = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data, user } = useLoaderData();
-console.log(data)
+  const[yearToFilter, updateYear] = useState(currentYear)
+  const year = new Date().getFullYear();
+  const years = Array.from({ length: 2 }, (_, i) => year - i);
+  const seevedData = data.filter(item => item.year === +yearToFilter)
+  
+  const getCurrentMonth = () => new Date().toISOString().slice(0, 7);
+  console.log(data)
   useEffect(() => {
     changeRole(user.user.role);
     changeModule("Employee Dashboard");
@@ -76,8 +82,25 @@ console.log(data)
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu />
           </Button>
+          <select
+        value={ yearToFilter}
+       onChange={(e) =>{ updateYear(e.target.value)}}
+        className="w-28 px-6 py-2 bg-white border border-gray-300 rounded-lg shadow-sm 
+                   text-gray-700 appearance-none cursor-pointer
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                   font-medium text-base tracking-wide"
+                   
+      >
+        <option value="">Select Year</option>
+        {years.map(year => (
+          <option key={year} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
           <h1 className="text-xl font-bold">{activeModule}</h1>
         </div>
+        
         <div className="bg-gray-100 min-h-screen p-8">
           <div className="max-w-6xl mx-auto space-y-8">
             <Card>
@@ -159,27 +182,27 @@ console.log(data)
                   <div className="text-center p-4 bg-blue-100 hover:bg-blue-200 rounded-lg">
                     <h4 className="font-semibold">Annual Leave</h4>
                     <p className="text-2xl font-bold">
-                      {data[0].annual_leave_balance} days
+                      {seevedData[0]?.annual_leave_balance || 0} days
                     </p>
                   </div>
                   <div className="text-center p-4 bg-green-100 hover:bg-green-200 rounded-lg">
                     <h4 className="font-semibold">Sick Leave</h4>
                     <p className="text-2xl font-bold">
-                      {data[0].sick_leave_balance} days
+                      {seevedData[0]?.sick_leave_balance || 0} days
                     </p>
                   </div>
                   <div className="text-center p-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg">
                     <h4 className="font-semibold">Compassionate Leave</h4>
                     <p className="text-2xl font-bold">
                       {" "}
-                      {data[0].compassionate_leave_entitlement} days
+                      {seevedData[0]?.compassionate_leave_entitlement || 0} days
                     </p>
                   </div>
                   {+data[0].paternity_leave_entitlement !== 0 && (
                     <div className="text-center p-4 bg-teal-100 hover:bg-teal-200 rounded-lg">
                       <h4 className="font-semibold">Paternity Leave</h4>
                       <p className="text-2xl font-bold">
-                        {data[0].paternity_leave_entitlement} days
+                        {seevedData[0]?.paternity_leave_entitlement || 0} days
                       </p>
                     </div>
                   )}
@@ -187,7 +210,7 @@ console.log(data)
                     <div className="text-center p-4 bg-lime-100 hover:bg-lime-200 rounded-lg">
                       <h4 className="font-semibold">Maternity Leave</h4>
                       <p className="text-2xl font-bold">
-                        {data[0].maternity_leave_entitlement} days
+                        {seevedData[0]?.maternity_leave_entitlement || 0} days
                       </p>
                     </div>
                   )}
@@ -195,8 +218,8 @@ console.log(data)
               </CardContent>
             </Card>
 
-            <LeaveStatusCard employeeId={data[0].employee_id} />
-            <DisciplinarySummaryCard employeeId={data[0].employee_id} />
+            <LeaveStatusCard employeeId={seevedData[0]?.employee_id} />
+            <DisciplinarySummaryCard employeeId={seevedData[0]?.employee_id} />
 
             <Card>
               <CardHeader>
@@ -226,10 +249,10 @@ console.log(data)
                       </tr>
                     </thead>
                     <tbody>
-                      {data.map((entry, index) => (
+                      {data.filter(item => item.year === +yearToFilter).map((entry, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="border p-2">
-                            {formatMonth(entry?.month)}
+                            {formatMonth(entry?.month}
                           </td>
                           <td className="border p-2">
                             {(entry?.gross_pay ?? 0).toLocaleString()}
@@ -278,14 +301,14 @@ console.log(data)
               </CardContent>
             </Card>
             <div className="flex justify-center space-x-4">
-              <Button onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <Button onClick={() => setSidebarOpen(!sidebarOpen)} >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
-                View Full Dashboard
+                <span className="text-sm md:text-base">View Full Dashboard</span>
               </Button>
               <Button>
                 <CalendarDays className="mr-2 h-4 w-4" />
 
-                <Link to="/leave"> Request Leave</Link>
+                <Link to="/leave" className="text-sm md:text-base"> Request Leave</Link>
               </Button>
               <Button>
                  <DownloadP9Modal data={data}/>
@@ -293,12 +316,12 @@ console.log(data)
               <Button>
                 <User className="mr-2 h-4 w-4" />
 
-                <Link to="/profile">Update Profile</Link>
+                <Link to="/profile" className="text-sm md:text-base">Update Profile</Link>
               </Button>
               <Button>
                 <Calendar className="mr-2 h-4 w-4" />
 
-                <Link to="/calender">Holidays Calendar</Link>
+                <Link to="/calender" className="text-sm md:text-base">Holidays Calendar</Link>
               </Button>
             </div>
           </div>
@@ -339,7 +362,7 @@ export async function loader() {
   const userData = await response.json();
 
   const dashData = await response2.json();
-
+   console.log(dashData)
   if (userData.message === "token expired") {
     return redirect("/");
   }

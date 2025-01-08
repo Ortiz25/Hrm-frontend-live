@@ -811,6 +811,7 @@ export async function loader() {
 
   const payrollInfo = await response3.json();
    
+  console.log(payroll)
   if (userData.message === "token expired") {
     return redirect("/");
   }
