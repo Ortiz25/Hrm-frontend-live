@@ -60,6 +60,7 @@ export const formatDate = (timestamp) => {
 };
 
 export const formatMonth = (dateStr) => {
+  console.log(dateStr)
   const date = new Date(dateStr);
 
   const formattedDate = date.toLocaleDateString("en-US", {

@@ -252,7 +252,7 @@ const EmployeeDashboard = () => {
                       {data.filter(item => item.year === +yearToFilter).map((entry, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="border p-2">
-                            {formatMonth(entry?.month)}
+                            {entry?.month}
                           </td>
                           <td className="border p-2">
                             {(entry?.gross_pay ?? 0).toLocaleString()}

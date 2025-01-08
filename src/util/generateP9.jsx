@@ -3,18 +3,39 @@ import 'jspdf-autotable';
 
 export const generateP9PDF = (payrollData) => {
    // Map payroll data to monthlyData schema
-const monthlyData = Array(12).fill(null).map((_, index) => {
-  const monthData = payrollData.find(data => new Date(data.month).getMonth() === index);
-  return monthData
+   const monthlyData = Array(12).fill(null).map((_, index) => {
+    const monthData = payrollData.find(
+      data => new Date(`${data.year}-${data.month}-01`).getMonth() === index
+    );
+  
+    return monthData
       ? {
+          employeeId: monthData.employee_id,
+          employeeName: monthData.employee_name,
+          employeeNumber: monthData.employee_number,
+          position: monthData.position,
+          department: monthData.department,
+          hireDate: monthData.hire_date,
           grossPay: parseFloat(monthData.gross_pay),
           totalGross: parseFloat(monthData.gross_pay),
           chargeablePay: parseFloat(monthData.taxable_income),
           taxCharged: parseFloat(monthData.paye),
-          payeTax: parseFloat(monthData.paye)
-      }
-      : { grossPay: 0, totalGross: 0, chargeablePay: 0, taxCharged: 0, payeTax: 0 };
-});
+          payeTax: parseFloat(monthData.paye),
+        }
+      : {
+          employeeId: null,
+          employeeName: null,
+          employeeNumber: null,
+          position: null,
+          department: null,
+          hireDate: null,
+          grossPay: 0,
+          totalGross: 0,
+          chargeablePay: 0,
+          taxCharged: 0,
+          payeTax: 0,
+        };
+  });
   const data = {
     employerName: 'Teqova Business Solutions',
     employerPin: 'P051397932M',
@@ -23,6 +44,7 @@ const monthlyData = Array(12).fill(null).map((_, index) => {
     year: '2024',
     monthlyData
 };
+console.log(monthlyData)
   
   // Create new PDF document
   const doc = new jsPDF({
@@ -44,7 +66,6 @@ const monthlyData = Array(12).fill(null).map((_, index) => {
   doc.setFontSize(10);
   doc.text(`Employer's Name: ${data.employerName}`, 15, 50);
   doc.text(`Employee's Main Name: ${data.employeeName}`, 15, 56);
-  doc.text(`Employee's Other Names: ${data.employeeOtherNames}`, 15, 62);
   
   doc.text(`Employer's PIN: ${data.employerPin}`, doc.internal.pageSize.width - 80, 50);
   doc.text(`Employee's PIN: ${data.employeePin}`, doc.internal.pageSize.width - 80, 56);

@@ -25,8 +25,9 @@ const DownloadP9Modal = ({data}) => {
   
   const handleDownload = () => {
     if (!selectedYear) return;
+    const p9Info = data.filter(item => item.year === +selectedYear)
     // Implement your download logic here
-    generateAndDownloadP9(data)
+    generateAndDownloadP9(p9Info)
     console.log(`Downloading P9 for year ${selectedYear}`);
   };
 
