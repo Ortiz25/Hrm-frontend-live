@@ -98,7 +98,7 @@ const EmployeeDashboard = () => {
           </option>
         ))}
       </select>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-sm md:text-xl font-bold">{activeModule}</h1>
         </div>
         
         <div className="bg-gray-100 min-h-screen p-8">
@@ -110,33 +110,33 @@ const EmployeeDashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-xl font-semibold mr-2">Name:</span>
-                    <span className="italic text-lg">
+                    <span className="text-base md:text-xl font-semibold mr-2">Name:</span>
+                    <span className="italic text-sm md:text-lg">
                       {data[0].employee_name}
                     </span>
                     <br />
-                    <span className="text-xl font-semibold mr-2">
+                    <span className="text-base md:text-xl font-semibold mr-2">
                       Position:
                     </span>
-                    <span className="italic text-lg">{data[0].position}</span>
+                    <span className="italic text-sm md:text-lg">{data[0].position}</span>
                     <br />
-                    <span className="text-xl font-semibold mr-2">
+                    <span className="text-base md:text-xl font-semibold mr-2">
                       Employee ID:
                     </span>
-                    <span className="italic text-lg">
+                    <span className="italic text-sm md:text-lg">
                       {data[0].employee_number}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xl font-semibold mr-2">
+                    <span className="text-base md:text-xl font-semibold mr-2">
                       Department:{" "}
                     </span>
-                    <span className="italic text-lg">{data[0].department}</span>
+                    <span className="italic text-sm md:text-lg">{data[0].department}</span>
                     <br />
-                    <span className="text-xl font-semibold mr-2">
+                    <span className="text-base md:text-xl font-semibold mr-2">
                       Join Date:{" "}
                     </span>
-                    <span className="italic text-lg">
+                    <span className="italic text-sm md:text-lg">
                       {formatDate(data[0].hire_date)}
                     </span>
                   </div>
@@ -149,7 +149,7 @@ const EmployeeDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="p-6 bg-gray-100 min-h-max">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h1 className="text-lg md:text-2xl font-bold text-gray-900 mb-6">
                     Performance Rating Over Time
                   </h1>
                   <ResponsiveContainer width="100%" height={400}>
@@ -179,29 +179,29 @@ const EmployeeDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-100 hover:bg-blue-200 rounded-lg">
+                  <div className="text-center p-4 bg-blue-100 hover:bg-blue-200 rounded-lg overflow-hidden break-words">
                     <h4 className="font-semibold">Annual Leave</h4>
-                    <p className="text-2xl font-bold">
+                    <p className="text-lg md:text-2xl font-bold">
                       {seevedData[0]?.annual_leave_balance || 0} days
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-green-100 hover:bg-green-200 rounded-lg">
+                  <div className="text-center p-4 bg-green-100 hover:bg-green-200 rounded-lg overflow-hidden break-words">
                     <h4 className="font-semibold">Sick Leave</h4>
-                    <p className="text-2xl font-bold">
+                    <p className="text-lg md:text-2xl font-bold">
                       {seevedData[0]?.sick_leave_balance || 0} days
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg">
-                    <h4 className="font-semibold">Compassionate Leave</h4>
-                    <p className="text-2xl font-bold">
+                  <div className="text-center p-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg overflow-hidden break-words">
+                    <h4 className="font-semibold text-sm whitespace-normal">Compassionate Leave</h4>
+                    <p className="text-lg md:text-2xl  font-bold">
                       {" "}
                       {seevedData[0]?.compassionate_leave_entitlement || 0} days
                     </p>
                   </div>
                   {+data[0].paternity_leave_entitlement !== 0 && (
-                    <div className="text-center p-4 bg-teal-100 hover:bg-teal-200 rounded-lg">
-                      <h4 className="font-semibold">Paternity Leave</h4>
-                      <p className="text-2xl font-bold">
+                    <div className="text-center p-4 bg-teal-100 hover:bg-teal-200 rounded-lg overflow-hidden break-words">
+                      <h4 className="font-semibold whitespace-normal">Paternity Leave</h4>
+                      <p className="text-lg md:text-2xl  font-bold">
                         {seevedData[0]?.paternity_leave_entitlement || 0} days
                       </p>
                     </div>
@@ -209,7 +209,7 @@ const EmployeeDashboard = () => {
                   {+data[0].maternity_leave_entitlement !== 0 && (
                     <div className="text-center p-4 bg-lime-100 hover:bg-lime-200 rounded-lg">
                       <h4 className="font-semibold">Maternity Leave</h4>
-                      <p className="text-2xl font-bold">
+                      <p className="text-lg md:text-2xl  font-bold">
                         {seevedData[0]?.maternity_leave_entitlement || 0} days
                       </p>
                     </div>
@@ -300,7 +300,7 @@ const EmployeeDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-            <div className="flex justify-center space-x-4">
+            <div className="flex justify-center space-x-2 p-2 md:space-x-4 overflow-x-auto">
               <Button onClick={() => setSidebarOpen(!sidebarOpen)} >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span className="text-sm md:text-base">View Full Dashboard</span>

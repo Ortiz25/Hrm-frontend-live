@@ -23,7 +23,7 @@ import { formatDate } from "../util/helpers.jsx";
 import { handleLeaveRequest } from "../util/helpers.jsx";
 
 const LeaveManagementModule = () => {
-  const { activeModule, changeModule, changeRole, role } = useStore();
+  const { activeModule, changeModule, changeRole, role, currentYear } = useStore();
   const leaves = useLoaderData();
   const navigation = useNavigation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -32,7 +32,7 @@ const LeaveManagementModule = () => {
   const [leaveData, setLeaveData] = useState(leaves.leaveData.leaves);
   const [isUpdated, setIsUpdated] = useState(false);
   const [employeeLeaveData, setEmployeeLeaveData] = useState(
-    leaves.leaveBalance
+    leaves.leaveBalance.filter((entry)=> entry.year === +currentYear)
   );
 
   const [leaveAdjustment, setLeaveAdjustment] = useState({
@@ -48,9 +48,9 @@ const LeaveManagementModule = () => {
   const slicedBalance = employeeLeaveData.slice(0, 5);
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
-  console.log(leaveData)
+  
   const seevedData = leaveData.filter((entry) => {
-    return entry.status === "pending";
+    return entry.status === "pending" && entry.year === +currentYear;
   });
   const slicedData = seevedData.slice(0, 5);
 
@@ -148,20 +148,20 @@ const LeaveManagementModule = () => {
           </Button>
           <NavLink
             to="/leavedash"
-            className=" border p-2  rounded shadow-lg hover:bg-slate-200"
+            className=" border p-2  rounded shadow-lg hover:bg-slate-200 m-2"
           >
             <TextSelect className="inline size-8 mr-2 text-green-500 mb-2" />
-            <span className="font-semibold text-lg ">Leave Dash</span>
+            <span className="font-semibold text-sm  md:text-lg ">Leave Dash</span>
           </NavLink>
           <NavLink
             to="/calender"
-            className=" border p-2  rounded shadow-lg hover:bg-slate-200"
+            className=" border p-2  rounded shadow-lg hover:bg-slate-200 m-2"
           >
             <Calendar className="inline size-8 mr-2 text-blue-500 mb-2" />
-            <span className="font-semibold text-lg ">Holidays</span>
+            <span className="font-semibold text-sm md:text-lg ">Holidays</span>
           </NavLink>
 
-          <h1 className="text-2xl font-bold">{activeModule}</h1>
+          <h1 className="text-base md:text-2xl font-bold ml-2">{activeModule}</h1>
         </div>
         <div className="p-4 space-y-6">
           {viewMgt && (

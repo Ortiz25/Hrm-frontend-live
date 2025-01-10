@@ -25,12 +25,13 @@ import {
 } from "../components/ui/select";
 
 const StaffManagementModule = () => {
+  const { activeModule, changeModule, currentYear } = useStore();
+  const[yearToFilter, updateYear] = useState(currentYear)
   const staffReq = useLoaderData();
   const [staffData, setStaffData] = useState(staffReq.staffReq);
-  const { activeModule, changeModule } = useStore();
+  
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [newStaff, setNewStaff] = useState({
     name: "",
     position: "",
@@ -45,6 +46,8 @@ const StaffManagementModule = () => {
   const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);
   const [isDenyDialogOpen, setIsDenyDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
+   const year = new Date().getFullYear();
+  const years = Array.from({ length: 2 }, (_, i) => year - i);
 
   useEffect(() => {
     changeModule("Staff Requisition");
@@ -175,11 +178,27 @@ const StaffManagementModule = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+      <div className="p-4 bg-white shadow-md flex justify-between items-center">
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu />
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <select
+        value={ yearToFilter}
+       onChange={(e) =>{ updateYear(e.target.value)}}
+        className="w-28 px-6 py-2 bg-white border border-gray-300 rounded-lg shadow-sm 
+                   text-gray-700 appearance-none cursor-pointer
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                   font-medium text-base tracking-wide"
+                   
+      >
+        <option value="">Select Year</option>
+        {years.map(year => (
+          <option key={year} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
+          <h1 className="text-sm md:text-xl font-bold">{activeModule}</h1>
         </div>
         <div className="p-4 space-y-6 shadow-2xl m-4">
           <div className="bg-white shadow rounded-lg">
@@ -201,110 +220,90 @@ const StaffManagementModule = () => {
                 onChange={handleSearchInputChange}
               />
             </div>
-            <div className="overflow-x-auto w-full">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="grid grid-cols-7 gap-2 font-bold py-2 bg-gray-100 text-sm md:text-base">
-                    <th className="px-2">Supervisor/Manager</th>
-                    <th className="px-2">Position</th>
-                    <th className="px-2">Department</th>
-                    <th className="px-2">Request Date</th>
-                    <th className="px-2">Reason</th>
-                    <th className="px-2">Status</th>
-                    <th className="px-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchTerm
-                    ? filteredStaffData.map((staff) => (
-                        <tr
-                          key={staff.id}
-                          className="grid grid-cols-7 gap-2 py-2 border-b text-sm md:text-base items-center"
-                        >
-                          <td className="px-2 truncate">{staff.name}</td>
-                          <td className="px-2 truncate">{staff.position}</td>
-                          <td className="px-2 truncate">{staff.department}</td>
-                          <td className="px-2 truncate">
-                            {formatDate(staff.requested_date)}
-                          </td>
-                          <td className="px-2 truncate">
-                            {staff.justification}
-                          </td>
-                          <td className="px-2 truncate">{staff.status}</td>
-                          <td className="px-2">
-                            <div className="flex flex-col sm:flex-row gap-2">
-                              {staff.status === "pending" ? (
-                                <>
-                                  <Button
-                                    onClick={() =>
-                                      handleRequisition(staff, "accept")
-                                    }
-                                    className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
-                                  >
-                                    Accept
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      handleRequisition(staff, "reject")
-                                    }
-                                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
-                                  >
-                                    Deny
-                                  </Button>
-                                </>
-                              ) : (
-                                "Closed"
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    : staffData.map((staff) => (
-                        <tr
-                          key={staff.id}
-                          className="grid grid-cols-7 gap-2 py-2 border-b text-sm md:text-base items-center"
-                        >
-                          <td className="px-2 truncate">{staff.name}</td>
-                          <td className="px-2 truncate">{staff.position}</td>
-                          <td className="px-2 truncate">{staff.department}</td>
-                          <td className="px-2 truncate">
-                            {formatDate(staff.requested_date)}
-                          </td>
-                          <td className="px-2 truncate">
-                            {staff.justification}
-                          </td>
-                          <td className="px-2 truncate">{staff.status}</td>
-                          <td className="px-2">
-                            <div className="flex flex-col sm:flex-row gap-2">
-                              {staff.status === "pending" ? (
-                                <>
-                                  <Button
-                                    onClick={() =>
-                                      handleRequisition(staff, "accept")
-                                    }
-                                    className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
-                                  >
-                                    Accept
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      handleRequisition(staff, "reject")
-                                    }
-                                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
-                                  >
-                                    Deny
-                                  </Button>
-                                </>
-                              ) : (
-                                "Closed"
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                </tbody>
-              </table>
-            </div>
+            <div className="overflow-x-auto">
+  <table className="w-full border-collapse">
+    <thead>
+      <tr className="bg-gray-100">
+        <th className="border p-2 text-left">Supervisor/Manager</th>
+        <th className="border p-2 text-left">Position</th>
+        <th className="border p-2 text-left">Department</th>
+        <th className="border p-2 text-left">Request Date</th>
+        <th className="border p-2 text-left">Reason</th>
+        <th className="border p-2 text-left">Status</th>
+        <th className="border p-2 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {searchTerm
+        ? filteredStaffData.filter(entry => entry.year === +yearToFilter).map((staff) => (
+            <tr key={staff.id} className="hover:bg-gray-50">
+              <td className="border p-2">{staff.name}</td>
+              <td className="border p-2">{staff.position}</td>
+              <td className="border p-2">{staff.department}</td>
+              <td className="border p-2">{formatDate(staff.requested_date)}</td>
+              <td className="border p-2">{staff.justification}</td>
+              <td className="border p-2">{staff.status}</td>
+              <td className="px-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {staff.status === "pending" ? (
+                    <>
+                      <Button
+                        onClick={() => handleRequisition(staff, "accept")}
+                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        onClick={() => handleRequisition(staff, "reject")}
+                        className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                      >
+                        Deny
+                      </Button>
+                    </>
+                  ) : (
+                    "Closed"
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))
+        : staffData.filter(entry => entry.year === +yearToFilter).map((staff) => (
+            <tr key={staff.id} className="hover:bg-gray-50">
+              <td className="border p-2">{staff.name}</td>
+              <td className="border p-2">{staff.position}</td>
+              <td className="border p-2">{staff.department}</td>
+              <td className="border p-2">{formatDate(staff.requested_date)}</td>
+              <td className="border p-2">{staff.justification}</td>
+              <td className="border p-2">{staff.status}</td>
+              <td className="px-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {staff.status === "pending" ? (
+                    <>
+                      <Button
+                        onClick={() => handleRequisition(staff, "accept")}
+                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        onClick={() => handleRequisition(staff, "reject")}
+                        className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                      >
+                        Deny
+                      </Button>
+                    </>
+                  ) : (
+                    "Closed"
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+    </tbody>
+  </table>
+</div>
+
+           
           </div>
 
           {/* Add Dialog */}

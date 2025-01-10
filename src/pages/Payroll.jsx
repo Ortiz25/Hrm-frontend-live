@@ -62,7 +62,7 @@ const PayrollModule = () => {
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
-    console.log(searchTerm)
+    console.log(payrollHistory)
   const filteredPayrollData = payrollData.filter((entry) => {
     const matchesSearch =
       entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -342,6 +342,7 @@ const PayrollModule = () => {
                       <tr className="bg-gray-100">
                         <th className="border p-2 text-left">Name</th>
                         <th className="border p-2 text-left">Position</th>
+                        <th className="border p-2 text-left">Year</th>
                         <th className="border p-2 text-left">Month</th>
                         <th className="border p-2 text-left">
                           Gross Salary (KES)
@@ -350,7 +351,7 @@ const PayrollModule = () => {
                         <th className="border p-2 text-left">
                           House Levy (KES)
                         </th>
-                        <th className="border p-2 text-left">NHIF (KES)</th>
+                        <th className="border p-2 text-left">SHIF (KES)</th>
                         <th className="border p-2 text-left">NSSF (KES)</th>
                         <th className="border p-2 text-left">Net Pay (KES)</th>
                       </tr>
@@ -366,7 +367,10 @@ const PayrollModule = () => {
                           </td>
                           <td className="border p-2">{entry.position}</td>
                           <td className="border p-2">
-                            {formatMonth(entry.month)}
+                            {entry.year}
+                          </td>
+                          <td className="border p-2">
+                            {entry.month}
                           </td>
                           <td className="border p-2">
                             {entry.gross_pay.toLocaleString()}

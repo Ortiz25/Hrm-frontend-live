@@ -272,7 +272,7 @@ const Onboarding = () => {
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu />
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-base md:text-xl font-bold">{activeModule}</h1>
         </div>
         <div className="p-6 space-y-8">
           {/* Employees List */}

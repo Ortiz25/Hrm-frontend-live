@@ -23,14 +23,14 @@ import EmployeeSuggestions from "../components/layout/suggestions.jsx";
 import { formatDate } from "../util/helpers.jsx";
 
 const DisciplinaryModule = () => {
-  const { activeModule, changeModule } = useStore();
+  const { activeModule, changeModule,currentYear } = useStore();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
   const loaderData = useLoaderData();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [disciplinaryData, setDisciplinaryData] = useState(loaderData.cases);
+  const [disciplinaryData, setDisciplinaryData] = useState(loaderData.cases.filter(entry => entry.year === +currentYear));
   const [selectedAction, setSelectedAction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAction, setNewAction] = useState({
@@ -42,6 +42,7 @@ const DisciplinaryModule = () => {
     status: "Open",
   });
   const [employeeSuggestions, setEmployeeSuggestions] = useState([]);
+  console.log(disciplinaryData)
   const slicedCases = disciplinaryData.slice(0, 5);
   // New function to fetch employee data
   const fetchEmployeeData = async (searchTerm) => {
@@ -144,13 +145,13 @@ const DisciplinaryModule = () => {
           </Button>
           <NavLink
             to="/warnings"
-            className=" border p-2  rounded shadow-lg hover:bg-slate-200"
+            className=" border p-2  rounded shadow-lg hover:bg-slate-200 mr-4"
           >
-            <TriangleAlert className="inline size-8 mr-2 text-red-500 mb-2" />
-            <span className="font-semibold text-lg ">Warnings</span>
+            <TriangleAlert className="inline size-4 md:size-8 mr-2 text-red-500 mb-2" />
+            <span className="font-semibold text-sm md:text-lg ">Warnings</span>
           </NavLink>
 
-          <h1 className="text-2xl font-bold">{activeModule}</h1>
+          <h1 className=" text-base md:text-2xl font-bold">{activeModule}</h1>
         </div>
         <div className="p-4 space-y-6">
           <Card className="shadow-2xl">

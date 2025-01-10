@@ -79,12 +79,12 @@ const DashboardContent = ({ dashData, yearToFilter,updateYear }) => (
       />
       <DashboardCard
         title="Leave Requests"
-        value={dashData.results.filter(item => item.year === yearToFilter).length === 0 ?0: dashData.leaveRequests.filter(item => item.year === +yearToFilter).map(item => item.pending_leaves)}
+        value={dashData.leaveRequests.filter(item => item.year === +yearToFilter).length === 0 ?0: dashData.leaveRequests.filter(item => item.year === +yearToFilter).map(item => item.pending_leaves)}
         icon={Calendar}
       />
       <DashboardCard
         title="Open Requisitions"
-        value={dashData.results.filter(item => item.year === yearToFilter).length === 0 ? 0:dashData.openRequisitions.filter(item => item.year === +yearToFilter).map(item => item.requisitions_count
+        value={dashData.openRequisitions.filter(item => item.year === +yearToFilter).length === 0 ? 0:dashData.openRequisitions.filter(item => item.year === +yearToFilter).map(item => item.requisitions_count
         )}
         icon={UserPlus}
       />
