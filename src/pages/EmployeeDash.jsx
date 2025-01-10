@@ -300,30 +300,34 @@ const EmployeeDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-            <div className="flex justify-center space-x-2 p-2 md:space-x-4 overflow-x-auto">
-              <Button onClick={() => setSidebarOpen(!sidebarOpen)} >
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span className="text-sm md:text-base">View Full Dashboard</span>
-              </Button>
-              <Button>
-                <CalendarDays className="mr-2 h-4 w-4" />
-
-                <Link to="/leave" className="text-sm md:text-base"> Request Leave</Link>
-              </Button>
-              <Button>
-                 <DownloadP9Modal data={data}/>
-              </Button>
-              <Button>
-                <User className="mr-2 h-4 w-4" />
-
-                <Link to="/profile" className="text-sm md:text-base">Update Profile</Link>
-              </Button>
-              <Button>
-                <Calendar className="mr-2 h-4 w-4" />
-
-                <Link to="/calender" className="text-sm md:text-base">Holidays Calendar</Link>
-              </Button>
-            </div>
+            <div className="flex flex-wrap justify-center gap-2 p-2 sm:flex-nowrap sm:space-x-2 md:space-x-4 overflow-x-auto">
+  <Button 
+    onClick={() => setSidebarOpen(!sidebarOpen)}
+    className="w-full sm:w-auto flex items-center justify-center"
+  >
+    <LayoutDashboard className="mr-2 h-4 w-4" />
+    <span className="text-sm md:text-base">View Full Dashboard</span>
+  </Button>
+  
+  <Button className="w-full sm:w-auto flex items-center justify-center">
+    <CalendarDays className="mr-2 h-4 w-4" />
+    <Link to="/leave" className="text-sm md:text-base">Request Leave</Link>
+  </Button>
+  
+  <Button className="w-full sm:w-auto flex items-center justify-center">
+    <DownloadP9Modal data={data} />
+  </Button>
+  
+  <Button className="w-full sm:w-auto flex items-center justify-center">
+    <User className="mr-2 h-4 w-4" />
+    <Link to="/profile" className="text-sm md:text-base">Update Profile</Link>
+  </Button>
+  
+  <Button className="w-full sm:w-auto flex items-center justify-center">
+    <Calendar className="mr-2 h-4 w-4" />
+    <Link to="/calender" className="text-sm md:text-base">Holidays Calendar</Link>
+  </Button>
+</div>
           </div>
         </div>
       </div>
