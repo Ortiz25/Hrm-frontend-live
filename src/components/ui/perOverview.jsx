@@ -13,22 +13,22 @@ import {
 const initialEmployeeData = [
   {
     id: 1,
-    name: "Alice Smith",
-    position: "Senior Developer",
+    name: "Samuel Deya",
+    position: "CTO",
     rating: 4,
     performance: 92,
   },
   {
     id: 2,
-    name: "Bob Johnson",
-    position: "Data Analyst",
+    name: "Grace Otieno",
+    position: "Customer Support",
     rating: 3,
     performance: 78,
   },
   {
     id: 3,
-    name: "Carol Williams",
-    position: "Project Manager",
+    name: "Catherine Akinyi",
+    position: "Financial Analist",
     rating: 5,
     performance: 95,
   },

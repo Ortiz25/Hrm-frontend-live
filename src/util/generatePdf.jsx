@@ -1,7 +1,7 @@
 import logo from "../assets/logo.png";
 import jsPDF from "jspdf";
 import 'jspdf-autotable';
-import { formatMonth, formatDate } from "./helpers";
+import { formatMonth, formatDate, getFullMonthName } from "./helpers";
 
 export const generatePayslipPDF = (entry) => {
   if (!entry) {
@@ -44,7 +44,7 @@ export const generatePayslipPDF = (entry) => {
       doc.setLineWidth(0.5);
       doc.line(10, 112, 200, 112); // Horizontal line for visual separation
 
-      doc.text(`Month: ${formatMonth(entry.month) || "N/A"}`, 10, 120);
+      doc.text(`Month: ${getFullMonthName(entry.month) || "N/A"}`, 10, 120);
       doc.text(
         `Gross Salary: KES ${
           entry.gross_pay ? entry.gross_pay.toLocaleString() : "N/A"

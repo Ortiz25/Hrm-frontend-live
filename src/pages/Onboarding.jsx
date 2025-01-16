@@ -69,7 +69,7 @@ const Onboarding = () => {
   const fetchEmployees = async () => {
     try {
       const response = await fetch(
-        "https://hrmbackend.teqova.biz/api/getemployees"
+        "http://hrmdemo.teqova.biz/api/getemployees"
       );
       const data = await response.json();
       if (response.ok) {
@@ -95,7 +95,7 @@ const Onboarding = () => {
     try {
       // Start adding employee - disable the button
       setIsAddingEmployee(true);
-      const url = "https://hrmbackend.teqova.biz/api/adduser";
+      const url = "http://hrmdemo.teqova.biz/api/adduser";
       const response = await fetch(url, {
         method: "PUT",
         headers: {
@@ -185,7 +185,7 @@ const Onboarding = () => {
     // try {
     //   console.log("Removing employee with ID:", employeeToRemove);
 
-    //   const url = "https://hrmbackend.teqova.biz/api/deleteemployee";
+    //   const url = "http://hrmdemo.teqova.biz/api/deleteemployee";
     //   const response = await fetch(url, {
     //     method: "DELETE",
     //     headers: {
@@ -477,8 +477,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
-  const url2 = "https://hrmbackend.teqova.biz/api/getemployees";
+  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
+  const url2 = "http://hrmdemo.teqova.biz/api/getemployees";
 
   const data = { token: token };
 

@@ -8,7 +8,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import { AlertTriangle, CheckCircle, AlertCircle } from "lucide-react";
 
-const DisciplinarySummaryCard = ({ employeeId }) => {
+const DisciplinarySummaryCard = ({ employeeId, yearToFilter }) => {
   const [disciplinaryRecord, setDisciplinaryRecord] = useState({
     warnings: [],
     cases: [],
@@ -18,7 +18,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "https://hrmbackend.teqova.biz/api/discplinary";
+        const url = "http://hrmdemo.teqova.biz/api/discplinary";
 
         const data = { employeeId: employeeId };
 
@@ -122,7 +122,7 @@ const DisciplinarySummaryCard = ({ employeeId }) => {
                 <div className="flex items-center justify-center p-4">
                   <CheckCircle className="w-6 h-6 mr-2 text-green-500" />
                   <p className="text-lg font-semibold text-green-500">
-                    No Active Disciplinary Records
+                    No Active Disciplinary Records in {yearToFilter}
                   </p>
                 </div>
               )}

@@ -7,7 +7,7 @@ export function cn(...inputs) {
 
 export const getEmployeeNameByNumber = async (employeeNumber) => {
   try {
-    const response = await fetch(`https://hrmbackend.teqova.biz/api/employees/${employeeNumber}`, {
+    const response = await fetch(`http://hrmdemo.teqova.biz/api/employees/${employeeNumber}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -59,6 +59,29 @@ export const formatDate = (timestamp) => {
   return extractedDate;
 };
 
+
+export function getFullMonthName(monthAbbr) {
+  const monthMap = {
+      'Jan': 'January',
+      'Feb': 'February',
+      'Mar': 'March',
+      'Apr': 'April',
+      'May': 'May',
+      'Jun': 'June',
+      'Jul': 'July',
+      'Aug': 'August',
+      'Sep': 'September',
+      'Oct': 'October',
+      'Nov': 'November',
+      'Dec': 'December'
+  };
+  
+  // Convert first letter to uppercase and rest to lowercase to handle different cases
+  const formattedAbbr = monthAbbr.charAt(0).toUpperCase() + monthAbbr.slice(1).toLowerCase();
+  
+  return monthMap[formattedAbbr] || 'Invalid month abbreviation';
+}
+
 export const formatMonth = (dateStr) => {
   console.log(dateStr)
   const date = new Date(dateStr);
@@ -83,7 +106,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `https://hrmbackend.teqova.biz/api/approve/${id}`,
+      `http://hrmdemo.teqova.biz/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {

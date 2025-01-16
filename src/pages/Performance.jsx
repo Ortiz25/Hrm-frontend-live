@@ -42,8 +42,8 @@ import EmployeeSearch from "../components/ui/employeeSearch.jsx";
 const initialEmployeeData = [
   {
     id: 1,
-    name: "Alice Smith",
-    position: "Senior Developer",
+    name: "Jane Muthoni",
+    position: "HR Manager",
     targets: { performance: 90, goals: 95, productivity: 85 },
     evaluations: [
       { date: "2024-01", performance: 88, goals: 92, productivity: 86 },
@@ -52,8 +52,8 @@ const initialEmployeeData = [
   },
   {
     id: 2,
-    name: "Bob Johnson",
-    position: "Data Analyst",
+    name: "John Ochieng",
+    position: "Accountant",
     targets: { performance: 85, goals: 80, productivity: 85 },
     evaluations: [
       { date: "2024-01", performance: 82, goals: 78, productivity: 84 },
@@ -62,7 +62,7 @@ const initialEmployeeData = [
   },
   {
     id: 3,
-    name: "Carol Davis",
+    name: "Alice Wanjiru",
     position: "Marketing Manager",
     targets: { performance: 88, goals: 92, productivity: 90 },
     evaluations: [
@@ -72,8 +72,8 @@ const initialEmployeeData = [
   },
   {
     id: 4,
-    name: "David Wilson",
-    position: "HR Specialist",
+    name: "David Njoroge",
+    position: "Software Developer",
     targets: { performance: 85, goals: 88, productivity: 87 },
     evaluations: [
       { date: "2024-01", performance: 84, goals: 86, productivity: 85 },
@@ -82,8 +82,8 @@ const initialEmployeeData = [
   },
   {
     id: 5,
-    name: "Eva Brown",
-    position: "Project Manager",
+    name: "Catherine Akinyi",
+    position: "Financial Analyst",
     targets: { performance: 92, goals: 95, productivity: 93 },
     evaluations: [
       { date: "2024-01", performance: 90, goals: 93, productivity: 91 },
@@ -92,8 +92,8 @@ const initialEmployeeData = [
   },
   {
     id: 6,
-    name: "Frank Miller",
-    position: "Customer Service Representative",
+    name: "Grace Otieno",
+    position: "Customer Support",
     targets: { performance: 82, goals: 85, productivity: 80 },
     evaluations: [
       { date: "2024-01", performance: 80, goals: 83, productivity: 79 },
@@ -102,8 +102,8 @@ const initialEmployeeData = [
   },
   {
     id: 7,
-    name: "Grace Taylor",
-    position: "Software Engineer",
+    name: "Esther Chebet",
+    position: "Recruitment Specialist",
     targets: { performance: 90, goals: 88, productivity: 92 },
     evaluations: [
       { date: "2024-01", performance: 89, goals: 87, productivity: 90 },

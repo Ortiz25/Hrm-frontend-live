@@ -14,9 +14,9 @@ import { redirect } from "react-router-dom";
 const localizer = momentLocalizer(moment);
 
 // Function to fetch Kenya holidays
-const getKenyaHolidays = () => {
+const getKenyaHolidays = (year) => {
   const hd = new Holidays("KE");
-  return hd.getHolidays(2024).map((holiday) => ({
+  return hd.getHolidays(year).map((holiday) => ({
     title: holiday.name,
     start: new Date(holiday.start),
     end: new Date(holiday.end || holiday.start),
@@ -40,7 +40,7 @@ const HolidayCalendar = () => {
   useEffect(() => {
     changeModule("Holidays Calender");
   }, []);
-
+   
   // Fetch holidays from API and combine with Kenya holidays
   useEffect(() => {
     const fetchHolidays = async () => {
@@ -48,6 +48,7 @@ const HolidayCalendar = () => {
         const response = await fetch("https://api.example.com/holidays");
         const apiHolidays = await response.json();
         const kenyaHolidays = getKenyaHolidays();
+        console.log("Holidays",kenyaHolidays)
         setHolidays([...apiHolidays, ...kenyaHolidays]);
       } catch (error) {
         console.error("Error fetching holidays:", error);
@@ -124,7 +125,7 @@ const HolidayCalendar = () => {
             className="border shadow-2xl rounded"
           />
 
-          {role !== "employee" && (
+          {role === "super_admin" && (
             <div className="mt-10 mb-5 p-4 border rounded shadow-lg w-2/4">
               <h2 className="text-2xl font-bold mb-4 text-center">
                 Add Holiday
@@ -201,8 +202,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
-  // const url2 = "https://hrmbackend.teqova.biz/attendance";
+  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
+  // const url2 = "http://hrmdemo.teqova.biz/attendance";
   const data = { token: token };
 
   const response = await fetch(url, {

@@ -171,7 +171,7 @@ export async function action({ request, params }) {
   const data = { token: token, newPassword: newPassword };
   try {
     const response = await fetch(
-      "https://hrmbackend.teqova.biz/api/resetpassword",
+      "http://hrmdemo.teqova.biz/api/resetpassword",
       {
         method: "POST",
         headers: {

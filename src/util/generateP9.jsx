@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 export const generateP9PDF = (payrollData) => {
+  console.log(payrollData)
    // Map payroll data to monthlyData schema
    const monthlyData = Array(12).fill(null).map((_, index) => {
     const monthData = payrollData.find(
@@ -40,7 +41,7 @@ export const generateP9PDF = (payrollData) => {
     employerName: 'Teqova Business Solutions',
     employerPin: 'P051397932M',
     employeeName: payrollData[0].employee_name,
-    employeePin: payrollData[0].employee_number,
+    employeePin: payrollData[0].kra_pin,
     year: '2024',
     monthlyData
 };

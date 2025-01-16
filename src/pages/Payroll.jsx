@@ -62,7 +62,7 @@ const PayrollModule = () => {
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
-    console.log(payrollHistory)
+    
   const filteredPayrollData = payrollData.filter((entry) => {
     const matchesSearch =
       entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -114,7 +114,7 @@ const PayrollModule = () => {
 
   async function fetchData() {
     try {
-      const url = "https://hrmbackend.teqova.biz/api/payroll";
+      const url = "http://hrmdemo.teqova.biz/api/payroll";
       const response = await fetch(url);
       const data = await response.json();
       setPayrollData(data);
@@ -126,7 +126,7 @@ const PayrollModule = () => {
   const handleUpdate = async (e) => {
     try {
       setIsUpdatingPayroll(true);
-      const url = "https://hrmbackend.teqova.biz/api/updatepayroll";
+      const url = "http://hrmdemo.teqova.biz/api/updatepayroll";
       const data = currentEntry;
       const response = await fetch(url, {
         method: "PUT",
@@ -162,7 +162,7 @@ const PayrollModule = () => {
       setIsProcessingPayroll(true)
       // Process mass payment logic here
       try {
-        const response = await fetch('https://hrmbackend.teqova.biz/api/processbulkpayroll');
+        const response = await fetch('http://hrmdemo.teqova.biz/api/processbulkpayroll');
         const data = await response.json();
         if(data.message.includes("already processed") ){
           setMessage(data.message);
@@ -787,8 +787,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
-  const url2 = "https://hrmbackend.teqova.biz/api/payroll";
+  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
+  const url2 = "http://hrmdemo.teqova.biz/api/payroll";
   const data = { token: token };
 
   const response = await fetch(url, {

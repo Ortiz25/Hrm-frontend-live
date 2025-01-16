@@ -14,15 +14,15 @@ import {
 } from "../components/ui/tabs";
 import { Calendar } from "lucide-react";
 
-const LeaveStatusCard = ({ employeeId }) => {
+const LeaveStatusCard = ({ employeeId, yearToFilter }) => {
   const [currentLeaves, setCurrentLeaves] = useState([]);
   const [pastLeaves, setPastLeaves] = useState([]);
   const today = new Date();
-
+   console.log(employeeId, yearToFilter)
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "https://hrmbackend.teqova.biz/api/leaverequests";
+        const url = "http://hrmdemo.teqova.biz/api/leaverequests";
         const data = { employeeId: employeeId };
 
         const response = await fetch(url, {
@@ -41,9 +41,13 @@ const LeaveStatusCard = ({ employeeId }) => {
 
         const leaveRequests = result.requests;
         const pastApprovedLeaves = leaveRequests.filter((request) => {
-          return (
-            request.status === "approved" && new Date(request.end_date) < today
-          );
+          const endDate = new Date(request.end_date);
+         const year = endDate.getFullYear();
+         return (
+          request.status === "approved" &&
+          endDate < today &&
+          year === +yearToFilter
+        );
         });
 
         const currentOrUpcomingLeaves = leaveRequests.filter((request) => {
@@ -63,7 +67,7 @@ const LeaveStatusCard = ({ employeeId }) => {
     }
 
     fetchData();
-  }, [employeeId]);
+  }, [employeeId, yearToFilter]);
 
   const LeaveItem = ({ leave }) => (
     <div className="flex items-center justify-between p-2 border-b last:border-b-0">

@@ -56,7 +56,7 @@ const EmployeeDashboard = () => {
   const year = new Date().getFullYear();
   const years = Array.from({ length: 2 }, (_, i) => year - i);
   const seevedData = data.filter(item => item.year === +yearToFilter)
-  
+       console.log(seevedData)
   const getCurrentMonth = () => new Date().toISOString().slice(0, 7);
   console.log(data)
   useEffect(() => {
@@ -218,12 +218,12 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
 
-            <LeaveStatusCard employeeId={seevedData[0]?.employee_id} />
-            <DisciplinarySummaryCard employeeId={seevedData[0]?.employee_id} />
+            <LeaveStatusCard employeeId={seevedData[0]?.employee_id}  yearToFilter={yearToFilter}/>
+            <DisciplinarySummaryCard employeeId={seevedData[0]?.employee_id} yearToFilter={yearToFilter} />
 
             <Card>
               <CardHeader>
-                <CardTitle>Payroll Information</CardTitle>
+                <CardTitle>Payroll History</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -344,8 +344,8 @@ export async function loader() {
     return redirect("/");
   }
 
-  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
-  const url2 = "https://hrmbackend.teqova.biz/api/employeedash";
+  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
+  const url2 = "http://hrmdemo.teqova.biz/api/employeedash";
   const data = { token: token };
 
   const response = await fetch(url, {
