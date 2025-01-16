@@ -112,7 +112,7 @@ const StaffManagementModule = () => {
   };
   async function getRequistions() {
     try {
-      const url2 = "http://hrmdemo.teqova.biz/api/staffreq";
+      const url2 = "https://hrmbackend.teqova.biz/api/staffreq";
 
       const response2 = await fetch(url2);
 
@@ -126,7 +126,7 @@ const StaffManagementModule = () => {
 
   async function handleRequest(status, id) {
     try {
-      const url = "http://hrmdemo.teqova.biz/api/handlerequest";
+      const url = "https://hrmbackend.teqova.biz/api/handlerequest";
 
       const data = { status: status, id: id };
 
@@ -464,8 +464,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
-  const url2 = "http://hrmdemo.teqova.biz/api/staffreq";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "https://hrmbackend.teqova.biz/api/staffreq";
 
   const data = { token: token };
 

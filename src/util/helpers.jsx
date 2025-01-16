@@ -7,7 +7,7 @@ export function cn(...inputs) {
 
 export const getEmployeeNameByNumber = async (employeeNumber) => {
   try {
-    const response = await fetch(`http://hrmdemo.teqova.biz/api/employees/${employeeNumber}`, {
+    const response = await fetch(`https://hrmbackend.teqova.biz/api/employees/${employeeNumber}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const handleLeaveRequest = async (
     console.log(id, status);
 
     const response = await fetch(
-      `http://hrmdemo.teqova.biz/api/approve/${id}`,
+      `https://hrmbackend.teqova.biz/api/approve/${id}`,
       {
         method: "PUT", // Using PUT to update the approval status
         headers: {

@@ -340,8 +340,8 @@ export async function loader() {
     if (!token) {
       return redirect("/");
     }
-    const url = "http://hrmdemo.teqova.biz/api/verifyToken";
-    // const url2 = "http://hrmdemo.teqova.biz/api/getemployees";
+    const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+    // const url2 = "https://hrmbackend.teqova.biz/api/getemployees";
   
     const data = { token: token };
   

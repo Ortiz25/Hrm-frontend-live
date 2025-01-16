@@ -60,7 +60,7 @@ const ProfilePage = () => {
       const data = { token: token };
 
       try {
-        const url = "http://hrmdemo.teqova.biz/api/profile";
+        const url = "https://hrmbackend.teqova.biz/api/profile";
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -216,7 +216,7 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
   const data = { token: token };
 
   const response = await fetch(url, {
@@ -248,7 +248,7 @@ export async function action({ request, params }) {
     token: token,
   };
 
-  const url = "http://hrmdemo.teqova.biz/api/updateprofile";
+  const url = "https://hrmbackend.teqova.biz/api/updateprofile";
   const response = await fetch(url, {
     method: "POST",
     headers: {

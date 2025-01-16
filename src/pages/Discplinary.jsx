@@ -48,7 +48,7 @@ const DisciplinaryModule = () => {
   const fetchEmployeeData = async (searchTerm) => {
     try {
       const response = await fetch(
-        `http://hrmdemo.teqova.biz/api/employees?search=${searchTerm}`
+        `https://hrmbackend.teqova.biz/api/employees?search=${searchTerm}`
       );
       const data = await response.json();
 
@@ -84,7 +84,7 @@ const DisciplinaryModule = () => {
     console.log(id, newStatus);
 
     try {
-      const url = "http://hrmdemo.teqova.biz/api/updatecase";
+      const url = "https://hrmbackend.teqova.biz/api/updatecase";
       const data = { status: newStatus, id: id };
       const response = await fetch(url, {
         method: "POST",
@@ -352,7 +352,7 @@ export async function action({ request, params }) {
   };
   console.log(caseData);
 
-  let url = "http://hrmdemo.teqova.biz/api/recordcase";
+  let url = "https://hrmbackend.teqova.biz/api/recordcase";
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -374,8 +374,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
-  const url2 = "http://hrmdemo.teqova.biz/api/discplinary";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "https://hrmbackend.teqova.biz/api/discplinary";
 
   const data = { token: token };
 

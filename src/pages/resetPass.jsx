@@ -18,7 +18,7 @@ const RestPass = () => {
 
     try {
       const response = await fetch(
-        "http://hrmdemo.teqova.biz/api/forgotpassword",
+        "https://hrmbackend.teqova.biz/api/forgotpassword",
         {
           method: "POST",
           headers: {

@@ -45,7 +45,7 @@ const WarningModule = ({ warningsData, actionData }) => {
       const fileName = attachments[0].split("/").pop();
 
       // Construct the download URL
-      const url = `http://hrmdemo.teqova.biz/api/download/${fileName}`;
+      const url = `https://hrmbackend.teqova.biz/api/download/${fileName}`;
 
       // Fetch the file
       const response = await fetch(url);
@@ -82,7 +82,7 @@ const WarningModule = ({ warningsData, actionData }) => {
       try {
         console.log(warningId);
         const data = { id: warningId };
-        const url = "http://hrmdemo.teqova.biz/api/deletewarning";
+        const url = "https://hrmbackend.teqova.biz/api/deletewarning";
         const response = await fetch(url, {
           method: "DELETE",
           headers: {
@@ -93,7 +93,7 @@ const WarningModule = ({ warningsData, actionData }) => {
 
         const result = await response.json();
         if (result.message === "warning deleted") {
-          const url2 = "http://hrmdemo.teqova.biz/api/warnings";
+          const url2 = "https://hrmbackend.teqova.biz/api/warnings";
 
           const response2 = await fetch(url2);
 

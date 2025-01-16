@@ -29,7 +29,7 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "http://hrmdemo.teqova.biz/api/profile";
+        const url = "https://hrmbackend.teqova.biz/api/profile";
         const token = localStorage.getItem("token");
         const data = { token: token };
 

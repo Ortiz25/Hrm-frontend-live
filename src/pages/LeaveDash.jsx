@@ -162,8 +162,8 @@ export async function loader() {
     return redirect("/");
   }
 
-  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
-  const url2 = "http://hrmdemo.teqova.biz/api/leave";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "https://hrmbackend.teqova.biz/api/leave";
   const data = { token: token };
 
   const response = await fetch(url, {

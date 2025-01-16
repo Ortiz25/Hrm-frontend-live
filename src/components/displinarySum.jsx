@@ -18,7 +18,7 @@ const DisciplinarySummaryCard = ({ employeeId, yearToFilter }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = "http://hrmdemo.teqova.biz/api/discplinary";
+        const url = "https://hrmbackend.teqova.biz/api/discplinary";
 
         const data = { employeeId: employeeId };
 

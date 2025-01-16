@@ -44,7 +44,7 @@ export async function action({ request, params }) {
   try {
     const data = await request.formData();
     console.log(data)
-    let url = "http://hrmdemo.teqova.biz/warningsupload";
+    let url = "https://hrmbackend.teqova.biz/warningsupload";
     const response = await fetch(url, {
       method: "PUT",
       body: data,
@@ -70,8 +70,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
-  const url2 = "http://hrmdemo.teqova.biz/api/warnings";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "https://hrmbackend.teqova.biz/api/warnings";
 
   const data = { token: token };
 

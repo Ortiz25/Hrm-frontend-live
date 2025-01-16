@@ -124,7 +124,7 @@ const AdminSettingsModule = () => {
   }
 
   const fetchData = async () => {
-    const url2 = "http://hrmdemo.teqova.biz/api/adminsettings";
+    const url2 = "https://hrmbackend.teqova.biz/api/adminsettings";
     const response2 = await fetch(url2);
 
     const userData = await response2.json();
@@ -173,7 +173,7 @@ const AdminSettingsModule = () => {
     console.log(editNewUserData);
     try {
       updateDelete(!isDeleting);
-      const url = "http://hrmdemo.teqova.biz/api/adduser";
+      const url = "https://hrmbackend.teqova.biz/api/adduser";
       const data = {
         employeeId: editNewUserData.employeeId,
         password: generatedPass,
@@ -218,7 +218,7 @@ const AdminSettingsModule = () => {
   const handleDeleteUser = async (user) => {
     try {
       updateDelete(!isDeleting);
-      const url = "http://hrmdemo.teqova.biz/api/deleteuser";
+      const url = "https://hrmbackend.teqova.biz/api/deleteuser";
       const data = { userId: user.id };
       const response = await fetch(url, {
         method: "DELETE",
@@ -909,7 +909,7 @@ export async function action({ request, params }) {
   if (adminData.password && adminData.password !== adminData.cpassword) {
     return { message: "password Mismatch" };
   }
-  let url = "http://hrmdemo.teqova.biz/api/updateuser";
+  let url = "https://hrmbackend.teqova.biz/api/updateuser";
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -927,8 +927,8 @@ export async function loader() {
   if (!token) {
     return redirect("/");
   }
-  const url = "http://hrmdemo.teqova.biz/api/verifyToken";
-  const url2 = "http://hrmdemo.teqova.biz/api/adminsettings";
+  const url = "https://hrmbackend.teqova.biz/api/verifyToken";
+  const url2 = "https://hrmbackend.teqova.biz/api/adminsettings";
   const data = { token: token };
 
   const response = await fetch(url, {
