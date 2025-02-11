@@ -20,10 +20,12 @@ import {
   useNavigation,
 } from "react-router-dom";
 import { formatDate } from "../util/helpers.jsx";
+import navlogo from "../assets/navlogo.png";
 import { handleLeaveRequest } from "../util/helpers.jsx";
 
 const LeaveManagementModule = () => {
-  const { activeModule, changeModule, changeRole, role, currentYear } = useStore();
+  const { activeModule, changeModule, changeRole, role, currentYear } =
+    useStore();
   const leaves = useLoaderData();
   const navigation = useNavigation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -32,7 +34,7 @@ const LeaveManagementModule = () => {
   const [leaveData, setLeaveData] = useState(leaves.leaveData.leaves);
   const [isUpdated, setIsUpdated] = useState(false);
   const [employeeLeaveData, setEmployeeLeaveData] = useState(
-    leaves.leaveBalance.filter((entry)=> entry.year === +currentYear)
+    leaves.leaveBalance.filter((entry) => entry.year === +currentYear)
   );
 
   const [leaveAdjustment, setLeaveAdjustment] = useState({
@@ -48,7 +50,7 @@ const LeaveManagementModule = () => {
   const slicedBalance = employeeLeaveData.slice(0, 5);
   const isSubmitting = navigation.state === "submitting";
   const isLoading = navigation.state === "loading";
-  
+
   const seevedData = leaveData.filter((entry) => {
     return entry.status === "pending" && entry.year === +currentYear;
   });
@@ -142,28 +144,39 @@ const LeaveManagementModule = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div
+          className="p-4 bg-white shadow-md flex justify-between items-center md:bg-cover md:bg-center"
+          style={{ backgroundImage: `url(${navlogo})` }}
+        >
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white" />
           </Button>
-          <NavLink
-            to="/leavedash"
-            className=" border p-2  rounded shadow-lg hover:bg-slate-200 m-2"
-          >
-            <TextSelect className="inline size-8 mr-2 text-green-500 mb-2" />
-            <span className="font-semibold text-sm  md:text-lg ">Leave Dash</span>
-          </NavLink>
-          <NavLink
-            to="/calender"
-            className=" border p-2  rounded shadow-lg hover:bg-slate-200 m-2"
-          >
-            <Calendar className="inline size-8 mr-2 text-blue-500 mb-2" />
-            <span className="font-semibold text-sm md:text-lg ">Holidays</span>
-          </NavLink>
 
-          <h1 className="text-base md:text-2xl font-bold ml-2">{activeModule}</h1>
+          <h1 className="text-base md:text-2xl font-bold ml-2 text-white ">
+            {activeModule}
+          </h1>
         </div>
         <div className="p-4 space-y-6">
+          <div className="p-2 flex justify-center">
+            <NavLink
+              to="/leavedash"
+              className=" border p-2  rounded shadow-lg hover:bg-slate-100 hover:opacity-75 m-2"
+            >
+              <TextSelect className="inline size-8 mr-2 text-green-500 mb-2" />
+              <span className="font-semibold text-sm  md:text-lg  hover:text-black ">
+                Leave Dash
+              </span>
+            </NavLink>
+            <NavLink
+              to="/calender"
+              className=" border p-2  rounded shadow-lg hover:bg-slate-100 hover:opacity-75 m-2"
+            >
+              <Calendar className="inline size-8 mr-2 text-blue-500 mb-2" />
+              <span className="font-semibold text-sm md:text-lg  hover:text-black">
+                Holidays
+              </span>
+            </NavLink>
+          </div>
           {viewMgt && (
             <Card className="shadow-2xl">
               <CardHeader>
@@ -556,7 +569,6 @@ export async function action({ request, params }) {
     endDate: data.get("endDate"),
     days: data.get("days"),
     coveringEmployeeNumber: data.get("coveringEmployeeNumber"),
-    
   };
 
   if (!leaveData.startDate) {
@@ -624,7 +636,7 @@ export async function loader() {
   if (userData.message === "token expired") {
     return redirect("/");
   }
-  console.log(leaveData)
+  console.log(leaveData);
   return {
     leaveData: leaveData,
     user: userData.user,

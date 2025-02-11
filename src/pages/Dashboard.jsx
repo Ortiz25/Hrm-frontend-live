@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
-
+import navlogo from "../assets/navlogo.png";
 import { Button } from "../components/ui/button.jsx";
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import DashboardContent from "../components/dashboardContent.jsx";
@@ -28,11 +28,11 @@ const HRDashboard = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div className="p-4 bg-white shadow-md flex justify-between items-center bg-cover bg-center" style={{ backgroundImage: `url(${navlogo})` }}>
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white"/>
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-xl font-bold text-white">{activeModule}</h1>
         </div>
 
         <DashboardContent dashData={dashData.dashData} yearToFilter={yearToFilter} updateYear={updateYear}/>

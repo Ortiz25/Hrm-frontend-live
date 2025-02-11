@@ -10,6 +10,7 @@ import { useStore } from "../store/store.jsx";
 import { Menu } from "lucide-react";
 import { Button } from "../components/ui/button.jsx";
 import { redirect } from "react-router-dom";
+import navlogo from "../assets/navlogo.png";
 
 const localizer = momentLocalizer(moment);
 
@@ -100,11 +101,11 @@ const HolidayCalendar = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div className="p-4 bg-white shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }}>
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu  className="text-white"/>
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-xl font-bold text-white">{activeModule}</h1>
         </div>
 
         <div className="flex flex-col items-center p-4 shadow-lg">

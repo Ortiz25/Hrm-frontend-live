@@ -6,6 +6,7 @@ import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import WarningModule from "../components/warning.jsx";
 import { useStore } from "../store/store.jsx";
 import { redirect, useActionData, useLoaderData } from "react-router-dom";
+import navlogo from "../assets/navlogo.png";
 
 const WarningPage = () => {
   const { activeModule, changeModule } = useStore();
@@ -25,11 +26,11 @@ const WarningPage = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div className="p-4 bg-white shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }}>
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white"/>
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-xl font-bold text-white">{activeModule}</h1>
         </div>
 
         <WarningModule warningsData={data.warnings} actionData={actionData} />

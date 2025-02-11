@@ -8,6 +8,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import navlogo from "../assets/navlogo.png";
 import {
   ClipboardList,
   KeyRound,
@@ -117,11 +118,11 @@ const OffboardingModule = () => {
       />
     )}
     <div className="flex-1 overflow-auto">
-      <div className="p-4 bg-white shadow-md flex justify-between items-center">
+      <div className="p-4 bg-white shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }}>
         <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <Menu />
+          <Menu className='text-white'/>
         </Button>
-        <h1 className="text-xl font-bold">{activeModule}</h1>
+        <h1 className="text-xl font-bold text-white">{activeModule}</h1>
       </div>
 
       <Card className="w-full max-w-5xl m-8">

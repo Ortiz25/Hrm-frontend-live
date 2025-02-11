@@ -35,7 +35,7 @@ import { generatePayslipPDF } from "../util/generatePdf.jsx";
 import LeaveStatusCard from "../components/leaveStatus.jsx";
 import DisciplinarySummaryCard from "../components/displinarySum.jsx";
 import { formatDate, formatMonth } from "../util/helpers.jsx";
-
+import navlogo from "../assets/navlogo.png";
 import DownloadP9Modal from "../components/downloadp9.jsx";
 
 const dataP = [
@@ -49,28 +49,27 @@ const dataP = [
 ];
 
 const EmployeeDashboard = () => {
-  const { activeModule, changeModule, changeRole, currentYear} = useStore();
+  const { activeModule, changeModule, changeRole, currentYear } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data, user } = useLoaderData();
-  const[yearToFilter, updateYear] = useState(currentYear)
+  const [yearToFilter, updateYear] = useState(currentYear);
   const year = new Date().getFullYear();
   const years = Array.from({ length: 2 }, (_, i) => year - i);
-  const seevedData = data.filter(item => item.year === +yearToFilter)
-       console.log(seevedData)
+  const seevedData = data.filter((item) => item.year === +yearToFilter);
+  console.log(seevedData);
   const getCurrentMonth = () => new Date().toISOString().slice(0, 7);
-  console.log(data)
+  console.log(data);
   useEffect(() => {
     changeRole(user.user.role);
     changeModule("Employee Dashboard");
   }, [data]);
 
-  const handleGenerateP9 = async()=>{
-    generateP9PDF()
-  }
+  const handleGenerateP9 = async () => {
+    generateP9PDF();
+  };
 
   return (
     <div className="flex h-screen">
-     
       {sidebarOpen && (
         <SidebarLayout
           activeModule={activeModule}
@@ -78,30 +77,37 @@ const EmployeeDashboard = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div
+          className="p-4 bg-white shadow-md flex justify-between items-center"
+          style={{ backgroundImage: `url(${navlogo})` }}
+        >
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white" />
           </Button>
-          <select
-        value={ yearToFilter}
-       onChange={(e) =>{ updateYear(e.target.value)}}
-        className="w-28 px-6 py-2 bg-white border border-gray-300 rounded-lg shadow-sm 
+         
+          <h1 className="text-sm md:text-xl font-bold text-white">
+            {activeModule}
+          </h1>
+        </div>
+
+        <div className="bg-gray-100 min-h-screen p-8">
+        <select
+            value={yearToFilter}
+            onChange={(e) => {
+              updateYear(e.target.value);
+            }}
+            className="w-28 px-6 py-2 bg-white border border-gray-300 rounded-lg shadow-sm 
                    text-gray-700 appearance-none cursor-pointer
                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                   font-medium text-base tracking-wide"
-                   
-      >
-        <option value="">Select Year</option>
-        {years.map(year => (
-          <option key={year} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
-          <h1 className="text-sm md:text-xl font-bold">{activeModule}</h1>
-        </div>
-        
-        <div className="bg-gray-100 min-h-screen p-8">
+                   font-medium text-base tracking-wide mb-4"
+          >
+            <option value="">Select Year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
           <div className="max-w-6xl mx-auto space-y-8">
             <Card>
               <CardHeader>
@@ -110,7 +116,9 @@ const EmployeeDashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-base md:text-xl font-semibold mr-2">Name:</span>
+                    <span className="text-base md:text-xl font-semibold mr-2">
+                      Name:
+                    </span>
                     <span className="italic text-sm md:text-lg">
                       {data[0].employee_name}
                     </span>
@@ -118,7 +126,9 @@ const EmployeeDashboard = () => {
                     <span className="text-base md:text-xl font-semibold mr-2">
                       Position:
                     </span>
-                    <span className="italic text-sm md:text-lg">{data[0].position}</span>
+                    <span className="italic text-sm md:text-lg">
+                      {data[0].position}
+                    </span>
                     <br />
                     <span className="text-base md:text-xl font-semibold mr-2">
                       Employee ID:
@@ -131,7 +141,9 @@ const EmployeeDashboard = () => {
                     <span className="text-base md:text-xl font-semibold mr-2">
                       Department:{" "}
                     </span>
-                    <span className="italic text-sm md:text-lg">{data[0].department}</span>
+                    <span className="italic text-sm md:text-lg">
+                      {data[0].department}
+                    </span>
                     <br />
                     <span className="text-base md:text-xl font-semibold mr-2">
                       Join Date:{" "}
@@ -192,7 +204,9 @@ const EmployeeDashboard = () => {
                     </p>
                   </div>
                   <div className="text-center p-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg overflow-hidden break-words">
-                    <h4 className="font-semibold text-sm whitespace-normal">Compassionate Leave</h4>
+                    <h4 className="font-semibold text-sm whitespace-normal">
+                      Compassionate Leave
+                    </h4>
                     <p className="text-lg md:text-2xl  font-bold">
                       {" "}
                       {seevedData[0]?.compassionate_leave_entitlement || 0} days
@@ -200,7 +214,9 @@ const EmployeeDashboard = () => {
                   </div>
                   {+data[0].paternity_leave_entitlement !== 0 && (
                     <div className="text-center p-4 bg-teal-100 hover:bg-teal-200 rounded-lg overflow-hidden break-words">
-                      <h4 className="font-semibold whitespace-normal">Paternity Leave</h4>
+                      <h4 className="font-semibold whitespace-normal">
+                        Paternity Leave
+                      </h4>
                       <p className="text-lg md:text-2xl  font-bold">
                         {seevedData[0]?.paternity_leave_entitlement || 0} days
                       </p>
@@ -218,8 +234,14 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
 
-            <LeaveStatusCard employeeId={seevedData[0]?.employee_id}  yearToFilter={yearToFilter}/>
-            <DisciplinarySummaryCard employeeId={seevedData[0]?.employee_id} yearToFilter={yearToFilter} />
+            <LeaveStatusCard
+              employeeId={seevedData[0]?.employee_id}
+              yearToFilter={yearToFilter}
+            />
+            <DisciplinarySummaryCard
+              employeeId={seevedData[0]?.employee_id}
+              yearToFilter={yearToFilter}
+            />
 
             <Card>
               <CardHeader>
@@ -249,46 +271,47 @@ const EmployeeDashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.filter(item => item.year === +yearToFilter).map((entry, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="border p-2">
-                            {entry?.month}
-                          </td>
-                          <td className="border p-2">
-                            {(entry?.gross_pay ?? 0).toLocaleString()}
-                          </td>
-                          <td className="border p-2">
-                            {(entry?.paye ?? 0).toLocaleString() || 0}
-                          </td>
-                          <td className="border p-2">
-                            {+entry.paye +
-                              +entry.nssf_tier_i +
-                              +entry.nssf_tier_ii +
-                              +entry.nhif +
-                              +entry.housing_levy +
-                              +entry.other_deductions || 0}
-                          </td>
-                          <td className="border p-2">
-                            {(entry?.housing_levy ?? 0).toLocaleString() || 0}
-                          </td>
-                          <td className="border p-2">
-                            {(entry?.taxable_income ?? 0).toLocaleString() || 0}
-                          </td>
-                          <td className="border p-2">
-                            {(entry?.net_pay ?? 0).toLocaleString() || 0}
-                          </td>
-                          <td className="border p-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => generatePayslipPDF(entry)}
-                            >
-                              <DownloadIcon className="mr-2 h-4 w-4" />
-                              Payslip
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
+                      {data
+                        .filter((item) => item.year === +yearToFilter)
+                        .map((entry, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="border p-2">{entry?.month}</td>
+                            <td className="border p-2">
+                              {(entry?.gross_pay ?? 0).toLocaleString()}
+                            </td>
+                            <td className="border p-2">
+                              {(entry?.paye ?? 0).toLocaleString() || 0}
+                            </td>
+                            <td className="border p-2">
+                              {+entry.paye +
+                                +entry.nssf_tier_i +
+                                +entry.nssf_tier_ii +
+                                +entry.nhif +
+                                +entry.housing_levy +
+                                +entry.other_deductions || 0}
+                            </td>
+                            <td className="border p-2">
+                              {(entry?.housing_levy ?? 0).toLocaleString() || 0}
+                            </td>
+                            <td className="border p-2">
+                              {(entry?.taxable_income ?? 0).toLocaleString() ||
+                                0}
+                            </td>
+                            <td className="border p-2">
+                              {(entry?.net_pay ?? 0).toLocaleString() || 0}
+                            </td>
+                            <td className="border p-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => generatePayslipPDF(entry)}
+                              >
+                                <DownloadIcon className="mr-2 h-4 w-4" />
+                                Payslip
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                   {/* <div className="mt-4 flex justify-end">
@@ -301,33 +324,41 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
             <div className="flex flex-wrap justify-center gap-2 p-2 sm:flex-nowrap sm:space-x-2 md:space-x-4 overflow-x-auto">
-  <Button 
-    onClick={() => setSidebarOpen(!sidebarOpen)}
-    className="w-full sm:w-auto flex items-center justify-center"
-  >
-    <LayoutDashboard className="mr-2 h-4 w-4" />
-    <span className="text-sm md:text-base">View Full Dashboard</span>
-  </Button>
-  
-  <Button className="w-full sm:w-auto flex items-center justify-center">
-    <CalendarDays className="mr-2 h-4 w-4" />
-    <Link to="/leave" className="text-sm md:text-base">Request Leave</Link>
-  </Button>
-  
-  <Button className="w-full sm:w-auto flex items-center justify-center">
-    <DownloadP9Modal data={data} />
-  </Button>
-  
-  <Button className="w-full sm:w-auto flex items-center justify-center">
-    <User className="mr-2 h-4 w-4" />
-    <Link to="/profile" className="text-sm md:text-base">Update Profile</Link>
-  </Button>
-  
-  <Button className="w-full sm:w-auto flex items-center justify-center">
-    <Calendar className="mr-2 h-4 w-4" />
-    <Link to="/calender" className="text-sm md:text-base">Holidays Calendar</Link>
-  </Button>
-</div>
+              <Button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="w-full sm:w-auto flex items-center justify-center"
+              >
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span className="text-sm md:text-base">
+                  View Full Dashboard
+                </span>
+              </Button>
+
+              <Button className="w-full sm:w-auto flex items-center justify-center">
+                <CalendarDays className="mr-2 h-4 w-4" />
+                <Link to="/leave" className="text-sm md:text-base">
+                  Request Leave
+                </Link>
+              </Button>
+
+              <Button className="w-full sm:w-auto flex items-center justify-center">
+                <DownloadP9Modal data={data} />
+              </Button>
+
+              <Button className="w-full sm:w-auto flex items-center justify-center">
+                <User className="mr-2 h-4 w-4" />
+                <Link to="/profile" className="text-sm md:text-base">
+                  Update Profile
+                </Link>
+              </Button>
+
+              <Button className="w-full sm:w-auto flex items-center justify-center">
+                <Calendar className="mr-2 h-4 w-4" />
+                <Link to="/calender" className="text-sm md:text-base">
+                  Holidays Calendar
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -366,7 +397,7 @@ export async function loader() {
   const userData = await response.json();
 
   const dashData = await response2.json();
-   console.log(dashData)
+  console.log(dashData);
   if (userData.message === "token expired") {
     return redirect("/");
   }

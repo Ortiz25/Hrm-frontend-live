@@ -20,6 +20,8 @@ import { Outlet, NavLink, useNavigate, redirect } from "react-router-dom";
 import "./tooltip.css";
 import { useStore } from "../../store/store";
 
+import flowLogo from "../../assets/FlowLogo.png";
+
 const SidebarLayout = ({ activeModule, setActiveModule }) => {
   const user = localStorage.getItem("name");
   const { role, changeRole, changeUser } = useStore();
@@ -151,9 +153,8 @@ const SidebarLayout = ({ activeModule, setActiveModule }) => {
   return (
     <div className="flex">
       <div className="bg-gray-800 text-white w-20 md:w-80 min-h-screen md:h-screen p-2 relative">
-        <div className="flex items-center justify-center md:justify-start mb-10">
-          <Shield className="mr-0 md:mr-2 size-10" />
-          <h1 className="hidden md:block text-2xl font-bold">SecureHR</h1>
+        <div className="flex items-center justify-center  mb-5">
+          <img src={flowLogo} className="h-12 w-12 md:h-24 md:w-24 rounded-full bg-gray-600" />
         </div>
 
         <nav className="relative">

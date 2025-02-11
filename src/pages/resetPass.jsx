@@ -3,6 +3,8 @@ import { Shield, Mail } from "lucide-react";
 import { Form, Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
+import bgImage from "../assets/login-bg.png";
+import flowLogo from "../assets/FlowLogo.png";
 
 const RestPass = () => {
   const [email, setEmail] = useState("");
@@ -45,10 +47,10 @@ const RestPass = () => {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-gray-100 ">
-        <div className="absolute top-10 lg:left-20 flex items-center justify-center  bg-gray-100">
-          <Shield className="mr-2 size-12" />
-          <h1 className="text-4xl font-bold">SecureHR</h1>
-        </div>
+       {/* Logo Section */}
+               <div className="absolute top-10 lg:left-20 flex items-center justify-center bg-gray-100 rounded-full p-2 shadow-lg">
+                 <img src={flowLogo} className="h-24 w-24 rounded-full bg-gray-600" />
+               </div>
 
         <div className="w-full max-w-sm md:max-w-lg ">
           <form
@@ -108,7 +110,7 @@ const RestPass = () => {
               </Alert>
             )}
           </form>
-          <p className="text-center text-gray-500 text-md">
+          <p className="text-center text-black text-md">
             &copy;2025 Teqova. All rights reserved.
           </p>
         </div>

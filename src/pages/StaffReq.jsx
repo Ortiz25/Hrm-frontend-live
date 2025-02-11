@@ -23,13 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import navlogo from "../assets/navlogo.png";
 
 const StaffManagementModule = () => {
   const { activeModule, changeModule, currentYear } = useStore();
-  const[yearToFilter, updateYear] = useState(currentYear)
+  const [yearToFilter, updateYear] = useState(currentYear);
   const staffReq = useLoaderData();
   const [staffData, setStaffData] = useState(staffReq.staffReq);
-  
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [newStaff, setNewStaff] = useState({
@@ -46,7 +47,7 @@ const StaffManagementModule = () => {
   const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);
   const [isDenyDialogOpen, setIsDenyDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
-   const year = new Date().getFullYear();
+  const year = new Date().getFullYear();
   const years = Array.from({ length: 2 }, (_, i) => year - i);
 
   useEffect(() => {
@@ -178,29 +179,37 @@ const StaffManagementModule = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-      <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div
+          className="p-4 bg-white shadow-md flex justify-between items-center"
+          style={{ backgroundImage: `url(${navlogo})` }}
+        >
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white" />
           </Button>
-          <select
-        value={ yearToFilter}
-       onChange={(e) =>{ updateYear(e.target.value)}}
-        className="w-28 px-6 py-2 bg-white border border-gray-300 rounded-lg shadow-sm 
+
+          <h1 className="text-sm md:text-xl font-bold text-white">{activeModule}</h1>
+        </div>
+        <div className="p-4 ">
+            <select
+              value={yearToFilter}
+              onChange={(e) => {
+                updateYear(e.target.value);
+              }}
+              className="w-28 px-6 py-2 bg-white border border-gray-300 rounded-lg shadow-sm 
                    text-gray-700 appearance-none cursor-pointer
                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                    font-medium text-base tracking-wide"
-                   
-      >
-        <option value="">Select Year</option>
-        {years.map(year => (
-          <option key={year} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
-          <h1 className="text-sm md:text-xl font-bold">{activeModule}</h1>
-        </div>
+            >
+              <option value="">Select Year</option>
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
         <div className="p-4 space-y-6 shadow-2xl m-4">
+          
           <div className="bg-white shadow rounded-lg">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-2xl font-semibold">Staff Requisition</h2>
@@ -221,89 +230,107 @@ const StaffManagementModule = () => {
               />
             </div>
             <div className="overflow-x-auto">
-  <table className="w-full border-collapse">
-    <thead>
-      <tr className="bg-gray-100">
-        <th className="border p-2 text-left">Supervisor/Manager</th>
-        <th className="border p-2 text-left">Position</th>
-        <th className="border p-2 text-left">Department</th>
-        <th className="border p-2 text-left">Request Date</th>
-        <th className="border p-2 text-left">Reason</th>
-        <th className="border p-2 text-left">Status</th>
-        <th className="border p-2 text-left">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {searchTerm
-        ? filteredStaffData.filter(entry => entry.year === +yearToFilter).map((staff) => (
-            <tr key={staff.id} className="hover:bg-gray-50">
-              <td className="border p-2">{staff.name}</td>
-              <td className="border p-2">{staff.position}</td>
-              <td className="border p-2">{staff.department}</td>
-              <td className="border p-2">{formatDate(staff.requested_date)}</td>
-              <td className="border p-2">{staff.justification}</td>
-              <td className="border p-2">{staff.status}</td>
-              <td className="px-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {staff.status === "pending" ? (
-                    <>
-                      <Button
-                        onClick={() => handleRequisition(staff, "accept")}
-                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        onClick={() => handleRequisition(staff, "reject")}
-                        className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
-                      >
-                        Deny
-                      </Button>
-                    </>
-                  ) : (
-                    "Closed"
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))
-        : staffData.filter(entry => entry.year === +yearToFilter).map((staff) => (
-            <tr key={staff.id} className="hover:bg-gray-50">
-              <td className="border p-2">{staff.name}</td>
-              <td className="border p-2">{staff.position}</td>
-              <td className="border p-2">{staff.department}</td>
-              <td className="border p-2">{formatDate(staff.requested_date)}</td>
-              <td className="border p-2">{staff.justification}</td>
-              <td className="border p-2">{staff.status}</td>
-              <td className="px-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {staff.status === "pending" ? (
-                    <>
-                      <Button
-                        onClick={() => handleRequisition(staff, "accept")}
-                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        onClick={() => handleRequisition(staff, "reject")}
-                        className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
-                      >
-                        Deny
-                      </Button>
-                    </>
-                  ) : (
-                    "Closed"
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-    </tbody>
-  </table>
-</div>
-
-           
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border p-2 text-left">Supervisor/Manager</th>
+                    <th className="border p-2 text-left">Position</th>
+                    <th className="border p-2 text-left">Department</th>
+                    <th className="border p-2 text-left">Request Date</th>
+                    <th className="border p-2 text-left">Reason</th>
+                    <th className="border p-2 text-left">Status</th>
+                    <th className="border p-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {searchTerm
+                    ? filteredStaffData
+                        .filter((entry) => entry.year === +yearToFilter)
+                        .map((staff) => (
+                          <tr key={staff.id} className="hover:bg-gray-50">
+                            <td className="border p-2">{staff.name}</td>
+                            <td className="border p-2">{staff.position}</td>
+                            <td className="border p-2">{staff.department}</td>
+                            <td className="border p-2">
+                              {formatDate(staff.requested_date)}
+                            </td>
+                            <td className="border p-2">
+                              {staff.justification}
+                            </td>
+                            <td className="border p-2">{staff.status}</td>
+                            <td className="px-2">
+                              <div className="flex flex-col sm:flex-row gap-2">
+                                {staff.status === "pending" ? (
+                                  <>
+                                    <Button
+                                      onClick={() =>
+                                        handleRequisition(staff, "accept")
+                                      }
+                                      className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
+                                    >
+                                      Accept
+                                    </Button>
+                                    <Button
+                                      onClick={() =>
+                                        handleRequisition(staff, "reject")
+                                      }
+                                      className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                                    >
+                                      Deny
+                                    </Button>
+                                  </>
+                                ) : (
+                                  "Closed"
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                    : staffData
+                        .filter((entry) => entry.year === +yearToFilter)
+                        .map((staff) => (
+                          <tr key={staff.id} className="hover:bg-gray-50">
+                            <td className="border p-2">{staff.name}</td>
+                            <td className="border p-2">{staff.position}</td>
+                            <td className="border p-2">{staff.department}</td>
+                            <td className="border p-2">
+                              {formatDate(staff.requested_date)}
+                            </td>
+                            <td className="border p-2">
+                              {staff.justification}
+                            </td>
+                            <td className="border p-2">{staff.status}</td>
+                            <td className="px-2">
+                              <div className="flex flex-col sm:flex-row gap-2">
+                                {staff.status === "pending" ? (
+                                  <>
+                                    <Button
+                                      onClick={() =>
+                                        handleRequisition(staff, "accept")
+                                      }
+                                      className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 text-xs sm:text-sm"
+                                    >
+                                      Accept
+                                    </Button>
+                                    <Button
+                                      onClick={() =>
+                                        handleRequisition(staff, "reject")
+                                      }
+                                      className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                                    >
+                                      Deny
+                                    </Button>
+                                  </>
+                                ) : (
+                                  "Closed"
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Add Dialog */}

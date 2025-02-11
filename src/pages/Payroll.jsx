@@ -29,7 +29,7 @@ import {
   generateAndDownloadExcel,
   generateAndDownloadExcelInfo,
 } from "../util/generateXL";
-
+import navlogo from "../assets/navlogo.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { redirect, useLoaderData } from "react-router-dom";
 import { formatMonth } from "../util/helpers";
@@ -196,15 +196,15 @@ const PayrollModule = () => {
           />
         )}
         <div className="flex-1 overflow-auto">
-          <div className="p-4 bg-white shadow-md flex justify-between items-center">
+          <div className="p-4 bg-white shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }}>
             <Button
               variant="ghost"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2"
             >
-              <Menu />
+              <Menu  className="text-white"/>
             </Button>
-            <h1 className="text-xl font-bold">{activeModule}</h1>
+            <h1 className="text-xl font-bold text-white">{activeModule}</h1>
           </div>
           <div className="p-8 space-y-6">
             <Card className="shadow-xl">

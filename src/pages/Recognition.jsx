@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import SidebarLayout from "../components/layout/sidebarLayout.jsx";
 import { useStore } from "../store/store.jsx";
 import { redirect, useLoaderData } from 'react-router-dom';
+import navlogo from "../assets/navlogo.png";
 
 
 const RecognitionPage = () => {
@@ -201,15 +202,15 @@ const RecognitionPage = () => {
 
             <div className="flex-1 flex flex-col h-full">
                 <header className="flex-shrink-0 bg-white border-b">
-                    <div className="px-4 py-3 flex items-center justify-between">
+                    <div className="px-4 py-3 flex items-center justify-between" style={{ backgroundImage: `url(${navlogo})` }}>
                         <Button 
                             variant="ghost" 
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="hover:bg-gray-100"
                         >
-                            <Menu className="h-5 w-5" />
+                            <Menu className="h-5 w-5 text-white" />
                         </Button>
-                        <h1 className="text-xl font-semibold">{activeModule}</h1>
+                        <h1 className="text-xl font-semibold text-white">{activeModule}</h1>
                     </div>
                 </header>
 

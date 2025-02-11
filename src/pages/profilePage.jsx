@@ -13,6 +13,7 @@ import {
   Menu,
   Loader,
 } from "lucide-react";
+import navlogo from "../assets/navlogo.png";
 import {
   Card,
   CardContent,
@@ -92,15 +93,15 @@ const ProfilePage = () => {
         />
       )}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div className="p-4 bg-white shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }}>
           <Button
             variant="ghost"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2"
+            className="p-2 "
           >
-            <Menu />
+            <Menu className="text-white"/>
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-xl font-bold text-white">{activeModule}</h1>
         </div>
         <div className="flex-1 overflow-auto py-6">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

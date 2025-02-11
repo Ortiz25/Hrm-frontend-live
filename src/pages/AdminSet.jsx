@@ -51,6 +51,7 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
+import navlogo from "../assets/navlogo.png";
 import {
   Dialog,
   DialogContent,
@@ -289,11 +290,11 @@ const AdminSettingsModule = () => {
         />
       )}
       <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900">
-        <div className="p-4 bg-white dark:bg-gray-800 shadow-md flex justify-between items-center">
+        <div className="p-4 bg-white dark:bg-gray-800 shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }}>
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu className="h-6 w-6" />
+            <Menu className="h-6 w-6 text-white" />
           </Button>
-          <h1 className="text-xl font-bold dark:text-white">{activeModule}</h1>
+          <h1 className="text-xl font-bold dark:text-white text-white">{activeModule}</h1>
         </div>
         <div className="p-6">
           <Card>

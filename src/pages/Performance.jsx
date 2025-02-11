@@ -8,6 +8,7 @@ import {
 import { Button } from "../components/ui/button.jsx";
 import { Input } from "../components/ui/input.jsx";
 import { Label } from "../components/ui/label.jsx";
+import navlogo from "../assets/navlogo.png";
 import {
   Tabs,
   TabsList,
@@ -225,11 +226,11 @@ const Perfomance = () => {
         />
       )}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 bg-white shadow-md flex justify-between items-center">
+        <div className="p-4 bg-white shadow-md flex justify-between items-center" style={{ backgroundImage: `url(${navlogo})` }} >
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white" />
           </Button>
-          <h1 className="text-xl font-bold">{activeModule}</h1>
+          <h1 className="text-xl font-bold text-white">{activeModule}</h1>
         </div>
 
         <div className="flex-1 p-8 overflow-y-auto h-screen">
