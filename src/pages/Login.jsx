@@ -39,7 +39,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="relative flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"  >
+      <div className="relative flex items-center justify-center min-h-screen bg-gray-100"  >
         {/* Logo Section */}
         <div className="absolute top-10 lg:left-20 flex items-center justify-center bg-gray-100 rounded-full p-2 shadow-lg">
           <img src={flowLogo} className="h-24 w-24 rounded-full bg-gray-600" />

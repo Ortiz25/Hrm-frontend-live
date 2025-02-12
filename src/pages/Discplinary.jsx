@@ -147,10 +147,10 @@ const DisciplinaryModule = () => {
           style={{ backgroundImage: `url(${navlogo})` }}
         >
           <Button variant="ghost" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu />
+            <Menu className="text-white" />
           </Button>
 
-          <h1 className=" text-base md:text-2xl font-bold">{activeModule}</h1>
+          <h1 className=" text-base md:text-2xl font-bold text-white">{activeModule}</h1>
         </div>
         <div className="p-4 space-y-6">
           <div className="flex justify-center p-2">
